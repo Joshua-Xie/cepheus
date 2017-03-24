@@ -41,3 +41,5 @@ if node['cepheus']['ceph']['tcmalloc']['enable']
     mode 00644
   end
 end
+
+include_recipe 'cepheus::system-schedulers'

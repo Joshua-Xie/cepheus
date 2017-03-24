@@ -16,9 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 include_recipe 'cepheus::ceph-conf'
 
-include_recipe 'ceph-chef::system'
+# Add the scheduler options
+if node['cepheus']['system']['scheduler']['device']['enable']
+    node['cepheus']['system']['scheduler']['device']['devices'].each_with_index do |dev, _index|
+      execute 'scheduler-updates-#{index}' do
+        command "echo #{node['cepheus']['system']['scheduler']['device']['type']} > /sys/block/#{dev}/queue/scheduler"
+        not_if "cat /sys/block/#{dev}/queue/scheduler | grep '\[#{node['cepheus']['system']['scheduler']['device']['type']}\]'"
+      end
+    end
+end
 
 # Substitute the OSD number for 0 below to check to check for 'non-besteffort' scheduler
 # sudo iotop --batch --iter 1 | grep 'ceph-osd -i 0' | grep -v be/4

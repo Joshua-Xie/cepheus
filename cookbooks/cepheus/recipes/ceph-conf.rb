@@ -43,7 +43,9 @@ end
 node.default['ceph']['repo']['create'] = node['cepheus']['ceph']['repo']['create']
 
 # System tunes
-node.default['ceph']['system']['sysctl'] = node['cepheus']['system']['sysctl']
+if node['cepheus']['system']['sysctl']['enable']
+    node.default['ceph']['system']['sysctls'] = node['cepheus']['system']['sysctl']['sysctls']
+end
 
 node.default['ceph']['network']['public']['cidr'] = node['cepheus']['network']['public']['cidr']
 node.default['ceph']['network']['cluster']['cidr'] = node['cepheus']['network']['cluster']['cidr']

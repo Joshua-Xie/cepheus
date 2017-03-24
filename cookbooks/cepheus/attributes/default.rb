@@ -41,3 +41,10 @@ default['cepheus']['ceph']['tcmalloc']['enable'] = true
 
 default['cepheus']['ceph']['radosgw']['debug']['logs']['enable'] = false
 default['cepheus']['ceph']['radosgw']['debug']['logs']['level'] = 20
+
+default['cepheus']['system']['scheduler']['device']['enable'] = false
+default['cepheus']['system']['sysctl']['enable'] = true
+
+# Only valide CFQ Scheduler
+default['cepheus']['ceph']['system']['scheduler']['device']['ceph']['class'] = 'idle'
+default['cepheus']['ceph']['system']['scheduler']['device']['ceph']['priority'] = 7

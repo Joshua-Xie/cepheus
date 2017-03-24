@@ -164,11 +164,39 @@
         }
       },
       "system": {
-        "sysctl": [
-          "kernel.pid_max=4194303",
-          "fs.file-max=26234859",
-          "vm.swappiness=0"
-        ]
+          "scheduler": {
+              "device": {
+                  "enable": true
+                  "NOTE": "Default is 'deadline', cfq, noop",
+                  "type": "cfq",
+                  "ceph": {
+                      "class": "idle",
+                      "priority": 7
+                  },
+                  "NOTE1": "Devices need to match devices in OSD section",
+                  "devices": [
+                      "sdb",
+                      "sdc",
+                      "sdd",
+                      "sde"
+                  ]
+              }
+          },
+        "NOTE": "Removed from sysctl - vm.swappiness=0",
+        "sysctl": {
+            "enable": true,
+            "sysctls": [
+              "kernel.pid_max=4194303",
+              "fs.file-max=26234859",
+              "net.core.rmem_max=67108864",
+              "net.core.wmem_max=67108864",
+              "net.core.rmem_default=33554432",
+              "net.core.wmem_default=33554432",
+              "net.ipv4.tcp_rmem=\"16777216 33554432 67108864\"",
+              "net.ipv4.tcp_wmem=\"16777216 33554432 67108864\"",
+              "net.core.optmem_max=33554432"
+            ]
+        }
       },
       "ipmi": {
         "user": "vbox",
@@ -689,7 +717,11 @@
       "zabbix": {
         "repository": "http://repo.zabbix.com/zabbix/2.4/rhel/7/x86_64/",
         "repository_key": "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX",
-        "server": "10.0.100.6"
+        "server": "10.0.100.6",
+        "ceph": {
+         "blocked_op": 0,
+         "slow_osd": 0
+        }
       }
     },
     "chef_client": {
