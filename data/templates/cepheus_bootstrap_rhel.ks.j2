@@ -207,7 +207,7 @@ chmod +x /tmp/rhelsub.sh
 # Build ISO to be used for Cobbler
 rm -rf /tmp/build/iso/ks
 find /tmp/build/iso -name TRANS.TBL -exec rm -f {} \;
-cp /tmp/postinstall/ceph-host/bootstrap/templates/isolinux.cfg /tmp/build/iso/isolinux/isolinux.cfg
+cp /tmp/postinstall/ceph-host/data/templates/isolinux.cfg /tmp/build/iso/isolinux/isolinux.cfg
 # TODAY=$(date +'%Y-%m-%d')
 rm -rf /tmp/build/iso/.rr_moved
 # mkisofs

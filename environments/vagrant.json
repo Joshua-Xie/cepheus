@@ -166,7 +166,7 @@
       "system": {
           "scheduler": {
               "device": {
-                  "enable": true
+                  "enable": true,
                   "NOTE": "Default is 'deadline', cfq, noop",
                   "type": "cfq",
                   "ceph": {

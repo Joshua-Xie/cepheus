@@ -22,7 +22,7 @@ set -e
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 
 source $REPO_ROOT/bootstrap/vms/base_environment.sh
-source $REPO_ROOT/bootstrap/common/bash_functions.sh
+# source $REPO_ROOT/bootstrap/common/bash_functions.sh
 
 # NOTE: These VirtualBox functions are purpose built for cepheus and not generic vbox functions.
 # However, they can be modified with parameter passing to make more generic.

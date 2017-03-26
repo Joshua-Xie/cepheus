@@ -24,3 +24,13 @@ execute 'symlink-librados' do
   command 'ln -s /usr/lib64/librados.so.2.0.0 /usr/lib64/librados.so'
   ignore_failure true
 end
+
+# Add user to 'ceph' group if it exists. Can only run after Ceph is installed.
+if node['cepheus']['ceph']['version'] != 'hammer'
+    node['cepheus']['cobbler']['kickstart']['users'].each do | user_value |
+        execute "add_user_to_ceph_#{user_value['name']}" do
+          command "usermod -a -G ceph #{user_value['name']}"
+          ignore_failure true
+        end
+    end
+end

@@ -1,8 +1,8 @@
-## Certs
+### Certs
 
 #### Important if using behind firewall or proxy
 
-This directory is where you place any CA certs that your firm may require for proxies. If your firm does not use proxies then there should be nothing except this readme in the directory.
+This directory is where you place any CA certs that your firm may require for proxies. If your firm does not use proxies then there should be nothing except this README.md in the directory.
 
 Once you place the cert(s) in this directory then you *must* update /bootstrap/vms/environment_config.yaml to modify the following:
 

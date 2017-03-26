@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# Copyright 2017, LambdaStack
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+##########
+# NOTE: If you run this script and receive a VBoxManage related error then most likely the VM(s) have been removed or
+# missing from where you store VirtualBox VMs BUT VBoxManage still thinks they are there. Simply pull up the
+# VirtualBox UI application, stop and remove the 'ceph-*' VMs that should be shown and then start this script again.
+##########
+
+# Exit immediately if anything goes wrong, instead of making things worse.
+set -eu
+
+clear
+
+echo "             __     "
+echo "             \ \    "
+echo "              > \   "
+echo "             / ^ \  "
+echo "            /_/ \_\ "
+echo
+echo "Cepheus Vagrant Build"
+echo "--------------------------------------------"
+echo "Bootstrapping local CEPH environment using Vagrant..."
+echo
+
+# Creates the REPO_ROOT env var for everything else to use...
+export REPO_ROOT=$(git rev-parse --show-toplevel)
+
+export CEPH_DEV_MODE=0
+export CHEF_CEPHEUS_DEBUG=0
+
+while getopts cbsvd:p:o:t: opt; do
+    case $opt in
+        b)
+            BUILD_VMS_ONLY=1
+            ;;
+        c)
+            CHEF_KNIFE_DEBUG="-VV"
+            CHEF_CLIENT_DEBUG="-l debug"
+            ;;
+        d)
+            # NB: Use this option if you need to test/debug ceph-chef. It will skip downloading the current
+            # version of ceph-chef so the local version will be used. The best way to do this is to copy over
+            # your modified version of ceph-chef to the cookbook directory in this project before running
+            # this script.
+
+            # BOOTSTRAP_VAGRANT_DEBUG=1
+            # CEPH_DEV_MODE == 1 then install ceph github source along with development tools. You can also install your favorite IDE if you want.
+            # If nothing is passed in with -d option the CEPH_DEV_MODE is empty and debug ceph-chef is used.
+            export CEPH_DEV_MODE=$OPTARG
+            export CHEF_CEPHEUS_DEBUG=1
+
+            # NB: Requires at least 1 argument '0' or '1'
+            # Example: ./CEPH_UP -d 0
+            ;;
+        p)
+            BOOTSTRAP_HTTP_PROXY=$OPTARG
+            BOOTSTRAP_HTTPS_PROXY=$OPTARG
+            ;;
+        s)
+            BOOTSTRAP_SKIP_VMS=1
+            ;;
+        t)
+            BOOTSTRAP_TYPE=$OPTARG
+            ;;
+        # verbose
+        v)
+            set -x
+            ;;
+    esac
+done
+
+# Build bootstrapping environment based on yaml data
+BUILD=data/build.sh
+$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/build.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
+sudo chmod +x $REPO_ROOT/$BUILD
+
+source $REPO_ROOT/$BUILD
+
+cd $REPO_ROOT/bootstrap/vms/vagrant
+
+./CEPH_UP_VAGRANT

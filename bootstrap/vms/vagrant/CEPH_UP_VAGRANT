@@ -24,67 +24,7 @@
 # Exit immediately if anything goes wrong, instead of making things worse.
 set -eu
 
-clear
-
-echo "             __     "
-echo "             \ \    "
-echo "              > \   "
-echo "             / ^ \  "
-echo "            /_/ \_\ "
-echo
-echo "Cepheus Vagrant Build"
-echo "--------------------------------------------"
-echo "Bootstrapping local CEPH environment using Vagrant..."
-echo
-
-export CEPH_DEV_MODE=0
-export CHEF_CEPHEUS_DEBUG=0
-
-while getopts cbsvd:p:o:t: opt; do
-    case $opt in
-        b)
-            BUILD_VMS_ONLY=1
-            ;;
-        c)
-            CHEF_KNIFE_DEBUG="-VV"
-            CHEF_CLIENT_DEBUG="-l debug"
-            ;;
-        d)
-            # NB: Use this option if you need to test/debug ceph-chef. It will skip downloading the current
-            # version of ceph-chef so the local version will be used. The best way to do this is to copy over
-            # your modified version of ceph-chef to the cookbook directory in this project before running
-            # this script.
-
-            # BOOTSTRAP_VAGRANT_DEBUG=1
-            # CEPH_DEV_MODE == 1 then install ceph github source along with development tools. You can also install your favorite IDE if you want.
-            # If nothing is passed in with -d option the CEPH_DEV_MODE is empty and debug ceph-chef is used.
-            export CEPH_DEV_MODE=$OPTARG
-            export CHEF_CEPHEUS_DEBUG=1
-
-            # NB: Requires at least 1 argument '0' or '1'
-            # Example: ./CEPH_UP -d 0
-            ;;
-        o)
-            BOOTSTRAP_OS=$OPTARG
-            ;;
-        p)
-            BOOTSTRAP_HTTP_PROXY=$OPTARG
-            BOOTSTRAP_HTTPS_PROXY=$OPTARG
-            ;;
-        s)
-            BOOTSTRAP_SKIP_VMS=1
-            ;;
-        t)
-            BOOTSTRAP_TYPE=$OPTARG
-            ;;
-        # verbose
-        v)
-            set -x
-            ;;
-    esac
-done
-
-source ../base_environment.sh
+source $REPO_ROOT/bootstrap/vms/base_environment.sh
 
 # Check for an existing environment_config.yaml file in /bootstrap/vms. If one exists then do nothing else copy over SAMPLE_environment_config.yaml
 if [[ ! -f $REPO_ROOT/bootstrap/vms/environment_config.yaml ]]; then
@@ -95,7 +35,7 @@ fi
 # Copy over the Vagrantfile_cepheus to Vagrantfile
 # There are two Vagrantfile* files. One for building the build environment (Vagrant_build_env) and one for
 # building the CEPHEUS cluster (Vagrantfile_cepheus) for testing.
-cp Vagrantfile_cepheus Vagrantfile
+cp $REPO_ROOT/bootstrap/vms/vagrant/Vagrantfile_cepheus $REPO_ROOT/bootstrap/vms/vagrant/Vagrantfile
 
 export CHEF_KNIFE_DEBUG=${CHEF_KNIFE_DEBUG:-""}
 export CHEF_CLIENT_DEBUG=${CHEF_CLIENT_DEBUG:-""}
@@ -121,32 +61,32 @@ export BOOTSTRAP_VAGRANT_DEBUG=${BOOTSTRAP_VAGRANT_DEBUG:-0}
 export DONT_SHOW_BANNER=0
 
 # Perform preflight checks to validate environment sanity as much as possible.
-echo "Performing preflight environment validation..."
+echo "===> Performing preflight environment validation..."
 source $REPO_ROOT/bootstrap/common/bootstrap_validate_env.sh
 
 if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   # Test that Vagrant is really installed and of an appropriate version.
   if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
-    echo "Checking VirtualBox and Vagrant..."
+    echo "===> Checking VirtualBox and Vagrant..."
     source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_test.sh
   fi
 fi
 
 # Configure and test any proxies configured.
 if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
-  echo "Testing configured proxies..."
+  echo "===> Testing configured proxies..."
   source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
 fi
 
 # Do prerequisite work prior to starting build, downloading files and
 # creating local directories.
-echo "Downloading necessary files to local cache..."
+echo "===> Downloading necessary files to local cache..."
 source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
 
 if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   # Create VMs in Vagrant and start them.
   # VM only tests inside vagrant_create script
-  echo "Clean up old VMs and Starting new local Vagrant cluster..."
+  echo "===> Clean up old VMs and Starting new local Vagrant cluster..."
   $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create.sh
 
   # IMPORTANT: Inside vagrant_create.sh in the configure_network function the ADDING of OSD drives
@@ -158,7 +98,7 @@ if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
 
   if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
     # Install and configure Chef on all Vagrant hosts.
-    echo "Installing and configuring Chef on all nodes using the all in one script."
+    echo "===> Installing and configuring Chef on all nodes using the all in one script."
     $REPO_ROOT/bootstrap/vms/vagrant/vagrant_configure_chef_aio.sh
   else
     echo
@@ -168,12 +108,16 @@ if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   fi
 
   # Added here to refresh the environment vars only
-  source vagrant_base.sh
+  source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_base.sh
 
+  echo "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
+  echo "  cd $REPO_ROOT/bootstrap/vms/vagrant"
+  echo "All Vagrant commands must originate from that directory."
+  echo
   echo "You can access the vms using the following:"
   for vm in ${CEPH_CHEF_HOSTS[@]}; do
     echo "  vagrant ssh $vm"
   done
 fi
 
-echo "Finished in $SECONDS seconds"
+echo "Finished Ceph Vagrant build with Cepheus in $SECONDS seconds"

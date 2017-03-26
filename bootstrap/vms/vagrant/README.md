@@ -1,10 +1,13 @@
-# Important
+## Important
+
+Do not call CEPH_UP_VAGRANT directly. It's used by CEPH_UP in the root of this repo.
 
 ## Start:
-Simply call **./CEPH_UP** in *this* directory to start the build process.
+Simply call **./CEPH_UP** in the root directory of this repo to start the build process.
 
-NOTE: If you're behind a proxy then call ./CEPH_UP with a -p option like so:
-./CEPH_UP -p http://proxy.whatever_my_domain.com:81
+NOTE: If you're behind a proxy then call **./CEPH_UP** with a -p option like so:
+
+>**./CEPH_UP -p http://proxy.whatever_your_domain.com:81**
 
 Make sure to include the trailing port number if different than the default of 80.
 
@@ -33,9 +36,7 @@ This script is what dynamically builds the network devices for the VMs so simply
 
   **vagrant plugin uninstall vagrant-vbguest**
 
- Now rerun **./CEPH_UP** in the following directory:
-
- **[cepheus root-dir]/bootstrap/vms/vagrant**
+ Now rerun **./CEPH_UP** in the root directory of this project.
 
 ## Proxy:
  If you run behind a corporate proxy then you may need to make a few simple modifications to get Vagrant to work correctly. Vagrant uses it's own embedded version of 'curl' found in /opt/vagrant/embedded. There is a CA bundle there called cacert.pem. There are two ways to get it to work correctly.
@@ -46,8 +47,13 @@ This script is what dynamically builds the network devices for the VMs so simply
 
  Proxy and cert values need to be added to the <cepheus root>/bootstrap/vms/environment_config.yaml so that they get added to the VMs so that the remote repos can be accessed.
  The following items in the environment_config.yaml need to be updated:
- http_proxy:
- https_proxy:
- ssl_ca_file_path:
- ssl_intermediate_file_path:
- *Note: The ssl_intermediate_file_path may not be required by your organization and thus can be left empty.
+
+ >http_proxy:
+ >
+ >https_proxy:
+ >
+ >ssl_ca_file_path:
+ >
+ >ssl_intermediate_file_path:
+ >
+ >*Note: The ssl_intermediate_file_path may not be required by your organization and thus can be left empty.

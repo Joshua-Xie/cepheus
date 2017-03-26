@@ -21,7 +21,6 @@ set -e
 # Important
 source vbox_functions.sh
 
-# Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
 delete=($CEPH_CHEF_BOOTSTRAP)
 # All of the VMs for Ceph with the bootstrap node removed.
 ceph_vms=("${CEPH_CHEF_HOSTS[@]/$delete}")

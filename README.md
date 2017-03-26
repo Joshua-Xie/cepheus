@@ -6,11 +6,13 @@ Powerful and flexible automated build/maintenance and management environment for
 
 >Chef and Ansible (orchestration)
 
->CollectD
+>LambaDB
 
->Graphite
+>CollectD (optional)
 
->Zabbix
+>Graphite (optional)
+
+>Zabbix (optional)
 
 >HAProxy (optional)
 
@@ -26,24 +28,23 @@ Powerful and flexible automated build/maintenance and management environment for
 
 >Integrations into Splunk (optional)
 
-## Prerequisites
+The __optional__ items above are set in the JSON file for the Chef environment. For example, the Vagrant development build uses a file called vagrant.json. In your production environment you may name it something like production.json.
+
+## Prerequisites for local build
 1. Vagrant - https://www.vagrantup.com/downloads.html  (for development or just spinning up VM version of cluster - not needed for bare metal cluster)
 2. VirtualBox - https://www.virtualbox.org/wiki/Downloads  
 3. Git
 
 ## Instructions
 1. Fork/clone repo
-2. Navigate to `[whatever path]/cepheus/bootstrap/vms/vagrant` directory
-3. Launch Vagrant version to see how it works and to do development and testing by issuing **./CEPH_UP** command (in /bootstrap/vms/vagrant directory)
+2. Launch Vagrant version to see how it works and to do development and testing by issuing **./CEPH_UP** command in the root of this project.
 
 ## Process (Vagrant)
-Assuming you're in the path mentioned in #2 above.
-
 To start a normal build simply do the following (no proxy):
 
 >./CEPH_UP
 
-NB: If you want to test the upstream `ceph-chef` cookbook then clone that repo, make your changes, copy your cloned repo into the `cookbooks` section of the is cloned repo and then run the following command to start the build and test:
+NB: If you want to test the upstream `ceph-chef` cookbook then clone that repo, make your changes, copy your cloned repo into the `cookbooks` section of this cloned repo and then run the following command to start the build and test:
 
 >./CEPH_UP -d 0   <-- Run in debug mode
 
@@ -53,7 +54,7 @@ NB: Behind firewall:
 
 >OR
 
->./CEPH_UP -d 0 -p [whatever your http(s) proxy url]  <-- Run in debug mode
+>./CEPH_UP -d 0 -p [whatever your http(s) proxy url]  <-- Run in debug mode behind firewall
 
 ### What happens...
 
@@ -171,7 +172,7 @@ The following two GEMS will need to be pulled down and loaded onto the productio
 * chef-sugar-3.4.0
 
 ## TEMPLATES
-The following templates are Jinja2 based templates. The `jinja_render.py` found in `bootstrap/templates` reads the production yaml data files and runs through these files and builds the `production.json`, kickstart, linux grub and operations key files. The `erb` are Chef templates but the `jinja_render` script builds and puts those erb files in the `template/default` area of the cookbook as part of the preprocess.
+The following templates are Jinja2 based templates. The `jinja_render.py` found in `data/templates` reads the production yaml data files and runs through these files and builds the `production.json`, kickstart, linux grub and operations key files. The `erb` are Chef templates but the `jinja_render` script builds and puts those erb files in the `template/default` area of the cookbook as part of the preprocess.
 
 * base_environment.json.j2
 * cepheus_bootstrap_rhel.ks.j2

@@ -25,7 +25,7 @@ ERR=${1:-''}
 
 export BOOTSTRAP_CHEF_ENV=${BOOTSTRAP_CHEF_ENV:-"vagrant"}
 
-source ../base_environment.sh
+source $REPO_ROOT/bootstrap/vms/base_environment.sh
 
 # IMPORTANT - DO NOT MAKE CHANGES unless to add new functionality that does not already exist. This process will
 # soon change to be like the bare metal build process.
@@ -84,7 +84,6 @@ cd $REPO_ROOT/bootstrap/vms/vagrant
 # use Chef Server embedded knife instead of the one in /usr/bin
 KNIFE=/opt/opscode/embedded/bin/knife
 
-# Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
 delete=($CEPH_CHEF_BOOTSTRAP)
 # All of the VMs for Ceph with the bootstrap node removed.
 ceph_vms=("${CEPH_CHEF_HOSTS[@]/$delete}")

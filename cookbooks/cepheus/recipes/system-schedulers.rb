@@ -24,7 +24,6 @@ if node['cepheus']['system']['scheduler']['device']['enable']
     node['cepheus']['system']['scheduler']['device']['devices'].each_with_index do |dev, _index|
       execute 'scheduler-updates-#{index}' do
         command "echo #{node['cepheus']['system']['scheduler']['device']['type']} > /sys/block/#{dev}/queue/scheduler"
-        # not_if "cat /sys/block/#{dev}/queue/scheduler | grep '\[#{node['cepheus']['system']['scheduler']['device']['type']}\]'"
         only_if "test -d /sys/block/#{dev}"
       end
     end

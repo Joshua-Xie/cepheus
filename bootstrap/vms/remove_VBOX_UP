@@ -28,22 +28,14 @@ set -e
 
 clear
 
-echo "  ____ _           __       ____   ____ ____  "
-echo " / ___| |__   ___ / _|     | __ ) / ___/ ___| "
-echo "| |   | '_ \ / _ \ |_ _____|  _ \| |   \___ \ "
-echo "| |___| | | |  __/  _|_____| |_) | |___ ___) |"
-echo " \____|_| |_|\___|_|       |____/ \____|____/ "
 echo
-echo "cepheus VirtualBox Bootstrap"
+echo "Cepheus VirtualBox Bootstrap"
 echo "--------------------------------------------"
 echo "Bootstrapping local VirtualBox environment..."
 echo
 
 while getopts vot opt; do
     case $opt in
-        o)
-            BOOTSTRAP_OS=$OPTARG
-            ;;
         t)
             BOOTSTRAP_TYPE=$OPTARG
             ;;
@@ -61,8 +53,6 @@ source vbox_functions.sh
 export BOOTSTRAP_CHEF_ENV=${BOOTSTRAP_CHEF_ENV:-"vm"}
 # Other types are 'bare_metal, vagrant'
 export BOOTSTRAP_TYPE=${BOOTSTRAP_TYPE:-"vbox"}
-# Set environment var BOOTSTRAP_OS here - default to centos-7
-export BOOTSTRAP_OS=${BOOTSTRAP_OS:-"centos-7"}
 # IMPORTANT: *MUST* match environment with 'chef owner' NOTE: This is also the Chef user
 export CHEF_CEPHEUS_OWNER=${CHEF_CEPHEUS_OWNER:-"vbox"}
 export CHEF_CEPHEUS_GROUP=${CHEF_CEPHEUS_GROUP:-"vbox"}
