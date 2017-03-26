@@ -33,9 +33,9 @@ The __optional__ items above are set in the JSON file for the Chef environment. 
 ## How to use Cepheus to build Ceph
 There are multiple ways to use Cepheus to build Ceph. Most all environments only show you the most basic and easiest way to build out a Ceph cluster which doesn't really help when it comes to your bare-metal environment.
 
->Build using PXE Booting - Most automated
+>Build using Cepheus repo - Simplest
 
->Build using Cepheus repo
+>Build using PXE Booting - Advanced
 
 ## Building - Base Requirements (all methods)
 No matter which way you decide to build out your Ceph cluster you will need to know what servers you're going to use and their basic information which makes up the `Inventory` of your cluster. For example, you need to know the following:
@@ -63,21 +63,11 @@ No matter which way you decide to build out your Ceph cluster you will need to k
 
  >  `cepheus-private` - Cepheus private repo that holds all of your private data. There is a public version that we have that shows you how to do this at https://github.com/cepheus-io/cepheus-private
 
-Most Enterprise environments for storage are not allowed direct access to the outside world. Because of this there needs to be ways to get Ceph and other packages that are used for the Ceph cluster. The most common is an internal GIT server or Github Enterprise server. This works for the private repos of Cepheus but it may not be good for large packages and files. In these cases a common repo (like those stated in #12 and #13 above) or a universal package manager like Artifactory from jfrog.
+Most Enterprise environments for storage are not allowed direct access to the outside world. Because of this there needs to be ways to get Ceph and other packages that are used for the Ceph cluster. The most common is an internal GIT server or Github Enterprise server. This works for the private repos like Cepheus but it may not be good for large packages and files (some versions of Enterprise Github support Large Files). In these cases you can use a common repo (like those stated in #12 and #13 above) or a universal package manager like Artifactory from jfrog.
 
 The choice is yours on how to pull in files but you will need someway. Some enterprises will temporarily allow access to the outside long enough to pull everything in and then close it back. This works for the initial build but getting updates will be a challenge. Just keep this in mind because there are many ways to solve it.
 
-## Building - PXE Booting (Advanced)
-The most automated is the PXE booting method. This process pulls down all dependencies and the OS ISO you want to use.
-It reads in the yaml data files from `/data/private` where all of the host information is held that was collected in the previous step.
-
-Based on the data this process will build a custom ISO of your OS along with kickstart files and packages needed to build out your cluster. Once the ISO is built you simply move it to an area that the initial bootstrap node can find it via it's IPMI interface (some hardware vendors call it iLO or something else). Once in the IPMI interface simply virtually mount the ISO via the menu options and start the host.
-
-The custom ISO will automatically start the process and lay down the OS and everything needed for the bootstrap node. Once the bootstrap node is built then you can SSH into it using the SSH Key you collected in the previous step.
-
-By default there will be a build script in the home directory of the `operations` user from the previous step. Launch it and it will start the process of PXE booting your entire Ceph cluster based on the data in `/data/private`.
-
-After the PXE booting is complete you should be able to ssh into each machine using the `operations` account collected in the previous step. Ceph should be fully setup.
+The `/data/build.yaml` contains a list of GEMs, RPMs or DEBs and tarballs that are required for the build environment. Those items can be compressed to be moved onto the bootserver if not using the PXE Boot method. The PXE Boot method bundles up everything in the custom ISO.
 
 ## Building - Cepheus Repo (Simplest)
 This process is similar to the Vagrant Local Build seen below except that all nodes are actual bare-metal and all of the nodes used by Cepheus has already been built by another process. This is common in Enterprises where a different group is responsible for building out all base nodes according to enterprise specs. In this case the build group will provide the hardware information needed in the `Base Requirements` section above such as NIC MAC addresses, IPs and maybe `operations` like user and ssh keys. It's very important to have SSH Keys for the primary user that will do all Ceph operations (not Ceph user in Jewel and later) but an operations like user account. Ansible needs this to orchestrate commands to all of the nodes.
@@ -96,7 +86,19 @@ sudo chmod +x cepheus_init.sh
 
 Clone the two private repos `cepheus` and `cepheus-private` that you mirrored and created above
 
-## Cepheus Management - Update Process
+## Building - PXE Booting (Advanced)
+The most automated is the PXE booting method. This process pulls down all dependencies and the OS ISO you want to use.
+It reads in the yaml data files from `/data/private` where all of the host information is held that was collected in the previous step.
+
+Based on the data this process will build a custom ISO of your OS along with kickstart files and packages needed to build out your cluster. Once the ISO is built you simply move it to an area that the initial bootstrap node can find it via it's IPMI interface (some hardware vendors call it iLO or something else). Once in the IPMI interface simply virtually mount the ISO via the menu options and start the host.
+
+The custom ISO will automatically start the process and lay down the OS and everything needed for the bootstrap node. Once the bootstrap node is built then you can SSH into it using the SSH Key you collected in the previous step.
+
+By default there will be a build script in the home directory of the `operations` user from the previous step. Launch it and it will start the process of PXE booting your entire Ceph cluster based on the data in `/data/private`.
+
+After the PXE booting is complete you should be able to ssh into each machine using the `operations` account collected in the previous step. Ceph should be fully setup.
+
+## Cepheus - Ceph Management and Update Process
 
 
 ***

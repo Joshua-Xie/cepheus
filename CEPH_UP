@@ -32,30 +32,38 @@ echo "              > \   "
 echo "             / ^ \  "
 echo "            /_/ \_\ "
 echo
-echo "Cepheus Vagrant Build"
-echo "--------------------------------------------"
+echo "            Cepheus Vagrant Build"
+echo "-----------------------------------------------------"
 echo "Bootstrapping local CEPH environment using Vagrant..."
 echo
 
 # Creates the REPO_ROOT env var for everything else to use...
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 
+# Default values...
 export CEPH_DEV_MODE=0
 export CHEF_CEPHEUS_DEBUG=0
 export BOOTSTRAP_GET_PREREQS_ONLY=0
 export BOOTSTRAP_REMOVE_PREREQS=0
+export BUILD_ENVIRONMENT=vagrant
+export BUILD_LOCATION=public
+export BUILD_OS=centos
 
-while getopts cbgrsvd:p:o:t: opt; do
+while getopts cbglrsve:d:p:o:t: opt; do
     case $opt in
         b)
+            # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
+            # to help save some time.
             BUILD_VMS_ONLY=1
             ;;
         c)
+            # (optional) Allows you to see Chef output that only happens when Chef debug flags are set.
+            # VERY verbose. The (-v below) option is meant for `bash` verbose and not Chef. You can combine both.
             CHEF_KNIFE_DEBUG="-VV"
             CHEF_CLIENT_DEBUG="-l debug"
             ;;
         d)
-            # NB: Use this option if you need to test/debug ceph-chef. It will skip downloading the current
+            # (optional) NB: Use this option if you need to test/debug ceph-chef. It will skip downloading the current
             # version of ceph-chef so the local version will be used. The best way to do this is to copy over
             # your modified version of ceph-chef to the cookbook directory in this project before running
             # this script.
@@ -69,28 +77,47 @@ while getopts cbgrsvd:p:o:t: opt; do
             # NB: Requires at least 1 argument '0' or '1'
             # Example: ./CEPH_UP -d 0
             ;;
+        e)
+            # (optional) NB: Use this option if you want to change the default environment from `vagrant` to something
+            # like `production`. Can be used with -l option to change from `public` to `private`
+            export BUILD_ENVIRONMENT=$OPTARG
+
+            # NB: ./CEPH_UP e production
+            ;;
         g)
-            # -g to simply get the prerequisites and exit
+            # (optional) -g to simply get the prerequisites and exit. Use it with (-r below) and it will remove the
+            # prerequisites and download them again.
             export BOOTSTRAP_GET_PREREQS_ONLY=1
             ;;
+        l)
+            # (optional) NB: Use this option if you want to change from the default `public` to `private` for 'location'.
+            export BUILD_LOCATION=private
+            ;;
+        o)
+            # (optional) NB: Use this option if you want to change from the default OS of `centos` to `rhel` or `ubuntu`
+            export BUILD_OS=$OPTARG
+            ;;
         p)
+            # (optional) Only used if your environment requires a proxy to access the outside world.
             BOOTSTRAP_HTTP_PROXY=$OPTARG
             BOOTSTRAP_HTTPS_PROXY=$OPTARG
             ;;
         r)
-            # -r to remove the prerequisites. Cleaning up.
+            # (optional) -r to remove the prerequisites. Cleaning up.
             # It does not exit like -g but is called before gathering prerequisites.
             # Use it with -g -r and it will clean up and gather updated prerequisites and exit based on versions in build.yaml
             export BOOTSTRAP_REMOVE_PREREQS=1
             ;;
         s)
+            # (optional) Used to skip building local Vagrant VMs build and jump right to building out Ceph. Used during
+            # development to help save some time.
             BOOTSTRAP_SKIP_VMS=1
             ;;
         t)
             BOOTSTRAP_TYPE=$OPTARG
             ;;
-        # verbose
         v)
+            # (optional) Verbose of `bash` commands - not Chef output
             set -x
             ;;
     esac
@@ -98,11 +125,14 @@ done
 
 # Build bootstrapping environment based on yaml data
 BUILD=data/build.sh
-$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/build.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
+$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
 sudo chmod +x $REPO_ROOT/$BUILD
 
+# Execute the freshly built `build.sh` script that was just built from the template.
 source $REPO_ROOT/$BUILD
 
-cd $REPO_ROOT/bootstrap/vms/vagrant
-
-./CEPH_UP_VAGRANT
+# Change later to support new repo build system...
+if [[ $BUILD_ENVIRONMENT == "vagrant" ]]; then
+    cd $REPO_ROOT/bootstrap/vms/vagrant
+    ./CEPH_UP_VAGRANT
+fi

@@ -26,17 +26,22 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # Builds the bootstrapping environment based on the templates and data found in this directory.
 
 # NB: Output directories for this process already exists
+# NB: The `build.yaml` will get created by combining all of the required yamls.
+
+cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/build.yaml
+sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_ENVIRONMENT.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/build.yaml
+sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_OS.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/build.yaml
 
 # Build from template
 
 echo "===> Generating bootstrap/vms/base_environment.sh..."
-$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/build.yaml -i $REPO_ROOT/data/templates/bootstrap/vms/base_environment.sh.j2 -o $REPO_ROOT/bootstrap/vms/base_environment.sh
+$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/$BUILD_LOCATION/build.yaml -i $REPO_ROOT/data/templates/bootstrap/vms/base_environment.sh.j2 -o $REPO_ROOT/bootstrap/vms/base_environment.sh
 sudo chmod +x $REPO_ROOT/bootstrap/vms/base_environment.sh
 
 echo "===> Generating bootstrap/common/bootstrap_validate_env.sh..."
-$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/build.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_validate_env.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_validate_env.sh
+$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/$BUILD_LOCATION/build.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_validate_env.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_validate_env.sh
 sudo chmod +x $REPO_ROOT/bootstrap/common/bootstrap_validate_env.sh
 
 echo "===> Generating bootstrap/common/bootstrap_prereqs.sh..."
-$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/build.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_prereqs.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
+$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/$BUILD_LOCATION/build.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_prereqs.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
 sudo chmod +x $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh

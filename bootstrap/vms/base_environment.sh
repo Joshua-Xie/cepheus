@@ -22,18 +22,22 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # NOTE: May remove this file and use only templates later...
 
 export BOOTSTRAP_DOMAIN=${BOOTSTRAP_DOMAIN:-"example.com"}
+
 # Set the env info in the given environment
-# NOTE: BOOTSTRAP_CHEF_ENV *MUST* be set to the correct environment (*.json) file (i.e., vagrant or production)
+# NB: BOOTSTRAP_CHEF_ENV *MUST* be set to the correct environment (*.json) file (i.e., vagrant or production)
 export BOOTSTRAP_CHEF_ENV=${BOOTSTRAP_CHEF_ENV:-}
+
+# Set proxies if there are any
 export BOOTSTRAP_HTTP_PROXY=${BOOTSTRAP_HTTP_PROXY:-}
 export BOOTSTRAP_HTTPS_PROXY=${BOOTSTRAP_HTTPS_PROXY:-}
+
 # Default for rhel/centos - Ubuntu is SATAController
 export VBOX_SATA_CONTROLLER=${VBOX_SATA_CONTROLLER:-"SATA Controller"}
 # IMPORTANT: The name of the cobbler distro that must match node['cepheus']['cobbler']['os']['distro']
 
 export COBBLER_DOWNLOAD_ISO=1
 
-# NB: These are still used in places
+# NB: These are still used in places and only for PXE booting method
 export COBBLER_BOOTSTRAP_ISO=${COBBLER_BOOTSTRAP_ISO:-"centos-7-x86_64-minimal.iso"}
 export COBBLER_REMOTE_URL_ISO=${COBBLER_REMOTE_URL_ISO:-"http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso"}
 export BOOTSTRAP_CACHE_DIR=${BOOTSTRAP_CACHE_DIR:-$HOME/.ceph-cache}

@@ -1,0 +1,11 @@
+---
+# Vagrant 'BASE' data file.
+
+# IMPORTANT: Whatever data is here will be appended to the overall `build.yaml` that will be located `public` or
+# `private` based on the value passed to the intial ./CEPH_UP script
+
+ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
+    name: luminous
+    version: 10.2.6
+    # Domain will be your actual domain in your production cluster
+    domain: example.com

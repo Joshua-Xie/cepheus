@@ -1,0 +1,124 @@
+---
+# Data file for building the bootstrapping of Cepheus.
+# Templates that use this data file:
+#   **See `files` section below**
+
+# NB: This file contains NO OS specific items but instead points to where it's located with the 'envrionment' section
+# below. Portions that are common across all OS and public/private versions will be found here.
+
+# IMPORTANT: Whatever data is here will be appended to the overall `build.yaml` that will be located `public` or
+# `private` based on the value passed to the intial ./CEPH_UP script
+
+# IMPORTANT: No section below can exist in other yaml files be used in the files being appended. For example,
+# 'environment' section can not already exist in other yaml files. The except are OS specific yaml files.
+
+# MUST be set to the environment you wish to build for. By default it is set to `vagrant.yaml` for a local build. This
+# MUST match a yaml data file by the same name. For example: `vagrant.yaml` or `production.yaml`
+# 'location' specifies 'public' or 'private'
+environment: vagrant
+
+# Can only be `public` or `private`.
+location: public
+
+# 'method' can only be `repo` or `pxe`. If `pxe` then the 'cobbler' section of the given OS yaml is used.
+method: repo
+
+# NB: Chef client/server data is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
+
+# Base Chef Cookbook for all of Ceph
+# Change the '-' to '_' of the cookbook name (ceph-chef)
+ceph_chef: # (required file - cookbook - for build)
+    version: 1.1.4
+    # These gems are required for the `ceph-chef`
+    gems: # (required files for build)
+        - name: netaddr
+          version: 1.5.1
+        - name: chef-sugar
+          version: 3.4.0
+
+python: # (required files for build)
+    - name: PyYAML
+      version: 3.12
+
+# Cache directories in the format of base/{cookbook,gem...}
+cache:
+    base: $HOME/.ceph-cache
+    cookbook: cookbooks
+    gem: gems
+    rpm: rpms
+    deb: debs
+    python: python
+    cobbler: cobbler
+    iso: isos
+    loader: loaders
+
+cookbooks: # (required files for build)
+    - name: poise
+      version: 2.7.2
+    - name: chef-client
+      version: 7.2.0
+    - name: windows
+      version: 2.1.1
+    - name: ohai
+      version: 5.0.0
+    - name: cron
+      version: 4.1.0
+    - name: logrotate
+      version: 2.1.0
+    - name: compat_resource
+      version: 12.16.3
+    - name: ntp
+      version: 3.3.1
+    - name: yum
+      version: 5.0.0
+    - name: yum-epel
+      version: 2.1.1
+    - name: apt
+      version: 6.0.1
+    - name: apache2
+      version: 3.2.2
+    - name: chef_handler
+      version: 2.1.0
+    - name: firewall
+      version: 2.5.4
+    - name: chef-sugar
+      version: 3.4.0
+    - name: sudo
+      version: 3.3.1
+    - name: collectd
+      version: 2.2.4
+    - name: collectd_plugins
+      version: 2.1.3
+    - name: poise-service
+      version: 1.4.2
+    - name: yumgroup
+      version: 0.5.0
+
+# These gems come from a different source and have a different url format that the ceph-chef gems
+gems: # (required files for build)
+    - arr-pm-0.0.10
+    - backports-3.6.4
+    - cabin-0.7.1
+    - childprocess-0.5.6
+    - clamp-0.6.5
+    - ffi-1.9.8
+    - fpm-1.3.3
+    - json-1.8.2
+
+# These are required for the build environment to function correctly.
+shell:
+    - curl
+    - rsync
+    - ssh
+    - git
+
+# List of build environment files that *MUST* be built first in order to build system.
+# When building files from templates add them here and it will happen automatically when running ./CEPH_UP
+# Leave off the initial '/'. Scripts will add that if needed.
+# These files should also be in the .gitignore file so that the final version will not be stored.
+# Leave out `build.sh` from this list.
+# Put these in the order you need them to be called in.
+files:
+    - "bootstrap/vms/base_environment.sh"
+    - "bootstrap/common/bootstrap_validate_env.sh"
+    - "bootstrap/common/bootstrap_prereqs.sh"

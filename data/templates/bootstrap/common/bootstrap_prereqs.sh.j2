@@ -21,22 +21,22 @@
 set -eu
 
 # Create directory for download cache.
-CACHE_ISO={{ build.cache.iso }}
-CACHE_RPM={{ build.cache.rpm }}
-CACHE_DEB={{ build.cache.deb }}
-CACHE_PYTHON={{ build.cache.python }}
-CACHE_LOADER={{ build.cache.loader }}
-CACHE_COOKBOOK={{ build.cache.cookbook }}
-CACHE_GEM={{ build.cache.gem }}
+CACHE_ISO={{ cache.iso }}
+CACHE_RPM={{ cache.rpm }}
+CACHE_DEB={{ cache.deb }}
+CACHE_PYTHON={{ cache.python }}
+CACHE_LOADER={{ cache.loader }}
+CACHE_COOKBOOK={{ cache.cookbook }}
+CACHE_GEM={{ cache.gem }}
 
 # If set then it will remove the cache directories
 if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
-    rm -rf {{ build.cache.base }}
+    rm -rf {{ cache.base }}
 fi
 
 # Create the cache directories...
-mkdir -p {{ build.cache.base }}/{{ build.cache.cobbler }}/{$CACHE_ISO,$CACHE_LOADER}
-mkdir -p {{ build.cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
+mkdir -p {{ cache.base }}/{{ cache.cobbler }}/{$CACHE_ISO,$CACHE_LOADER}
+mkdir -p {{ cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
 
 # download_file wraps the usual behavior of curling a remote URL to a local file
 # NOTE: PROXY - Make sure your http_proxy and https_proxy envrionment variables are set correctly if behind a proxy.
@@ -44,13 +44,13 @@ download_file() {
   FILE=$1
   URL=$2
 
-  if [[ ! -f {{ build.cache.base }}/$FILE && ! -f {{ build.cache.base }}/${FILE}_downloaded ]]; then
+  if [[ ! -f {{ cache.base }}/$FILE && ! -f {{ cache.base }}/${FILE}_downloaded ]]; then
     echo $FILE
     echo $URL
 
-    rm -f {{ build.cache.base }}/$FILE
-    curl -L --progress-bar -o {{ build.cache.base }}/$FILE $URL
-    touch {{ build.cache.base }}/${FILE}_downloaded
+    rm -f {{ cache.base }}/$FILE
+    curl -L --progress-bar -o {{ cache.base }}/$FILE $URL
+    touch {{ cache.base }}/${FILE}_downloaded
   fi
 }
 
@@ -59,13 +59,13 @@ ftp_file() {
   FILE=$1
   URL=$2
 
-  if [[ ! -f {{ build.cache.base }}/$FILE && ! -f {{ build.cache.base }}/${FILE}_downloaded ]]; then
+  if [[ ! -f {{ cache.base }}/$FILE && ! -f {{ cache.base }}/${FILE}_downloaded ]]; then
     echo $FILE
     echo $URL
 
-    rm -f {{ build.cache.base }}/$FILE
-    wget $URL -O {{ build.cache.base }}/$FILE
-    touch {{ build.cache.base }}/${FILE}_downloaded
+    rm -f {{ cache.base }}/$FILE
+    wget $URL -O {{ cache.base }}/$FILE
+    touch {{ cache.base }}/${FILE}_downloaded
   fi
 }
 
@@ -74,13 +74,13 @@ git_clone_or_update() {
   local URL=$2
 
   echo "===> Git clone or update..."
-  if [[ ! -f {{ build.cache.base }}/${NAME}_downloaded ]]; then
-    if [[ ! -d {{ build.cache.base }}/$NAME ]]; then
-      git clone $URL {{ build.cache.base }}/$NAME || true
+  if [[ ! -f {{ cache.base }}/${NAME}_downloaded ]]; then
+    if [[ ! -d {{ cache.base }}/$NAME ]]; then
+      git clone $URL {{ cache.base }}/$NAME || true
     else
-      ( cd {{ build.cache.base }}/$NAME && git pull --ff-only $URL )
+      ( cd {{ cache.base }}/$NAME && git pull --ff-only $URL )
     fi
-    touch {{ build.cache.base }}/${NAME}_downloaded
+    touch {{ cache.base }}/${NAME}_downloaded
   fi
 }
 
@@ -88,37 +88,37 @@ git_clone_or_update() {
 echo "===> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
-    # NOTE: the +e is because the hardware build. We can change it later...
+    # NOTE: the +e is because the hardware  We can change it later...
     set +e
-    download_file {{ build.cache.cobbler }}/{{ build.cache.iso }}/{{ build.cobbler.iso.rhel.name }} {{ build.cobbler.iso.rhel.url }}
+    download_file {{ cache.cobbler }}/{{ cache.iso }}/{{ cobbler.iso.name }} {{ cobbler.iso.url }}
     set -e
   fi
 fi
 
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
-  download_file {{ build.cache.cobbler }}/{{ build.cache.loader }}/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
-  download_file {{ build.cache.cobbler }}/{{ build.cache.loader }}/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
-  download_file {{ build.cache.cobbler }}/{{ build.cache.loader }}/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
-  download_file {{ build.cache.cobbler }}/{{ build.cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
+  download_file {{ cache.cobbler }}/{{ cache.loader }}/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
+  download_file {{ cache.cobbler }}/{{ cache.loader }}/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
+  download_file {{ cache.cobbler }}/{{ cache.loader }}/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
+  download_file {{ cache.cobbler }}/{{ cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
 fi
 
 echo "===> Downloading Chef..."
-download_file /{{ build.cache.rpm }}/{{ build.chef.client.rhel.package }} https://packages.chef.io/files/stable/chef/{{ build.chef.client.rhel.version }}/el/7/{{ build.chef.client.rhel.package }}
-download_file /{{ build.cache.rpm }}/{{ build.chef.server.rhel.package }} https://packages.chef.io/files/stable/chef-server/{{ build.chef.server.rhel.version }}/el/7/{{ build.chef.server.rhel.package }}
+download_file /{{ cache.rpm }}/{{ chef.client.package }} https://packages.chef.io/files/stable/chef/{{ chef.client.version }}/el/7/{{ chef.client.package }}
+download_file /{{ cache.rpm }}/{{ chef.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef.server.version }}/el/7/{{ chef.server.package }}
 
 # BIRD is a little different
 echo "===> Downloading Bird..."
-ftp_file /{{ build.cache.rpm }}/{{ build.adc.bgp.bird.rhel }} ftp://bird.network.cz/pub/bird/redhat/{{ build.adc.bgp.bird.rhel }}
+ftp_file /{{ cache.rpm }}/{{ adc.bgp.bird.package }} ftp://bird.network.cz/pub/bird/redhat/{{ adc.bgp.bird.package }}
 
 # Most important cookbook
 # If set then it will not download but remove from cache and use the development version that should be set in the cepheus/cookbooks directory.
 if [[ $CHEF_CEPHEUS_DEBUG -eq 0 ]]; then
   echo "===> Downloading ceph-chef..."
-  download_file {{ build.cache.cookbook }}/ceph-chef-{{ build.ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ build.ceph_chef.version }}/download
+  download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
 else
   # Remove it so it's not used.
   echo "===> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
-  rm -f {{ build.cache.base }}/{{ build.cache.cookbook }}/ceph-chef-*
+  rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
 fi
 
 if [[ $CEPH_DEV_MODE -ne 0 ]]; then
@@ -127,27 +127,27 @@ if [[ $CEPH_DEV_MODE -ne 0 ]]; then
 fi
 
 # Python
-{%- for item in build.python %}
+{%- for item in python %}
 download_file /python/{{ item.name }}-{{ item.verion }}.tar.gz http://pyyaml.org/download/pyyaml/{{ item.name }}-{{ item.version }}.tar.gz
 {%- endfor %}
 
 # Cookbooks
-{%- for item in build.cookbooks %}
-download_file {{ build.cache.cookbook }}/{{ item.name }}-{{ item.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/{{ item.name }}/versions/{{ item.version }}/download
+{%- for item in cookbooks %}
+download_file {{ cache.cookbook }}/{{ item.name }}-{{ item.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/{{ item.name }}/versions/{{ item.version }}/download
 {%- endfor %}
 
 # Gems
 # REQUIRED for ceph-chef cookbook - must be installed before doing 'sudo chef-client' on any node
-{%- for item in build.ceph_chef.gems %}
-download_file {{ build.cache.gem }}/{{ item.name }}-{{ item.version }}.gem https://rubygems.org/downloads/{{ item.name }}-{{ item.version }}.gem
+{%- for item in ceph_chef.gems %}
+download_file {{ cache.gem }}/{{ item.name }}-{{ item.version }}.gem https://rubygems.org/downloads/{{ item.name }}-{{ item.version }}.gem
 {%- endfor %}
 
 # Pull needed gems for fpm
-GEMS=( {{ build.gems|join(' ') }} )
-# mkdir -p {{ build.cache.base }}/gems
+GEMS=( {{ gems|join(' ') }} )
+# mkdir -p {{ cache.base }}/gems
 for GEM in ${GEMS[@]}; do
-  download_file {{ build.cache.gem }}/$GEM.gem https://rubygems.global.ssl.fastly.net/gems/$GEM.gem
+  download_file {{ cache.gem }}/$GEM.gem https://rubygems.global.ssl.fastly.net/gems/$GEM.gem
 done
 
 # Pull knife-acl gem. This is ONLY needed if using data bags where the data bag is created with a recipe!
-download_file {{ build.cache.gem }}/knife-acl-{{ build.chef.knife_acl_version }}.gem https://rubygems.global.ssl.fastly.net/gems/knife-acl-{{ build.chef.knife_acl_version }}.gem
+download_file {{ cache.gem }}/knife-acl-{{ chef.knife_acl_version }}.gem https://rubygems.global.ssl.fastly.net/gems/knife-acl-{{ chef.knife_acl_version }}.gem

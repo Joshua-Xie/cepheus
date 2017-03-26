@@ -88,7 +88,7 @@ git_clone_or_update() {
 echo "===> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
-    # NOTE: the +e is because the hardware build. We can change it later...
+    # NOTE: the +e is because the hardware  We can change it later...
     set +e
     download_file cobbler/isos/centos-7-x86_64-minimal.iso http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
     set -e

@@ -81,27 +81,38 @@ clear
 while getopts bc:d:e:g:p:v opt; do
   case $opt in
     b)
+        # This just builds the 'Build Server' and does not complete the process of building the custom ISO.
         BUILD_VMS_ONLY=1
         ;;
     d)
+        # (required) Data center label. This allows you the flexability to have different data centers which of course
+        # will have different data. This value is used to complete the PATH of where to find the yaml data files.
+        # For example, `nyc1` or `wdc1`. This value is on of the same values found in your `build.yaml` file.
         dc=$OPTARG
         ;;
     e)
+        # (required) Environment that must match the Chef environment file. For example, `vagrant` or `production`.
+        # This value is one of the values found in your `build.yaml` file. The final file will be <whatever>.json
+        # that will be located in the 'environment' directory which is used by Chef to build and manage your cluster.
         env=$OPTARG
         ;;
-    # private_git is optional
     g)
+        # (optional) private_git. If this value is not set then it will be assumed that all data is found in the
+        # public github repo.
         private_git=$OPTARG
         ;;
     c)
+        # (optional) Sample of a credential_file is in `/data/sample_git_credentials_file`. This would only be used
+        # in cases where your GIT credentials for the 'private_git' (-g above) is different than your public github repo.
         credential_file=$OPTARG
         ;;
     p)
+        # (optional) If your environment requires a proxy then it must be set using -p <proxy url>
         BOOTSTRAP_HTTP_PROXY=$OPTARG
         BOOTSTRAP_HTTPS_PROXY=$OPTARG
         ;;
-    # verbose
     v)
+        # (optional) Verbose of `bash` commands and not Chef output
         set -x
         ;;
   esac
