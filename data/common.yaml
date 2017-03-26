@@ -12,11 +12,6 @@
 # IMPORTANT: No section below can exist in other yaml files be used in the files being appended. For example,
 # 'environment' section can not already exist in other yaml files. The except are OS specific yaml files.
 
-# MUST be set to the environment you wish to build for. By default it is set to `vagrant.yaml` for a local build. This
-# MUST match a yaml data file by the same name. For example: `vagrant.yaml` or `production.yaml`
-# 'location' specifies 'public' or 'private'
-environment: vagrant
-
 # Can only be `public` or `private`.
 location: public
 
@@ -122,3 +117,5 @@ files:
     - "bootstrap/vms/base_environment.sh"
     - "bootstrap/common/bootstrap_validate_env.sh"
     - "bootstrap/common/bootstrap_prereqs.sh"
+
+# Other yaml files are appended here during the build process to make a new `build.yaml` file.

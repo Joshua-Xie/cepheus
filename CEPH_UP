@@ -47,9 +47,10 @@ export BOOTSTRAP_GET_PREREQS_ONLY=0
 export BOOTSTRAP_REMOVE_PREREQS=0
 export BUILD_ENVIRONMENT=vagrant
 export BUILD_LOCATION=public
+export BUILD_DATA_CENTER=local
 export BUILD_OS=centos
 
-while getopts cbglrsve:d:p:o:t: opt; do
+while getopts cbglrsvn:e:d:p:o:t: opt; do
     case $opt in
         b)
             # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
@@ -63,6 +64,29 @@ while getopts cbglrsve:d:p:o:t: opt; do
             CHEF_CLIENT_DEBUG="-l debug"
             ;;
         d)
+            # (optional) NB: Use this option if you want to change the default 'data center' from `local` to something
+            # like `data_center_nyc`. It MUST represent a sub-folder in `private` or `public`!
+            export BUILD_DATA_CENTER=$OPTARG
+
+            # NB: ./CEPH_UP -d data_center_nyc
+            ;;
+        e)
+            # (optional) NB: Use this option if you want to change the default environment from `vagrant` to something
+            # like `production`. Can be used with -l option to change from `public` to `private`
+            export BUILD_ENVIRONMENT=$OPTARG
+
+            # NB: ./CEPH_UP -e production
+            ;;
+        g)
+            # (optional) -g to simply get the prerequisites and exit. Use it with (-r below) and it will remove the
+            # prerequisites and download them again.
+            export BOOTSTRAP_GET_PREREQS_ONLY=1
+            ;;
+        l)
+            # (optional) NB: Use this option if you want to change from the default `public` to `private` for 'location'.
+            export BUILD_LOCATION=private
+            ;;
+        n)
             # (optional) NB: Use this option if you need to test/debug ceph-chef. It will skip downloading the current
             # version of ceph-chef so the local version will be used. The best way to do this is to copy over
             # your modified version of ceph-chef to the cookbook directory in this project before running
@@ -75,23 +99,7 @@ while getopts cbglrsve:d:p:o:t: opt; do
             export CHEF_CEPHEUS_DEBUG=1
 
             # NB: Requires at least 1 argument '0' or '1'
-            # Example: ./CEPH_UP -d 0
-            ;;
-        e)
-            # (optional) NB: Use this option if you want to change the default environment from `vagrant` to something
-            # like `production`. Can be used with -l option to change from `public` to `private`
-            export BUILD_ENVIRONMENT=$OPTARG
-
-            # NB: ./CEPH_UP e production
-            ;;
-        g)
-            # (optional) -g to simply get the prerequisites and exit. Use it with (-r below) and it will remove the
-            # prerequisites and download them again.
-            export BOOTSTRAP_GET_PREREQS_ONLY=1
-            ;;
-        l)
-            # (optional) NB: Use this option if you want to change from the default `public` to `private` for 'location'.
-            export BUILD_LOCATION=private
+            # Example: ./CEPH_UP -n 0
             ;;
         o)
             # (optional) NB: Use this option if you want to change from the default OS of `centos` to `rhel` or `ubuntu`
@@ -129,6 +137,14 @@ $REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/common.yaml -i $REP
 sudo chmod +x $REPO_ROOT/$BUILD
 
 # Execute the freshly built `build.sh` script that was just built from the template.
+source $REPO_ROOT/$BUILD
+
+# Add all other data files to the final build.yaml
+BUILD=data/data_files.sh
+$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
+sudo chmod +x $REPO_ROOT/$BUILD
+
+# Execute the freshly built `data_files.sh` script that was just built from the template.
 source $REPO_ROOT/$BUILD
 
 # Change later to support new repo build system...

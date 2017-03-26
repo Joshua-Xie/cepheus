@@ -12,16 +12,14 @@ These items should live in a private repo somewhere such as Enterprise Github or
 
 We have provided an example repo called https://github.com/cepheus-io/cepheus-private that shows you how to do it. Cepheus uses Layering Techniques along with powerful template features to make this possible and very easy to manage.
 
-The data files can be called anything you want as long as you update them in the build.yaml file.
+The final data file that gets built is called `build.yaml`. It does not get saved (in .gitignore) in a repo. The data files:
 
-Examples:
+>/data/common.yaml
+>
+>/data/(public|private)/(local|whatever_you_want)/environment.yaml
+>
+>/data/(public|private)/(local|whatever_you_want)/(rhel|centos|ubuntu).yaml
+>
+>/data/(public|private)/(local|whatever_you_want)/racks.yaml
 
->base_data.yaml
->
->rack01_data.yaml
->
->rack02_data.yaml
->
->rack03_data.yaml
-
-In the example above, `base_data.yaml` will contain all of the common data and data specific to the bootstrap node. As a reminder, the bootstrap node is the build, Chef, PXE boot and misc server. It can also have a Ceph role such as RGW (Rados Gateway) etc or not. After the cluster is built the resources the bootstrap node consumes is minimal.
+The `environment.yaml` will describe your environment that needs building. ANY files located in the `private` folder and not the sub-folder should be considered common between all data centers such as scripts etc.

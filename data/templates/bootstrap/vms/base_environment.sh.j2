@@ -21,7 +21,7 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 
 # NOTE: May remove this file and use only templates later...
 
-export BOOTSTRAP_DOMAIN=${BOOTSTRAP_DOMAIN:-"{{ ceph.domain }}"}
+export BOOTSTRAP_DOMAIN=${BOOTSTRAP_DOMAIN:-"{{ domain }}"}
 
 # Set the env info in the given environment
 # NB: BOOTSTRAP_CHEF_ENV *MUST* be set to the correct environment (*.json) file (i.e., vagrant or production)

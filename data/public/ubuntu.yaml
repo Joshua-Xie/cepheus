@@ -1,4 +1,8 @@
 ---
-# RHEL specific data
+# Ubuntu specific data
 
-build:
+ceph_repo:
+    create: false
+    branch: stable
+    arch: x86_64
+    revision:

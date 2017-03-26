@@ -21,18 +21,19 @@
       },
       "cron": {
         "logs": {
-          "ceph": {
-            "radosgw": {
-              "uid": "",
-              "name": "",
-              "access_key": "",
-              "secret_key": "",
-              "bucket": ""
-            }
-          },
-          "patterns": [
-            {"directory": "", "pattern": "", "bucket": ""}
-          ]
+            "enable": true,
+            "ceph": {
+                "radosgw": {
+                    "uid": "",
+                    "name": "",
+                    "access_key": "",
+                    "secret_key": "",
+                    "bucket": ""
+                }
+            },
+            "patterns": [
+                {"directory": "", "pattern": "", "bucket": ""}
+            ]
         }
       },
       "bootstrap": {

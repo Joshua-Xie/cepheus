@@ -34,3 +34,9 @@ cobbler: # (optional) Only used for the PXE Boot method
     iso:
         name: centos-7-x86_64-minimal.iso
         url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+
+ceph_repo:
+    create: false
+    branch: stable
+    arch: x86_64
+    revision: 0.el7

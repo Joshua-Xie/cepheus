@@ -5,6 +5,7 @@
 /bootstrap/common/bootstrap_validate_env.sh
 /bootstrap/vms/base_environment.sh
 /data/build.sh
+/data/data_files.sh
 
 # Private data
 /data/private/*.yaml
@@ -12,8 +13,8 @@
 /data/private/*.json
 /data/private/*.sh
 
-# Created build file for public
-/data/public/build.yaml
+# Created build file for any environment
+build.yaml
 
 # Environment
 /bootstrap/data/environment/

@@ -1,0 +1,60 @@
+---
+# Environment data file
+
+# IMPORTANT: Whatever data is here will be appended to the overall `build.yaml` that will be located `public` or
+# `private` based on the value passed to the intial ./CEPH_UP script
+
+# Things specific to the environment of which you're building. The default is 'vagrant' for a 'local' build.
+
+environment: vagrant
+
+# Domain will be your actual domain in your production cluster
+domain: example.com
+
+# Default data center name is `local`
+data_center: local
+
+# These can be any data files you want. A normal example is putting your rack data into a separate yaml for each rack
+# and then add them here to be included in the final build of `build.yaml` which everything will eventually derive from.
+data_files:
+    - "rack01.yaml"
+
+ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
+    mgr:
+        enable: false
+    cluster: ceph
+    name: luminous
+    version: 10.2.6
+
+    osd:
+        journal:
+            # Production may be something like 20000
+            size: 3000
+        rebalance: false
+        niceness: -10
+        crush:
+            update: false # true for production...
+            update_on_start: true # false for production...
+            chooseleaf_type: 1
+        device: dev
+        devices:
+            - device: sdb
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false
+            - device: sdc
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false
+            - device: sdd
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false
+            - device: sde
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false
