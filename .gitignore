@@ -1,8 +1,27 @@
+# Cepheus Git ignore
+
+# Template built files - these should match the build.yaml files section except with leading '/'
+/bootstrap/common/bootstrap_prereqs.sh
+/bootstrap/common/bootstrap_validate_env.sh
+/bootstrap/vms/base_environment.sh
+
+# Private data
+/data/private/*.yaml
+/data/private/*.yml
+/data/private/*.json
+/data/private/*.sh
+
+# Environment
 /bootstrap/data/environment/
 /bootstrap/vms/environment_config.yaml
 /bootstrap/vms/build_environment_config.yaml
 environment_config.yaml
 build_environment_config.yaml
+
+# Files/directories marked for removal
+*remove_*
+
+# Standard
 ~$*
 .DS_Store
 ceph-chef/

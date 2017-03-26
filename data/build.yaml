@@ -3,6 +3,11 @@
 # Templates that use this data file:
 #   `bootstrap_prereqs.sh.j2`
 
+# Can maybe do the following:
+# *Add Ubuntu support
+# *Add AWS credentials to use EC2 environment to build out a Ceph cluster
+# *Docker environment for Ceph
+
 build:
     ceph:
         name: luminous
@@ -124,6 +129,7 @@ build:
     # List of build environment files that *MUST* be built first in order to build system.
     # When building files from templates add them here and it will happen automatically when running ./CEPH_UP
     # Leave off the initial '/'. Scripts will add that if needed.
+    # These files should also be in the .gitignore file so that the final version will not be stored.
     # Leave out `build.sh` from this list.
     # Put these in the order you need them to be called in.
     files:

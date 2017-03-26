@@ -1,4 +1,4 @@
-## Cepheus Build
+## Cepheus - Build and Manage Ceph Clusters
 
 Powerful and flexible automated build/maintenance and management environment for Ceph based on the following tools:
 
@@ -30,16 +30,86 @@ Powerful and flexible automated build/maintenance and management environment for
 
 The __optional__ items above are set in the JSON file for the Chef environment. For example, the Vagrant development build uses a file called vagrant.json. In your production environment you may name it something like production.json.
 
-## Prerequisites for local build
+## How to use Cepheus to build Ceph
+There are multiple ways to use Cepheus to build Ceph. Most all environments only show you the most basic and easiest way to build out a Ceph cluster which doesn't really help when it comes to your bare-metal environment.
+
+>Build using PXE Booting - Most automated
+
+>Build using Cepheus repo
+
+## Building - Base Requirements (all methods)
+No matter which way you decide to build out your Ceph cluster you will need to know what servers you're going to use and their basic information which makes up the `Inventory` of your cluster. For example, you need to know the following:
+
+>Most of the items below in this section may not be required if not using PXE booting or LAG (network bonding)
+
+1. Host names
+2. NIC MAC Addresses (public and private if using two NICs or ports)
+3. Ceph Role(s) you want the given host represent (i.e., Ceph Monitor, Ceph OSD, Ceph RGW, etc)
+4. IP addresses of each host (2 per host if using different public/private NICs or 1 if using combined public/private or 1 Ceph Monitor or Ceph RGW since "clients" only use the public interface)
+5. Operations user name. Most enterprises use a default `operations` like account so use it or create one. It should link to the key in the next step. This use MUST have `sudo` rights
+6. Private SSH Key needed to access each host in the cluster. Create one if you do not have a default one you already use
+7. (Advanced) If each rack is on a different subnet then you also need to know that
+8. (Advanced - PXE) IPMI addresses if you plan on using PXE booting
+9. (Advanced - PXE) Make sure the PXE boot option is enabled on the bios of each NIC in each host. If the bios on the NICs are not set correctly to PXE boot then nothing will happen
+10. (Advanced - PXE) Depending on how your racks are setup (i.e., different subnets) then you may have to setup an option on your ToRs (Top of Rack Switches) to initially route PXE traffic to your bootstrap node since it will be the PXE boot server. Not required if not PXE booting
+11. (Advanced) If your nodes are using bonding (LAG) then you need to know that too. This is very important if PXE booting because most people do the initial PXE boot in a non-bond and then run a recipe that bonds the NICs on those nodes where bonding will be used. Important, make sure that your ToRs are set for bonding at that phase or you will not be able to see your nodes
+12. (Advanced) Required IF you use __RHEL__ and use a Satellite server to manage your licenses and repo then this information is needed too along with any RPM keys. If you are also PXE booting then the initial ISO will automatically use this information and setup your nodes for you
+13. (Advanced) Required IF you use __Ubuntu__. Need the repo keys and repo addresses that act as the master repo to the Ceph cluster
+14. IMPORTANT - Make sure all of your enterprise firewall rules have been updated to allow the Ceph cluster access to your enterprise git repo and other package managers used by your enterprise. This is unique to your environment
+15. IMPORTANT - Make sure your internal DNS is setup to know about all of your Ceph host names (both A and PTR records)
+16. IMPORTANT - Applies to all methods. Setup two private git repos in your Enterprise git environment that can be accessed:
+
+ >  `cepheus` - Mirror of the public Cepheus repo (keep updated)
+
+ >  `cepheus-private` - Cepheus private repo that holds all of your private data. There is a public version that we have that shows you how to do this at https://github.com/cepheus-io/cepheus-private
+
+Most Enterprise environments for storage are not allowed direct access to the outside world. Because of this there needs to be ways to get Ceph and other packages that are used for the Ceph cluster. The most common is an internal GIT server or Github Enterprise server. This works for the private repos of Cepheus but it may not be good for large packages and files. In these cases a common repo (like those stated in #12 and #13 above) or a universal package manager like Artifactory from jfrog.
+
+The choice is yours on how to pull in files but you will need someway. Some enterprises will temporarily allow access to the outside long enough to pull everything in and then close it back. This works for the initial build but getting updates will be a challenge. Just keep this in mind because there are many ways to solve it.
+
+## Building - PXE Booting (Advanced)
+The most automated is the PXE booting method. This process pulls down all dependencies and the OS ISO you want to use.
+It reads in the yaml data files from `/data/private` where all of the host information is held that was collected in the previous step.
+
+Based on the data this process will build a custom ISO of your OS along with kickstart files and packages needed to build out your cluster. Once the ISO is built you simply move it to an area that the initial bootstrap node can find it via it's IPMI interface (some hardware vendors call it iLO or something else). Once in the IPMI interface simply virtually mount the ISO via the menu options and start the host.
+
+The custom ISO will automatically start the process and lay down the OS and everything needed for the bootstrap node. Once the bootstrap node is built then you can SSH into it using the SSH Key you collected in the previous step.
+
+By default there will be a build script in the home directory of the `operations` user from the previous step. Launch it and it will start the process of PXE booting your entire Ceph cluster based on the data in `/data/private`.
+
+After the PXE booting is complete you should be able to ssh into each machine using the `operations` account collected in the previous step. Ceph should be fully setup.
+
+## Building - Cepheus Repo (Simplest)
+This process is similar to the Vagrant Local Build seen below except that all nodes are actual bare-metal and all of the nodes used by Cepheus has already been built by another process. This is common in Enterprises where a different group is responsible for building out all base nodes according to enterprise specs. In this case the build group will provide the hardware information needed in the `Base Requirements` section above such as NIC MAC addresses, IPs and maybe `operations` like user and ssh keys. It's very important to have SSH Keys for the primary user that will do all Ceph operations (not Ceph user in Jewel and later) but an operations like user account. Ansible needs this to orchestrate commands to all of the nodes.
+
+1. Login to bootstrap node using the `operations` like user (assumes you have information requested above)
+2. Copy and paste the following bash shell block into a file called `cepheus_init.sh`:
+```bash
+# Cepheus
+echo "... working on it ..."
+```
+3. Issue the following commands:
+```bash
+sudo chmod +x cepheus_init.sh
+./cepheus_init.sh
+```
+
+Clone the two private repos `cepheus` and `cepheus-private` that you mirrored and created above
+
+## Cepheus Management - Update Process
+
+
+***
+## Building - Development and Testing (local) - Prerequisites for local build
 1. Vagrant - https://www.vagrantup.com/downloads.html  (for development or just spinning up VM version of cluster - not needed for bare metal cluster)
 2. VirtualBox - https://www.virtualbox.org/wiki/Downloads  
 3. Git
 
-## Instructions
+### Instructions
 1. Fork/clone repo
 2. Launch Vagrant version to see how it works and to do development and testing by issuing **./CEPH_UP** command in the root of this project.
 
-## Process (Vagrant)
+### Process (Vagrant)
 To start a normal build simply do the following (no proxy):
 
 >./CEPH_UP
@@ -56,7 +126,7 @@ NB: Behind firewall:
 
 >./CEPH_UP -d 0 -p [whatever your http(s) proxy url]  <-- Run in debug mode behind firewall
 
-### What happens...
+#### What happens...
 
 1. Download CentOS 7.1 box version from Chef Bento upstream (7.2 and 7.3 versions of the bento/centos have sshd issues)
 2. Download required cookbooks including ceph-chef which is the most important
@@ -90,16 +160,15 @@ RADOS Gateway (RGW) uses **civetweb** as the embedded web server. You can login 
 ### Login to VMs (Vagrant)
 *Must* be located in the [wherever root dir]/bootstrap/vms/vagrant directory (vagrant keeps a .vagrant directory with node information in it)
 
-***
 Command(s):
 
-**vagrant ssh ceph-bootstrap**
+>**vagrant ssh ceph-bootstrap**
 
-**vagrant ssh ceph-vm1**
+>**vagrant ssh ceph-vm1**
 
-**vagrant ssh ceph-vm2**
+>**vagrant ssh ceph-vm2**
 
-**vagrant ssh ceph-vm3**
+>**vagrant ssh ceph-vm3**
 
 NOTE: These names can be changed in the [wherever root dir]/bootstrap/vms/servers_config.yaml file.
 ***
@@ -120,6 +189,8 @@ For documentation on how to use this cookbook, refer to the **[USAGE](#usage)** 
 Note: The documentation is a WIP along with a few other features. This repo is actively managed.  
 
 If there are **[issues](https://github.com/cepheus-io/cepheus/issues)** then please go to the ISSUES section in this repo.
+
+***
 
 ## REQUIREMENTS
 

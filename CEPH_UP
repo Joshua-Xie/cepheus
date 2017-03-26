@@ -42,8 +42,10 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 
 export CEPH_DEV_MODE=0
 export CHEF_CEPHEUS_DEBUG=0
+export BOOTSTRAP_GET_PREREQS_ONLY=0
+export BOOTSTRAP_REMOVE_PREREQS=0
 
-while getopts cbsvd:p:o:t: opt; do
+while getopts cbgrsvd:p:o:t: opt; do
     case $opt in
         b)
             BUILD_VMS_ONLY=1
@@ -67,9 +69,19 @@ while getopts cbsvd:p:o:t: opt; do
             # NB: Requires at least 1 argument '0' or '1'
             # Example: ./CEPH_UP -d 0
             ;;
+        g)
+            # -g to simply get the prerequisites and exit
+            export BOOTSTRAP_GET_PREREQS_ONLY=1
+            ;;
         p)
             BOOTSTRAP_HTTP_PROXY=$OPTARG
             BOOTSTRAP_HTTPS_PROXY=$OPTARG
+            ;;
+        r)
+            # -r to remove the prerequisites. Cleaning up.
+            # It does not exit like -g but is called before gathering prerequisites.
+            # Use it with -g -r and it will clean up and gather updated prerequisites and exit based on versions in build.yaml
+            export BOOTSTRAP_REMOVE_PREREQS=1
             ;;
         s)
             BOOTSTRAP_SKIP_VMS=1

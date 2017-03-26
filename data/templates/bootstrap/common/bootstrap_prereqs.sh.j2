@@ -20,17 +20,6 @@
 # Exit immediately if anything goes wrong!
 set -eu
 
-# Check for required environment variables and exit if not all are set.
-FAILED_ENVVAR_CHECK=0
-REQUIRED_VARS=( BOOTSTRAP_CACHE_DIR )
-for ENVVAR in ${REQUIRED_VARS[@]}; do
-  if [[ -z ${!ENVVAR} ]]; then
-    echo "===> Environment variable $ENVVAR must be set!" >&2
-    FAILED_ENVVAR_CHECK=1
-  fi
-done
-if [[ $FAILED_ENVVAR_CHECK != 0 ]]; then exit 1; fi
-
 # Create directory for download cache.
 CACHE_ISO={{ build.cache.iso }}
 CACHE_RPM={{ build.cache.rpm }}
@@ -39,6 +28,13 @@ CACHE_PYTHON={{ build.cache.python }}
 CACHE_LOADER={{ build.cache.loader }}
 CACHE_COOKBOOK={{ build.cache.cookbook }}
 CACHE_GEM={{ build.cache.gem }}
+
+# If set then it will remove the cache directories
+if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
+    rm -rf {{ build.cache.base }}
+fi
+
+# Create the cache directories...
 mkdir -p {{ build.cache.base }}/{{ build.cache.cobbler }}/{$CACHE_ISO,$CACHE_LOADER}
 mkdir -p {{ build.cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
 
@@ -94,7 +90,7 @@ if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
     # NOTE: the +e is because the hardware build. We can change it later...
     set +e
-    download_file {{ build.cache.cobbler }}/{{ build.cache.iso }}/$COBBLER_BOOTSTRAP_ISO $COBBLER_REMOTE_URL_ISO
+    download_file {{ build.cache.cobbler }}/{{ build.cache.iso }}/{{ build.cobbler.iso.rhel.name }} {{ build.cobbler.iso.rhel.url }}
     set -e
   fi
 fi

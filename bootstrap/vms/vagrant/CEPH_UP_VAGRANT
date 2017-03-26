@@ -83,6 +83,14 @@ fi
 echo "===> Downloading necessary files to local cache..."
 source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
 
+# If prerequisites only then end after getting them
+if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then
+    echo
+    echo "Prerequisites have been updated and exiting."
+    echo
+    exit 1
+fi
+
 if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   # Create VMs in Vagrant and start them.
   # VM only tests inside vagrant_create script
