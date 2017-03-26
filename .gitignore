@@ -1,10 +1,10 @@
 # Cepheus Git ignore
 
 # Template built files - these should match the build.yaml files section except with leading '/'
-/bootstrap/common/bootstrap_prereqs.sh
-/bootstrap/common/bootstrap_validate_env.sh
-/bootstrap/vms/base_environment.sh
-/data/build.sh
+# /bootstrap/common/bootstrap_prereqs.sh
+# /bootstrap/common/bootstrap_validate_env.sh
+# /bootstrap/vms/base_environment.sh
+# /data/build.sh
 
 # Private data
 /data/private/*.yaml
