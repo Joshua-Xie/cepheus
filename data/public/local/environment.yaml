@@ -12,19 +12,249 @@ environment: vagrant
 domain: example.com
 
 # Default data center name is `local`
-data_center: local
+data_center: &data_center local
 
 # These can be any data files you want. A normal example is putting your rack data into a separate yaml for each rack
 # and then add them here to be included in the final build of `build.yaml` which everything will eventually derive from.
 data_files:
     - "rack01.yaml"
 
+# Data specific for the given bootstrap node. This is environment specific data.
+bootstrap:
+    # Host name
+    name: ceph-bootstrap
+    # Used by scripts in the cookboks. The user MUST be correct. The default user is `operations`
+    env: /home/operations/cepheus/environments
+
+chef:
+  owner: vagrant
+  group: vagrant
+  server: http://10.0.100.20:4000
+
+monitoring:
+  collectd:
+    id: graphite
+    ip: 127.0.0.1
+    port: 2013
+    prefix: "collectd."
+  zabbix:
+    server: 10.0.100.6
+    ceph:
+      blocked_op: 0
+      slow_osd: 0
+
+cron:
+  # Log processing to push logs into Cepheus
+  logs:
+    enable: false
+    ceph:
+      radosgw:
+        uid: cepheus_log_admin
+        name: "Cepheus Log Admin"
+        access_key: "whatever_your_access_key"
+        secret_key: "whatever_your_secret_key"
+        endpoint: "whatever_your_endpoint"
+        port: 80
+        bucket: cepheus_logs
+    patterns:
+      - directory: "/var/log/ceph"
+        pattern: "*.log-*.gz"
+      - directory: "/var/log/radosgw"
+        pattern: "ceph.client.radosgw.*.log-*.gz"
+      # Broken out here to show that you can if you wanted to push the data to a different bucket
+      - directory: "/var/log/radosgw"
+        pattern: "civetweb.access.*.log-*.gz"
+        # Bucket here is to show that down the road we can add this feature maybe if we want to put the access logs in a different bucket
+        #bucket: cepheus_logs_access
+
+# Supermicro node NICs look like:
+#   NOTE: 1U nodes have the following interface names:
+#   enp4s0f0 - public and enp4s0f1d1 - cluster
+#   NOTE: 2U nodes have the following interface names:
+#   enp130s0f0 - public and enp130s0f1d1 - cluster
+#   2U Interfaces
+network:
+  public:
+    interface: enp0s8 # *device1_2U
+    cidr:
+        # If each rack was on a different subnet then list them for each rack
+        - 10.0.100.0/24
+    netmask: 255.255.255.0
+    # Change the MTU on production systems to 9000
+    mtu: 1500
+  cluster:
+    interface: enp0s9 # *device2_2U
+    gateway_enable: true # false for production
+    cidr:
+        - 110.121.2.0/24
+    route:
+        cidr: 10.121.2.0/24
+    netmask: 255.255.255.0
+    # Change the MTU on production systems to 9000
+    mtu: 1500
+
+# Put your DNS servers here
+nameservers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# Put your NTP servers here (host name or IP)
+ntp:
+    - 0.pool.ntp.org
+    - 1.pool.ntp.org
+    - 2.pool.ntp.org
+    - 3.pool.ntp.org
+
 ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
-    mgr:
-        enable: false
     cluster: ceph
     name: luminous
     version: 10.2.6
+
+    tcmalloc: # This becomes the default after Jewel
+        enable: true
+
+    ec:
+        enable: true
+        profile: cepheus
+        plugin: jerasure
+        directory: "/usr/lib64/ceph/erasure-code"
+        ruleset_root: hdd
+        ruleset_failure_domain: host
+        technique: reed_sol_van
+        # These numbers are based on the number of OSD nodes and racks. Adjust to fit the INITIAL cluster - not after the fact
+        k: 2
+        m: 1
+
+    pools:
+        crush_rule: 1
+
+    pgs:
+        num: 64
+        calc:
+            total_osds: 612
+            target_pgs_per_osd: 200
+            min_pgs_per_pool: 64
+            replicated_size: 3
+            erasure_size: 11
+    repo:
+        # This will tell ceph-chef cookbook not to create a yum repo because we will use RHEL Sat Server
+        create: false
+
+    restapi: # TODO: Change this later to support the VIP API
+        url: api.example.com
+        ip: 10.121.1.18
+        port: 5080
+
+    mgr:
+        enable: false
+
+    radosgw:
+        bucket_shards: 5
+        rados_handles: 1
+        civetweb_threads: 100
+        settings:
+            pg_num: 64
+            pgp_num: 64
+            size: 3
+            crush_ruleset: 1
+            chooseleaf: host
+            chooseleaf_type: 1
+            type: erasure
+            # OSD nodes per rack - helps determine crushmap feature for erasure coding
+            nodes_per_rack: 17
+        # This may need to move to a DB later...
+        default_url: s3.example.com
+        debug:
+            logs:
+                enable: true
+                level: 2
+        logs:
+            ops:
+                enable: true
+            usage:
+                enable: true
+        # Quotas are in MB
+        users:
+            - uid: radosgw
+              name: Admin
+              admin_caps: "users=*;buckets=*;metadata=*;usage=*;zone=*"
+              # Keys are not required and NOT there for real users.
+              access_key: ""
+              secret_key: ""
+              email: ""
+              max_buckets: 0
+              # status can be: enable, suspend or remove. Remove will remove the user and purge all data! You will then need
+              # to remove the entry block here after the user has been removed from the cluster.
+              status: enable
+              key_type: s3
+              quota:
+                    user:
+                        # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                        status: disable
+                        size: -1
+                        objects: -1
+                    buckets:
+                        - name: fill_test
+                          # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                          status: disable
+                          size: -1
+                          objects: -1
+              zones:
+              # buckets are for the initial bucket to create if desired. The first 3 users here are system users so we create the buckets.
+              # The remaining users are real users and there are no buckets unless we know them and want to place them here
+              buckets:
+                  - fill_test
+            - uid: cepheus_log_admin
+              name: "Ceheus Log Admin"
+              admin_caps: ""
+              access_key: ""
+              secret_key: ""
+              email: ""
+              max_buckets: 0
+              status: enable
+              key_type: s3
+              quota:
+                    user:
+                        # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                        status: disable
+                        size: -1
+                        objects: -1
+                    buckets:
+                        - name: cepheus_logs
+                          # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                          status: disable
+                          size: -1
+                          objects: -1
+              zones:
+              buckets:
+                  - cepheus_logs
+            - uid: tester
+              name: Tester
+              admin_caps: "usage=read; user=read; bucket=*"
+              access_key: ""
+              secret_key: ""
+              email: ""
+              max_buckets: 3
+              status: enable
+              key_type: s3
+              quota:
+                    user:
+                        # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                        status: enable
+                        size: 10
+                        objects: -1
+                        # NOTE: buckets are missing for quotas here just to show it can
+              zones:
+        federated:
+            enable: false
+            # master_zone must match one of the vip names.
+            master_zone: dev
+            master_zone_port: 8080
+            # Region represent cluster (datacenter)
+            regions:
+                - *data_center
+            # Zones represent network tiers
+            zones:
 
     osd:
         journal:

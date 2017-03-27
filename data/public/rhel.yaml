@@ -15,7 +15,7 @@ satellite:
     url:
     key:
 
-chef: # (required files for build)
+chef_repo: # (required files for build)
     knife_acl_version: 0.0.12
     client:
         version: 12.19.36

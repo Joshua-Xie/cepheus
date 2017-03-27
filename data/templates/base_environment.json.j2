@@ -3,12 +3,12 @@
   {#- and the second from another data file. The yaml data is found in /data/private or /data/public depending on option #}
   "name": "{{ environment }}",
   "json_class": "Chef::Environment",
-  "description": "Data to build out {{ node.data_center }} Ceph Cluster",
+  "description": "Data to build out {{ data_center }} Cepheus Cluster",
   "cookbook_versions": {},
   "chef_type": "environment",
   "override_attributes": {
     "cepheus": {
-      "environment": "{{ node.environment_short }}",
+      "environment": "{{ environment }}",
       "repo": {
         {#- Pins the current version of ceph or any other packaged in the array at the moment of install. #}
         "packages": [
@@ -39,8 +39,8 @@
         }
       },
       "bootstrap": {
-        "name": "{{ node.name }}",
-        "env": "{{ node.env }}",
+        "name": "{{ bootstrap.name }}",
+        "env": "{{ boostrap.env }}",
         "interfaces": [
         {%- for item in interfaces %}
           {"name": "{{ item.device }}", "ip": "{{ item.ip }}", "netmask": "{{ item.netmask }}", "gateway": "{{ item.gateway }}", "mac": "{{ item.mac }}"}{%- if not loop.last %},{% endif %}
@@ -559,7 +559,7 @@
         },
         "cluster": {
           "interface": "{{ network.cluster.interface }}",
-          "gateway_enable": false,
+          "gateway_enable": {%- if network.gateway_enable == True %} true, {% else %} false, {%- endif %}
           "cidr": [
             "{{ network.cluster.cidr|join('", "') }}"
           ],
