@@ -20,55 +20,55 @@
 include_recipe 'cepheus::ceph-conf'
 
 # NOTE: May want to move mount and import to install later...
-# cobbler distro edit --name=#{node['cepheus']['cobbler']['os']['name']}-#{node['cepheus']['cobbler']['os']['arch']} --kopts="ksdevice= inst.repo=http://#{node['cepheus']['cobbler']['server']}/cblr/ks_mirror/#{node['cepheus']['cobbler']['os']['name']}"
+# cobbler distro edit --name=#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']} --kopts="ksdevice= inst.repo=http://#{node['cepheus']['pxe_boot']['server']}/cblr/ks_mirror/#{node['cepheus']['pxe_boot']['os']['name']}"
 
-bash 'import-distro-distribution-cobbler' do
+bash 'import-distro-distribution-pxe_boot' do
   user 'root'
   code <<-EOH
-    mount -o loop /tmp/#{node['cepheus']['cobbler']['os']['distro']} /mnt
-    cobbler import --name=#{node['cepheus']['cobbler']['os']['name']} --path=/mnt --breed=#{node['cepheus']['cobbler']['os']['breed']} --arch=#{node['cepheus']['cobbler']['os']['arch']}
-    cobbler distro edit --name=#{node['cepheus']['cobbler']['os']['name']}-#{node['cepheus']['cobbler']['os']['arch']} --kopts="ksdevice= inst.repo=http://#{node['cepheus']['cobbler']['server']}/cblr/ks_mirror/#{node['cepheus']['cobbler']['os']['name']}-#{node['cepheus']['cobbler']['os']['arch']}"
+    mount -o loop /tmp/#{node['cepheus']['pxe_boot']['os']['distro']} /mnt
+    cobbler import --name=#{node['cepheus']['pxe_boot']['os']['name']} --path=/mnt --breed=#{node['cepheus']['pxe_boot']['os']['breed']} --arch=#{node['cepheus']['pxe_boot']['os']['arch']}
+    cobbler distro edit --name=#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']} --kopts="ksdevice= inst.repo=http://#{node['cepheus']['pxe_boot']['server']}/cblr/ks_mirror/#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']}"
     umount /mnt
   EOH
-  not_if "cobbler distro list | grep #{node['cepheus']['cobbler']['os']['name']}"
-  only_if "test -f /tmp/#{node['cepheus']['cobbler']['os']['distro']}"
+  not_if "cobbler distro list | grep #{node['cepheus']['pxe_boot']['os']['name']}"
+  only_if "test -f /tmp/#{node['cepheus']['pxe_boot']['os']['distro']}"
 end
 
 # NOTE: By default, cobbler import above will create a profile with the name of the import + arch
 # Distro was added so no need to edit it.
 # Rename the profile to the FIRST profile in the data.
 # There MUST be 2 profiles in the data or this will fail
-bash 'profile-update-cobbler' do
+bash 'profile-update-pxe_boot' do
   user 'root'
   code <<-EOH
-    cobbler profile edit --name=#{node['cepheus']['cobbler']['os']['name']}-#{node['cepheus']['cobbler']['os']['arch']} --kickstart=/var/lib/cobbler/kickstarts/#{node['cepheus']['cobbler']['kickstart']['file']["#{node['cepheus']['cobbler']['profiles'][0]['file_type']}"]} --kopts="interface=auto"
-    cobbler profile rename --name=#{node['cepheus']['cobbler']['os']['name']}-#{node['cepheus']['cobbler']['os']['arch']} --newname=#{node['cepheus']['cobbler']['profiles'][0]['name']}
-    cobbler profile edit --name=#{node['cepheus']['cobbler']['profiles'][0]['name']} --netboot-enabled=true --comment="#{node['cepheus']['cobbler']['profiles'][0]['comment']}" --name-servers="#{node['cepheus']['dns']['servers'].join(' ')}"
-    cobbler profile copy --name=#{node['cepheus']['cobbler']['profiles'][0]['name']} --newname=#{node['cepheus']['cobbler']['profiles'][1]['name']}
-    cobbler profile edit --name=#{node['cepheus']['cobbler']['profiles'][1]['name']} --kickstart=/var/lib/cobbler/kickstarts/#{node['cepheus']['cobbler']['kickstart']['file']["#{node['cepheus']['cobbler']['profiles'][1]['file_type']}"]}
+    cobbler profile edit --name=#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']} --kickstart=/var/lib/pxe_boot/kickstarts/#{node['cepheus']['pxe_boot']['kickstart']['file']["#{node['cepheus']['pxe_boot']['profiles'][0]['file_type']}"]} --kopts="interface=auto"
+    cobbler profile rename --name=#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']} --newname=#{node['cepheus']['pxe_boot']['profiles'][0]['name']}
+    cobbler profile edit --name=#{node['cepheus']['pxe_boot']['profiles'][0]['name']} --netboot-enabled=true --comment="#{node['cepheus']['pxe_boot']['profiles'][0]['comment']}" --name-servers="#{node['cepheus']['dns']['servers'].join(' ')}"
+    cobbler profile copy --name=#{node['cepheus']['pxe_boot']['profiles'][0]['name']} --newname=#{node['cepheus']['pxe_boot']['profiles'][1]['name']}
+    cobbler profile edit --name=#{node['cepheus']['pxe_boot']['profiles'][1]['name']} --kickstart=/var/lib/pxe_boot/kickstarts/#{node['cepheus']['pxe_boot']['kickstart']['file']["#{node['cepheus']['pxe_boot']['profiles'][1]['file_type']}"]}
   EOH
   only_if "cobbler profile list"
-  only_if "test -f /tmp/#{node['cepheus']['cobbler']['os']['distro']}"
+  only_if "test -f /tmp/#{node['cepheus']['pxe_boot']['os']['distro']}"
 end
 
 # Update the Red Hat Satellite/Capsule/RHN info
-if node['cepheus']['cobbler']['os']['breed'] == 'redhat' && node['cepheus']['cobbler']['redhat']['management']['type']
-  bash 'cobbler-rhel-mgt' do
+if node['cepheus']['pxe_boot']['os']['breed'] == 'redhat' && node['cepheus']['pxe_boot']['redhat']['management']['type']
+  bash 'pxe_boot-rhel-mgt' do
     user 'root'
     code <<-EOH
-      cobbler profile edit --name=#{node['cepheus']['cobbler']['profiles'][0]['name']} --redhat-management-key=#{node['cepheus']['cobbler']['redhat']['management']['key']} --redhat-management-server=#{node['cepheus']['cobbler']['redhat']['management']['server']}
-      cobbler profile edit --name=#{node['cepheus']['cobbler']['profiles'][1]['name']} --redhat-management-key=#{node['cepheus']['cobbler']['redhat']['management']['key']} --redhat-management-server=#{node['cepheus']['cobbler']['redhat']['management']['server']}
+      cobbler profile edit --name=#{node['cepheus']['pxe_boot']['profiles'][0]['name']} --redhat-management-key=#{node['cepheus']['pxe_boot']['redhat']['management']['key']} --redhat-management-server=#{node['cepheus']['pxe_boot']['redhat']['management']['server']}
+      cobbler profile edit --name=#{node['cepheus']['pxe_boot']['profiles'][1]['name']} --redhat-management-key=#{node['cepheus']['pxe_boot']['redhat']['management']['key']} --redhat-management-server=#{node['cepheus']['pxe_boot']['redhat']['management']['server']}
     EOH
-    only_if "test -f /tmp/#{node['cepheus']['cobbler']['os']['distro']}"
+    only_if "test -f /tmp/#{node['cepheus']['pxe_boot']['os']['distro']}"
   end
 end
 
 # Set up a default system - you will need to add the information via cobbler system edit on the cli to match your environment
 # Also, do cobbler system add for every ceph node with mac, IP, etc OR modify the json data used by cobbler and then restart cobbler
-node['cepheus']['cobbler']['servers'].each do | server |
+node['cepheus']['pxe_boot']['servers'].each do | server |
   if !server.roles.include? 'bootstrap'
     # NOTE: Set cluster gateway to "" - #{server['network']['cluster']['gateway']}
-    bash 'add-to-cobbler' do
+    bash 'add-to-pxe_boot' do
       user 'root'
       code <<-EOH
         cobbler system add --name=#{server['name']} --profile=#{server['profile']} --static=true --interface=#{server['network']['public']['interface']} --mac=#{server['network']['public']['mac']} --ip-address=#{server['network']['public']['ip']} --netmask=#{server['network']['public']['netmask']} --if-gateway=#{server['network']['public']['gateway']} --hostname=#{server['name']} --mtu=#{server['network']['public']['mtu']}
@@ -76,7 +76,7 @@ node['cepheus']['cobbler']['servers'].each do | server |
       EOH
       not_if "cobbler system list | grep #{server['name']}"
       only_if "cobbler profile list | grep #{server['profile']}"
-      #only_if "test -f /tmp/#{node['cepheus']['cobbler']['os']['distro']}"
+      #only_if "test -f /tmp/#{node['cepheus']['pxe_boot']['os']['distro']}"
     end
   end
 end
@@ -84,9 +84,9 @@ end
 # Update mac addresses - PUBLIC and CLUSTER
 # May want to add interfaces as an array so that any number of nic/mac can be added
 # TODO: Also update for any bonded nics
-node['cepheus']['cobbler']['servers'].each do | server |
+node['cepheus']['pxe_boot']['servers'].each do | server |
   # IMPORTANT: his version sets the --if-gateway of the cluster interface to "" so that ARP does not cause a race condition!
-  bash 'update-cobbler-macs1' do
+  bash 'update-pxe_boot-macs1' do
     user 'root'
     code <<-EOH
       cobbler system edit --name=#{server['name']} --static=true --interface=#{server['network']['public']['interface']} --mac=#{server['network']['public']['mac']} --ip-address=#{server['network']['public']['ip']} --netmask=#{server['network']['cluster']['netmask']} --if-gateway=#{server['network']['public']['gateway']} --mtu=#{server['network']['public']['mtu']}
@@ -96,10 +96,10 @@ node['cepheus']['cobbler']['servers'].each do | server |
   end
 end
 
-# Cobbler will create the base pxe boot files needed. Every time you modify profile/system/distro you will need to do a cobbler sync
-execute 'cobbler-sync' do
+# Cobbler will create the base pxe boot files needed. Every time you modify profile/system/distro you will need to do a pxe_boot sync
+execute 'pxe_boot-sync' do
   command lazy{ "cobbler sync" }
-  only_if "test -f /tmp/#{node['cepheus']['cobbler']['os']['distro']}"
+  only_if "test -f /tmp/#{node['cepheus']['pxe_boot']['os']['distro']}"
 end
 
 # The block below is done for non-vagrant environments

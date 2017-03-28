@@ -28,7 +28,15 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # NB: Output directories for this process already exists
 # NB: The `build.yaml` will get created by combining all of the required yamls.
 
-# Build from other data files listed in the environment.yaml
+sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+# sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/$BUILD_OS.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+
+# Build from other data files listed in the environment.yaml.
+# Pass the data files through the template engine first.
 {%- for item in data_files %}
+if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} ]]; then
+    $REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ item }}
+fi
+
 sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 {%- endfor %}

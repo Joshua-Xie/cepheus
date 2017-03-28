@@ -35,7 +35,7 @@ ceph_chef_hosts_content = 'export CEPH_CHEF_HOSTS=( '
 ceph_chef_bootstrap_content = 'export CEPH_CHEF_BOOTSTRAP='
 
 # Server list
-node['cepheus']['cobbler']['servers'].each do | server |
+node['cepheus']['pxe_boot']['servers'].each do | server |
   server['roles'].each do | role |
     case role
     when 'bootstrap'
@@ -84,7 +84,7 @@ ceph_chef_osd_rack03_hosts_content += ')'
 ceph_chef_rgw_hosts_content += ')'
 ceph_chef_hosts_content += ')'
 
-user_rec = node['cepheus']['cobbler']['kickstart']['users'].first
+user_rec = node['cepheus']['pxe_boot']['kickstart']['users'].first
 env = node['cepheus']['bootstrap']['env']
 
 # NOTE: file_name is also the variable names

@@ -7,3 +7,5 @@ The data file that gets built in each sub-folder of this public directory is cal
 The `local` sub-folder name holds the default vagrant build information as an example. For real production environments it's suggested that you use the `private` sub-folder instead of this one.
 
 ANY files located in the `public` folder and NOT the sub-folders should be considered common to all data centers.
+
+OS specific data files should be in both 'public' and 'private'. Once passed through the template engine the output will go into the sub-folder of the specified data center.

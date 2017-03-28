@@ -10,7 +10,7 @@ eula --agreed
 # System bootloader configuration
 # Use grub2-mkpasswd-pbkdf2 to generate cryptic password for security
 # --append=" crashkernel=auto"
-bootloader --location=mbr --driveorder=sdm --boot-drive=sdm <%= node['cepheus']['cobbler']['kickstart']['bootloader']['passwd_type'] %> <%= node['cepheus']['cobbler']['kickstart']['bootloader']['passwd'] %>
+bootloader --location=mbr --driveorder=sdm --boot-drive=sdm <%= node['cepheus']['pxe_boot']['kickstart']['bootloader']['passwd_type'] %> <%= node['cepheus']['pxe_boot']['kickstart']['bootloader']['passwd'] %>
 
 # Partition clearing information
 clearpart --all --initlabel
@@ -41,10 +41,10 @@ reboot
 # To create encrypted pwd: python -c 'import crypt; print(crypt.crypt("password", "$6$Salt"))' - Make 'password' whatever password you want and then run the python script
 # For example: vagrant password would be $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
 #Root password
-rootpw <%= node['cepheus']['cobbler']['kickstart']['root']['passwd_type'] %> <%= node['cepheus']['cobbler']['kickstart']['root']['passwd'] %>
+rootpw <%= node['cepheus']['pxe_boot']['kickstart']['root']['passwd_type'] %> <%= node['cepheus']['pxe_boot']['kickstart']['root']['passwd'] %>
 
 #User(s)
-<% node['cepheus']['cobbler']['kickstart']['users'].each do | usr | %>
+<% node['cepheus']['pxe_boot']['kickstart']['users'].each do | usr | %>
 user --name=<%= usr['name'] %> <%= usr['passwd_type'] %> --password=<%= usr['passwd'] %> --shell=<%= usr['shell'] %> --gecos="<%= usr['comment'] %>" --groups=<%= usr['groups'] %>
 <% end -%>
 
@@ -69,13 +69,13 @@ zerombr
 # Important: If you need other drives partitioned then change the 'partition_option' in the data and remove 'ignoredisk'
 # ignoredisk --drives=sdb,sdc
 # ignoredisk --only-use=sdm
-<%= node['cepheus']['cobbler']['partition_option'] %>
-<% if node['cepheus']['cobbler']['raid'] %>
-<% node['cepheus']['cobbler']['raid_partitions'].each do |raid_par| %>
+<%= node['cepheus']['pxe_boot']['partition_option'] %>
+<% if node['cepheus']['pxe_boot']['raid'] %>
+<% node['cepheus']['pxe_boot']['raid_partitions'].each do |raid_par| %>
 <%= raid_par['raid'] %>
 <% end %>
 <% else %>
-<% node['cepheus']['cobbler']['partitions'].each do |par| %>
+<% node['cepheus']['pxe_boot']['partitions'].each do |par| %>
 part <%= par['part'] %> --fstype=<%= par['fstype'] %> --size=<%= par['size'] %> <%= par['options'] %>
 <% end %>
 <% end %>
@@ -89,7 +89,7 @@ $SNIPPET('pre_anamon')
 %end
 
 %packages --nobase --ignoremissing
-<% if node['cepheus']['cobbler']['os']['name'] == 'centos-7' %>
+<% if node['cepheus']['pxe_boot']['os']['name'] == 'centos-7' %>
 # CentOS
 @Infrastructure Server
 # CentOS end
@@ -146,7 +146,7 @@ $SNIPPET('kickstart_done')
 set -x
 
 # With Cobbler, you can't simply cp files in --nochroot like you can with a mount device
-wget http://{{ node.ip }}/cblr/pub/postinstall.tar.gz -O /tmp/postinstall.tar.gz
+wget http://{{ bootstrap.ip }}/cblr/pub/postinstall.tar.gz -O /tmp/postinstall.tar.gz
 tar -zxvf /tmp/postinstall.tar.gz -C /
 find /tmp -name TRANS.TBL -exec rm -f {} \;
 
@@ -156,58 +156,58 @@ useradd {{ user.name }} -g {{ user.name }} -G wheel
 cp -R /tmp/postinstall/ceph-files/* /ceph-files/.
 cp -R /tmp/postinstall/ceph-host/* /ceph-host/.
 
-chown -R {{ user.name }}:{{ user.name }} /ceph-files
-chown -R {{ user.name }}:{{ user.name }} /ceph-host
+chown -R {{ primary_user.name }}:{{ primary_user.name }} /ceph-files
+chown -R {{ primary_user.name }}:{{ primary_user.name }} /ceph-host
 
-cat /ceph-host/bootstrap/data/environment/{{ node.environment }}/hosts >> /etc/hosts
+cat /ceph-host/bootstrap/data/environment/{{ environment }}/hosts >> /etc/hosts
 cp /ceph-files/gems/netaddr-1.5.1.gem /tmp/.
-chown {{ user.name }}:{{ user.name }} /tmp/netaddr-1.5.1.gem
+chown {{ primary_user.name }}:{{ primary_user.name }} /tmp/netaddr-1.5.1.gem
 cp /ceph-files/gems/chef-sugar-3.4.0.gem /tmp/.
-chown {{ user.name }}:{{ user.name }} /tmp/chef-sugar-3.4.0.gem
+chown {{ primary_user.name }}:{{ primary_user.name }} /tmp/chef-sugar-3.4.0.gem
 
 # Allow root login to begin with. Chef recipe will disable later in process.
 sed -i "s/#PermitRootLogin yes/PermitRootLogin yes/" /etc/ssh/sshd_config
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
 # Add a public key here to authorized_keys but make sure to set permission to 0600
-mkdir --mode=0700 -p /home/{{ user.name }}/.ssh
-cat <<EOM >/home/{{ user.name }}/.ssh/authorized_keys
-{{ user.key }}
+mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
+cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
+{{ primary_user.key }}
 EOM
-chmod 0600 /home/{{ user.name }}/.ssh/authorized_keys
-chown -R {{ user.name }}:{{ user.group }} /home/{{ user.name }}/.ssh
+chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
+chown -R {{ primary_user.name }}:{{ primary_user.group }} /home/{{ primary_user.name }}/.ssh
 
 # Setup sudoer
-echo "%{{ user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ user.name }}
+echo "%{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
 sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
-echo "{{ user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ user.name }}
+echo "{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
 
-{%- if cobbler.kickstart.redhat.management.type %}
-{{ cobbler.kickstart.redhat.management.commands.C1 }}
-{{ cobbler.kickstart.redhat.management.commands.C2 }}
-{{ cobbler.kickstart.redhat.management.commands.C3 }}
+{%- if pxe_boot.kickstart.redhat.management.type %}
+{{ pxe_boot.kickstart.redhat.management.commands.C1 }}
+{{ pxe_boot.kickstart.redhat.management.commands.C2 }}
+{{ pxe_boot.kickstart.redhat.management.commands.C3 }}
 yum update -y
 # Go ahead and create a script in /tmp if the network has issues during the process.
 cat <<EOM >/tmp/rhelsub.sh
 service network restart
-{{ cobbler.kickstart.redhat.management.commands.C1 }}
-{{ cobbler.kickstart.redhat.management.commands.C2 }}
-{{ cobbler.kickstart.redhat.management.commands.C3 }}
+{{ pxe_boot.kickstart.redhat.management.commands.C1 }}
+{{ pxe_boot.kickstart.redhat.management.commands.C2 }}
+{{ pxe_boot.kickstart.redhat.management.commands.C3 }}
 yum update -y
 EOM
 chmod +x /tmp/rhelsub.sh
 {% endif %}
 
-cp /ceph-host/bootstrap/data/environment/{{ node.environment }}/*.crt /tmp
-cp /ceph-host/bootstrap/data/environment/{{ node.environment }}/*.key /tmp
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/*.crt /tmp
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/*.key /tmp
 
 rpm -Uvh /ceph-files/rpms/{{ chef.rpms.client }}
 
 # Set up the node for chef-client
 mkdir -p /etc/chef
 mkdir -p /var/log/chef
-wget http://{{ node.ip }}/cblr/pub/validation.pem -O /etc/chef/validation.pem
-wget http://{{ node.ip }}/cblr/pub/client.rb -O /etc/chef/client.rb
+wget http://{{ bootstrap.ip }}/cblr/pub/validation.pem -O /etc/chef/validation.pem
+wget http://{{ bootstrap.ip }}/cblr/pub/client.rb -O /etc/chef/client.rb
 chmod 0600 /etc/chef/validation.pem
 chmod 0644 /etc/chef/client.rb
 knife ssl fetch -c /etc/chef/client.rb
@@ -217,15 +217,15 @@ chef-client
 
 cat <<EOM >/tmp/chef-enroll.sh
 yum update -y
-cp /ceph-host/bootstrap/data/environment/{{ node.environment }}/*.crt /tmp
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/*.crt /tmp
 
 rpm -Uvh /ceph-files/rpms/{{ chef.rpms.client }}
 
 # Set up the node for chef-client
 mkdir -p /etc/chef
 mkdir -p /var/log/chef
-wget http://{{ node.ip }}/cblr/pub/validation.pem -O /etc/chef/validation.pem
-wget http://{{ node.ip }}/cblr/pub/client.rb -O /etc/chef/client.rb
+wget http://{{ bootstrap.ip }}/cblr/pub/validation.pem -O /etc/chef/validation.pem
+wget http://{{ bootstrap.ip }}/cblr/pub/client.rb -O /etc/chef/client.rb
 chmod 0600 /etc/chef/validation.pem
 chmod 0644 /etc/chef/client.rb
 knife ssl fetch -c /etc/chef/client.rb

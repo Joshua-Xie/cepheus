@@ -14,17 +14,120 @@ domain: example.com
 # Default data center name is `local`
 data_center: &data_center local
 
+# Can only be `public` or `private`.
+location: public
+
+# NICs - Each hardware vendor *may* have different device names. Define them here for the given environment
+# Supermicro
+## Non-Storage nodes - Assumes 2 devices (could be any size 10Gb, 20Gb, 40Gb) in this scenario
+# Non-Storage nodes (clients) do not need a second NIC/Port since only the "public" interface is used
+# If you have two then you can bond them if desired
+# device1_1U: &device1_1U enp4s0f0
+# device2_1U: &device2_1U enp4s0f1d1
+## Storage nodes - Assumes 2 devices (could be any size 10Gb, 20Gb, 40Gb) in this scenario
+# device1_2U: &device1_2U enp130s0f0
+# device2_2U: &device2_2U enp130s0f1d1
+
+## Make sure to check the NIC device names of your hardware and update them here.
+
+## NB: Important - The following device variables are defined here in the environment.yaml file ONLY.
+## Other data files can reference `*device1_1U` etc since the final file 'build.yaml' will have these defined in it.
+#
+# Vagrant
+device1_1U: &device1_1U enp0s8
+device2_1U: &device2_1U enp0s9
+device1_2U: &device1_2U enp0s8
+device2_2U: &device2_2U enp0s9
+#
+## End of device variable naming
+
 # These can be any data files you want. A normal example is putting your rack data into a separate yaml for each rack
 # and then add them here to be included in the final build of `build.yaml` which everything will eventually derive from.
 data_files:
-    - "rack01.yaml"
+    - "rhel.yaml"
+    - "pxe_boot.yaml"
+    - "rack_01.yaml"
+    - "rack_02.yaml"
+    - "rack_03.yaml"
+
+# Root/sudo related items
+root:
+    # Used in bootstrap kickstart file only for now which is used only for PXE booting
+    pwd: $6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/
+
+# The users listed here will be created on all nodes in the cluster if they do not already exist
+# To create encrypted pwd: python -c 'import crypt; print(crypt.crypt("password", "$6$Salt"))'
+users:
+    - name: operations
+      group: wheel
+      comment: "Operations user"
+      passwd: $6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/
+      passwd_type: "--iscrypted"
+      key: "ceph_bootstrap.pub"
+      private_key: operations
+      sudo: true
+      # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
+      # required for ceph commands
+      ceph_group: true
+    - name: vagrant
+      group: wheel
+      comment: "Vagrant user"
+      passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
+      passwd_type: "--iscrypted"
+      key: "ceph_bootstrap.pub"
+      private_key: operations
+      sudo: true
+      # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
+      # required for ceph commands
+      ceph_group: true
+
+# This user will be the primary user of the given envrionment which will be `operations` in production and `vagrant` for local
+# This is can be a mirror of one of the users above. It must be present.
+primary_user:
+    name: vagrant
+    group: wheel
+    comment: "Vagrant user"
+    passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
+    passwd_type: "--iscrypted"
+    key: "ceph_bootstrap.pub"
+    private_key: operations
+    sudo: true
+    # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
+    # required for ceph commands
+    ceph_group: true
 
 # Data specific for the given bootstrap node. This is environment specific data.
 bootstrap:
+    # Bootstrap IP address
+    ip: 10.0.100.20
     # Host name
     name: ceph-bootstrap
     # Used by scripts in the cookboks. The user MUST be correct. The default user is `operations`
     env: /home/operations/cepheus/environments
+    # ks - Kickstart file in RHEL/CentOS
+    ks: cepheus_bootstrap_rhel.ks
+    # Roles are important. Roles define what gets installed and what purpose the node plays in your cluster.
+    # You can combine any number of roles the node is suppose to have as long as a given role does not conflict with another.
+    roles:
+        - bootstrap
+    interfaces:
+      - device: *device1_1U
+        ip: 10.0.100.20
+        mtu: 1500
+        netmask: 255.255.255.0
+        gateway:
+        mac:
+      - device: *device2_1U
+        ip: 10.121.2.2
+        mtu: 1500
+        netmask: 255.255.255.0
+        gateway:
+        mac:
+
+# Hardware vendor specific
+ipmi:
+  user:
+  passwd:
 
 chef:
   owner: vagrant
@@ -75,7 +178,7 @@ cron:
 #   2U Interfaces
 network:
   public:
-    interface: enp0s8 # *device1_2U
+    interface: *device1_2U
     cidr:
         # If each rack was on a different subnet then list them for each rack
         - 10.0.100.0/24
@@ -83,7 +186,7 @@ network:
     # Change the MTU on production systems to 9000
     mtu: 1500
   cluster:
-    interface: enp0s9 # *device2_2U
+    interface: *device2_2U
     gateway_enable: true # false for production
     cidr:
         - 110.121.2.0/24
@@ -92,6 +195,16 @@ network:
     netmask: 255.255.255.0
     # Change the MTU on production systems to 9000
     mtu: 1500
+
+# Example of bond if needed. Must enable it.
+bond:
+  name: bond0
+  enable: false
+  mtu: 1500
+  options: "mode=4 miimon=100 xmit_hash_policy=layer3+4"
+  interfaces:
+    - *device1_1U
+    - *device1_2U
 
 # Put your DNS servers here
 nameservers:

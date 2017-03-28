@@ -28,9 +28,7 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # NB: Output directories for this process already exists
 # NB: The `build.yaml` will get created by combining all of the required yamls.
 
-cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
-sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
-sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/$BUILD_OS.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+## ALL data files *MUST* be processed before anything else can be processed!
 
 # Build from template
 {%- for item in files %}

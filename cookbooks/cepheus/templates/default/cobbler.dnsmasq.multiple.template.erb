@@ -13,8 +13,8 @@ no-resolv
 read-ethers
 addn-hosts = /var/lib/cobbler/cobbler_hosts
 #domain=<%= node['cepheus']['domain_name'] %>
-listen-address=<%= node['cepheus']['cobbler']['server'] %>
-interface=<%= node['cepheus']['cobbler']['pxe_interface'] %>
+listen-address=<%= node['cepheus']['pxe_boot']['server'] %>
+interface=<%= node['cepheus']['pxe_boot']['pxe_interface'] %>
 dhcp-lease-max=1000
 dhcp-authoritative
 dhcp-boot=pxelinux.0
@@ -22,7 +22,7 @@ dhcp-boot=net:normalarch,pxelinux.0
 dhcp-boot=net:ia64,$elilo
 
 # Multiple subnets (each rack) that will be answered on one interface
-<% node['cepheus']['cobbler']['dhcp']['subnets'].each do |subnet| %>
+<% node['cepheus']['pxe_boot']['dhcp']['subnets'].each do |subnet| %>
 dhcp-range=<%= subnet['tag'] %>,<%= subnet['dhcp_range'].join(',') %>,<%= subnet['netmask'] %>
 dhcp-option=<%= subnet['tag'] %>,3,<%= subnet['router'] %>
 <% end -%>

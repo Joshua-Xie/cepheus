@@ -38,7 +38,7 @@ eula --agreed
 # System bootloader configuration
 # Use grub2-mkpasswd-pbkdf2 to generate cryptic password for security
 # bootloader --append=" crashkernel=auto" --location=mbr --boot-drive=sda --iscrypted --password={{ bootloader_pwd }}
-bootloader --location=mbr <%= node['cepheus']['cobbler']['kickstart']['bootloader']['passwd_type'] %> <%= node['cepheus']['cobbler']['kickstart']['bootloader']['passwd'] %>
+bootloader --location=mbr <%= node['cepheus']['pxe_boot']['kickstart']['bootloader']['passwd_type'] %> <%= node['cepheus']['pxe_boot']['kickstart']['bootloader']['passwd'] %>
 
 # Partition clearing information
 clearpart --all --initlabel
@@ -69,10 +69,10 @@ reboot
 # To create encrypted pwd: python -c 'import crypt; print(crypt.crypt("password", "$6$Salt"))' - Make 'password' whatever password you want and then run the python script
 # For example: vagrant password would be $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
 #Root password
-rootpw <%= node['cepheus']['cobbler']['kickstart']['root']['passwd_type'] %> <%= node['cepheus']['cobbler']['kickstart']['root']['passwd'] %>
+rootpw <%= node['cepheus']['pxe_boot']['kickstart']['root']['passwd_type'] %> <%= node['cepheus']['pxe_boot']['kickstart']['root']['passwd'] %>
 
 #User(s)
-<% node['cepheus']['cobbler']['kickstart']['users'].each do | usr | %>
+<% node['cepheus']['pxe_boot']['kickstart']['users'].each do | usr | %>
 user --name=<%= usr['name'] %> <%= usr['passwd_type'] %> --password=<%= usr['passwd'] %> --shell=<%= usr['shell'] %> --gecos="<%= usr['comment'] %>" --groups=<%= usr['groups'] %>
 <% end -%>
 
@@ -103,7 +103,7 @@ $SNIPPET('pre_anamon')
 %end
 
 %packages --nobase --ignoremissing
-<% if node['cepheus']['cobbler']['os']['name'] == 'centos-7' %>
+<% if node['cepheus']['pxe_boot']['os']['name'] == 'centos-7' %>
 # CentOS
 @Infrastructure Server
 # CentOS end
@@ -160,7 +160,7 @@ set -x
 sed -i "s/#PermitRootLogin yes/PermitRootLogin yes/" /etc/ssh/sshd_config
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
-<% node['cepheus']['cobbler']['kickstart']['users'].each do | usr | %>
+<% node['cepheus']['pxe_boot']['kickstart']['users'].each do | usr | %>
 <% if usr['key'] %>
 mkdir --mode=0700 -p /home/<%= usr['name'] %>/.ssh
 wget -O /home/<%= usr['name'] %>/.ssh/authorized_keys http://$http_server:$http_port/cobbler/pub/<%= usr['key'] %>

@@ -18,8 +18,8 @@ set vendorclass = option vendor-class-identifier;
 
 option pxe-system-type code 93 = unsigned integer 16;
 
-shared-network <%= node['cepheus']['cobbler']['dhcp']['shared_network'] %> {
-<% node['cepheus']['cobbler']['dhcp']['subnets'].each do |sub| %>
+shared-network <%= node['cepheus']['pxe_boot']['dhcp']['shared_network'] %> {
+<% node['cepheus']['pxe_boot']['dhcp']['subnets'].each do |sub| %>
 
   subnet <%= sub['subnet'] %> netmask <%= sub['netmask']%> {
        option routers             <%= sub['router'] %>;
@@ -70,7 +70,7 @@ group {
         #end if
         #if $iface.enable_gpxe:
         if exists user-class and option user-class = "gPXE" {
-            filename "http://$cobbler_server/cblr/svc/op/gpxe/system/$iface.owner";
+            filename "http://$cobblerserver/cblr/svc/op/gpxe/system/$iface.owner";
         } else if exists user-class and option user-class = "iPXE" {
             filename "http://$cobbler_server/cblr/svc/op/gpxe/system/$iface.owner";
         } else {

@@ -116,7 +116,7 @@ def get_ip(interface)
       end
     end
   else
-    servers = node['cepheus']['cobbler']['servers']
+    servers = node['cepheus']['']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         if interface == server['network']['public']['interface']
@@ -141,7 +141,7 @@ def get_gateway(interface)
       end
     end
   else
-    servers = node['cepheus']['cobbler']['servers']
+    servers = node['cepheus']['pxe_boot']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         if interface == server['network']['public']['interface']
@@ -166,7 +166,7 @@ def get_mac_address(interface)
       end
     end
   else
-    servers = node['cepheus']['cobbler']['servers']
+    servers = node['cepheus']['pxe_boot']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         if interface == server['network']['public']['interface']
@@ -191,7 +191,7 @@ def get_netmask(interface)
       end
     end
   else
-    servers = node['cepheus']['cobbler']['servers']
+    servers = node['cepheus']['pxe_boot']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         if interface == server['network']['public']['interface']
@@ -214,7 +214,7 @@ def get_bond_ip
     interface = node['cepheus']['bootstrap']['interfaces'].first
     val = interface['ip']
   else
-    servers = node['cepheus']['cobbler']['servers']
+    servers = node['cepheus']['pxe_boot']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         val = server['network']['public']['ip']
@@ -231,7 +231,7 @@ def get_bond_gateway
     interface = node['cepheus']['bootstrap']['interfaces'].first
     val = interface['gateway']
   else
-    servers = node['cepheus']['cobbler']['servers']
+    servers = node['cepheus']['pxe_boot']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         # IMPORTANT - VirtualBox environment should be named vagrant.json or vbox.json
@@ -254,7 +254,7 @@ def get_bond_netmask
     interface = node['cepheus']['bootstrap']['interfaces'].first
     val = interface['netmask']
   else
-    servers = node['cepheus']['cobbler']['servers']
+    servers = node['cepheus']['pxe_boot']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         val = server['network']['public']['netmask']
@@ -318,7 +318,7 @@ end
 
 def get_server
   val = nil
-  servers = node['cepheus']['cobbler']['servers']
+  servers = node['cepheus']['pxe_boot']['servers']
   servers.each do | server |
     if server['name'] == node['hostname']
       val = server
@@ -344,7 +344,7 @@ def get_adc_backend_nodes
   results = []
   # RGW are backend nodes...
   rgw_nodes = radosgw_nodes
-  servers = node['cepheus']['cobbler']['servers']
+  servers = node['cepheus']['pxe_boot']['servers']
   rgw_nodes.each do | rgw |
     servers.each do | server |
       if server['name'] == rgw['hostname']
@@ -363,12 +363,12 @@ def get_adc_backend_nodes
   results
 end
 
-# NOTE: The 'instance' value is added to the json environment file. 
+# NOTE: The 'instance' value is added to the json environment file.
 def get_adc_backend_federated_nodes
   results = []
   # Get the list of backend servers
   nodes = node['cepheus']['adc']['backend']['servers']
-  servers = node['cepheus']['cobbler']['servers']
+  servers = node['cepheus']['pxe_boot']['servers']
   nodes.each do | bes |
     servers.each do | server |
       if server['name'] == bes['name']

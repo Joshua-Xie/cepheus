@@ -9,11 +9,24 @@
 
 os:
     type: rhel
-    version: 7.3
+    version: 7.2
+    name: rhel-7.2
+    arch: x86_64
+    distro: rhel-server-7.2-x86_64.iso
+    breed: redhat
+    iso:
+        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
 
-satellite:
-    url:
-    key:
+# Subscription Manager - Satellite Server
+subscription:
+    type: true
+    server: rhncapsule.repo.example.com
+    key: cloud-storage-example-x86_64-server-7.2
+    commands:
+        C1: "curl -k -O http://rhnsat.example.com/pub/katello-ca-consumer-latest.noarch.rpm && rpm -Uvh ./katello-ca-consumer-latest.noarch.rpm"
+        C2: "subscription-manager register --activationkey cloud-storage-example-x86_64-server-7.2 --org \"EXAMPLE\" --force"
+        {#- This gets ran through the template engine before being processed #}
+        C3: "ls /ceph-host/data/{{ location }}/{{ data_center }}/*.key | xargs rpm --import"
 
 chef_repo: # (required files for build)
     knife_acl_version: 0.0.12
@@ -30,13 +43,83 @@ adc: # (optional) Only required if allowing Cepheus to build out your software l
             version: 1.5.0
             package: bird-1.5.0-1.x86_64.rpm
 
-cobbler: # (optional) Only used for the PXE Boot method
-    iso:
-        name: centos-7-x86_64-minimal.iso
-        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
-
 ceph_repo:
     create: false
     branch: stable
     arch: x86_64
     revision: 0.el7
+
+security:
+    firewall:
+        enable: false
+        use: rules
+        zone: public
+        rules:
+            - name: ceph
+              roles:
+                  - ceph-mon
+                  - ceph-osd
+                  - ceph-rgd
+                  - ceph-rgw
+                  - ceph-mds
+                  - ceph-admin
+                  - ceph-restapi
+                  - ceph-adc
+              type: rich-rule
+              zone: public
+              permanent: true
+              rules:
+                  - "rule family='ipv4' source address='10.0.100.0/24' accept"
+                  - "rule family='ipv4' source address='10.0.100.0/24' service name='ssh' accept"
+
+            ## All of the ones below are examples. You can get creative.
+            # - name: ceph-osd
+            #   roles:
+            #       - ceph-osd
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' accept"
+            # - name: ceph-rgw
+            #   roles:
+            #       - ceph-rgw
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' port port='8080-8089' protocol='tcp' accept"
+            # - name: ssh
+            #   roles:
+            #       - ceph-bootstrap
+            #       - ceph-mon
+            #       - ceph-osd
+            #       - ceph-rgd
+            #       - ceph-rgw
+            #       - ceph-mds
+            #       - ceph-admin
+            #       - ceph-restapi
+            #       - ceph-adc
+            #   type: service
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - ssh
+            # - name: bootstrap-internal
+            #   roles:
+            #       - ceph-bootstrap
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' accept"
+            # - name: adc
+            #   roles:
+            #       - ceph-adc
+            #   type: service
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - http
+            #       - https
+            ##

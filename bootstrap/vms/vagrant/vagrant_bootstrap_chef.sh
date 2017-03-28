@@ -62,7 +62,7 @@ do_on_node $CEPH_CHEF_BOOTSTRAP "cd \$HOME/cepheus/cookbooks && rm -f *.tar.gz"
 
 # NOTE: *HAVE* to load the files into files/ before cookbook upload
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
-  do_on_node $CEPH_CHEF_BOOTSTRAP "sudo cp /ceph-files/cobbler/loaders/* \$HOME/cepheus/cookbooks/cepheus/files/loaders"
+  do_on_node $CEPH_CHEF_BOOTSTRAP "sudo cp /ceph-files/pxe_boot/loaders/* \$HOME/cepheus/cookbooks/cepheus/files/loaders"
   do_on_node $CEPH_CHEF_BOOTSTRAP "sudo rm -f \$HOME/cepheus/cookbooks/cepheus/files/loaders/*_downloaded"
 fi
 

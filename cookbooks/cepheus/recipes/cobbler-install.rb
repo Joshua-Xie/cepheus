@@ -22,10 +22,10 @@ include_recipe 'cepheus::ceph-conf'
 package 'whois'
 
 # Generate web_user_pwd and save. NOTE: This attribute 'web_user_pwd' is not in an environment file!
-if node['cepheus']['cobbler']['web_user_pwd'].nil?
+if node['cepheus']['pxe_boot']['web_user_pwd'].nil?
   ruby_block 'gen-web-user-pwd' do
     block do
-      node.set['cepheus']['cobbler']['web_user_pwd'] = %x[ printf "#{node['cepheus']['cobbler']['web_user']}:Cobbler:#{secure_password()}" | md5sum | awk '{print $1}' ]
+      node.set['cepheus']['pxe_boot']['web_user_pwd'] = %x[ printf "#{node['cepheus']['pxe_boot']['web_user']}:Cobbler:#{secure_password()}" | md5sum | awk '{print $1}' ]
       node.save
     end
   end
@@ -75,7 +75,7 @@ end
 #            {"subnet": "10.121.1.32", "tag": "rack2", "dhcp_range": ["10.121.1.34", "10.121.1.62"], "netmask": "255.255.255.224", "router": "10.121.1.33"},
 #            {"subnet": "10.121.1.64", "tag": "rack3", "dhcp_range": ["10.121.1.66", "10.121.1.94"], "netmask": "255.255.255.224", "router": "10.121.1.65"}
 
-if node['cepheus']['cobbler']['dhcp']['subnets'].length > 1
+if node['cepheus']['pxe_boot']['dhcp']['subnets'].length > 1
   template '/etc/cobbler/dhcp.template' do
     source 'cobbler.dhcp.multiple.template.erb'
     mode 00644
@@ -90,8 +90,8 @@ else
     source 'cobbler.dhcp.single.template.erb'
     mode 00644
     variables(
-        :range => node['cepheus']['cobbler']['dhcp']['subnets'][0]['dhcp_range'].join(' '),
-        :subnet => node['cepheus']['cobbler']['dhcp']['subnets'][0]['subnet']
+        :range => node['cepheus']['pxe_boot']['dhcp']['subnets'][0]['dhcp_range'].join(' '),
+        :subnet => node['cepheus']['pxe_boot']['dhcp']['subnets'][0]['subnet']
     )
   end
 
@@ -99,7 +99,7 @@ else
     source 'cobbler.dnsmasq.single.template.erb'
     mode 00644
     variables(
-        :range => node['cepheus']['cobbler']['dhcp']['subnets'][0]['dhcp_range'].join(',')
+        :range => node['cepheus']['pxe_boot']['dhcp']['subnets'][0]['dhcp_range'].join(',')
     )
   end
 end
@@ -109,13 +109,13 @@ template '/etc/cobbler/modules.conf' do
   mode 00644
 end
 
-template "/var/lib/cobbler/kickstarts/#{node['cepheus']['cobbler']['kickstart']['file']['osd']}" do
-  source "#{node['cepheus']['cobbler']['kickstart']['file']['osd']}.erb"
+template "/var/lib/cobbler/kickstarts/#{node['cepheus']['pxe_boot']['kickstart']['file']['osd']}" do
+  source "#{node['cepheus']['pxe_boot']['kickstart']['file']['osd']}.erb"
   mode 00644
 end
 
-template "/var/lib/cobbler/kickstarts/#{node['cepheus']['cobbler']['kickstart']['file']['nonosd']}" do
-  source "#{node['cepheus']['cobbler']['kickstart']['file']['nonosd']}.erb"
+template "/var/lib/cobbler/kickstarts/#{node['cepheus']['pxe_boot']['kickstart']['file']['nonosd']}" do
+  source "#{node['cepheus']['pxe_boot']['kickstart']['file']['nonosd']}.erb"
   mode 00644
 end
 
@@ -131,8 +131,8 @@ end
 
 # NOTE: *.iso are blocked from github push/pull via .gitignore so download desired ISO and put it into files directory.
 if ENV.has_key?('COBBLER_BOOTSTRAP_ISO')
-  cookbook_file "/tmp/#{node['cepheus']['cobbler']['os']['distro']}" do
-    source "#{node['cepheus']['cobbler']['os']['distro']}"
+  cookbook_file "/tmp/#{node['cepheus']['pxe_boot']['os']['distro']}" do
+    source "#{node['cepheus']['pxe_boot']['os']['distro']}"
     owner 'root'
     group 'root'
     mode 00444

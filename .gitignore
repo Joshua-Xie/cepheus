@@ -23,9 +23,6 @@ build.yaml
 environment_config.yaml
 build_environment_config.yaml
 
-# Files/directories marked for removal
-*remove_*
-
 # Standard
 ~$*
 .DS_Store

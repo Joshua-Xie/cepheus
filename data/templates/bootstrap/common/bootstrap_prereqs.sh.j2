@@ -35,7 +35,7 @@ if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
 fi
 
 # Create the cache directories...
-mkdir -p {{ cache.base }}/{{ cache.cobbler }}/{$CACHE_ISO,$CACHE_LOADER}
+mkdir -p {{ cache.base }}/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
 mkdir -p {{ cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
 
 # download_file wraps the usual behavior of curling a remote URL to a local file
@@ -84,23 +84,25 @@ git_clone_or_update() {
   fi
 }
 
+{% if method == "pxe" %}
 # Obtain an RHEL 7.2 image to be used for PXE booting in production.
 echo "===> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
     # NOTE: the +e is because the hardware  We can change it later...
     set +e
-    download_file {{ cache.cobbler }}/{{ cache.iso }}/{{ cobbler.iso.name }} {{ cobbler.iso.url }}
+    download_file {{ cache.pxe_boot }}/{{ cache.iso }}/{{ pxe_boot.iso.name }} {{ pxe_boot.iso.url }}
     set -e
   fi
 fi
 
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
-  download_file {{ cache.cobbler }}/{{ cache.loader }}/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
-  download_file {{ cache.cobbler }}/{{ cache.loader }}/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
-  download_file {{ cache.cobbler }}/{{ cache.loader }}/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
-  download_file {{ cache.cobbler }}/{{ cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
+  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
+  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
+  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
+  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
 fi
+{% endif %}
 
 echo "===> Downloading Chef..."
 download_file /{{ cache.rpm }}/{{ chef_repo.client.package }} https://packages.chef.io/files/stable/chef/{{ chef_repo.client.version }}/el/7/{{ chef_repo.client.package }}

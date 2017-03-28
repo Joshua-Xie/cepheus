@@ -33,11 +33,12 @@ export BOOTSTRAP_HTTPS_PROXY=${BOOTSTRAP_HTTPS_PROXY:-}
 
 # Default for rhel/centos - Ubuntu is SATAController
 export VBOX_SATA_CONTROLLER=${VBOX_SATA_CONTROLLER:-"SATA Controller"}
-# IMPORTANT: The name of the cobbler distro that must match node['cepheus']['cobbler']['os']['distro']
+# IMPORTANT: The name of the cobbler distro that must match node['cepheus']['pxe_boot']['os']['distro']
 
-export COBBLER_DOWNLOAD_ISO=1
-
+{% if method == "pxe" %}
 # NB: These are still used in places and only for PXE booting method
-export COBBLER_BOOTSTRAP_ISO=${COBBLER_BOOTSTRAP_ISO:-"{{ cobbler.iso.name }}"}
-export COBBLER_REMOTE_URL_ISO=${COBBLER_REMOTE_URL_ISO:-"{{ cobbler.iso.url }}"}
+export COBBLER_DOWNLOAD_ISO=1
+export COBBLER_BOOTSTRAP_ISO=${COBBLER_BOOTSTRAP_ISO:-"{{ pxe_boot.iso.name }}"}
+export COBBLER_REMOTE_URL_ISO=${COBBLER_REMOTE_URL_ISO:-"{{ pxe_boot.iso.url }}"}
 export BOOTSTRAP_CACHE_DIR=${BOOTSTRAP_CACHE_DIR:-{{ cache.base }}}
+{% endif %}

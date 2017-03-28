@@ -6,3 +6,27 @@ ceph_repo:
     branch: stable
     arch: x86_64
     revision:
+
+# Change this to support the correct firewall
+security:
+    firewall:
+        enable: false
+        use: rules
+        zone: public
+        rules:
+            - name: ceph
+              roles:
+                  - ceph-mon
+                  - ceph-osd
+                  - ceph-rgd
+                  - ceph-rgw
+                  - ceph-mds
+                  - ceph-admin
+                  - ceph-restapi
+                  - ceph-adc
+              type: rich-rule
+              zone: public
+              permanent: true
+              rules:
+                  - "rule family='ipv4' source address='10.0.100.0/24' accept"
+                  - "rule family='ipv4' source address='10.0.100.0/24' service name='ssh' accept"

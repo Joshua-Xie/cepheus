@@ -7,11 +7,13 @@
 # Change 'password' to whatever password you like.
 
 # Root password
-rootpw --iscrypted {{ node.root_pwd }}
+rootpw --iscrypted {{ root.pwd }}
 
 # User
 # Change pwd 'operations' to anything you like
+{% for user in users %}
 user --groups={{ user.group }} --name={{ user.name }} --iscrypted --password={{ user.passwd }}
+{% endfor %}
 
 # Static NETWORK
 # NOTE: Anaconda only allows for one DNS entry (last one wins if more than one)
@@ -149,8 +151,8 @@ $yum_config_stanza
 # End yum configuration
 
 # Start final steps
-groupadd {{ user.name }}
-useradd {{ user.name }} -g {{ user.name }} -G wheel
+groupadd {{ primary_user.name }}
+useradd {{ primary_user.name }} -g {{ primary_user.name }} -G wheel
 
 # Note: The postinstall directory remains but can be removed if desired.
 cp -R /tmp/postinstall/ceph-files/* /ceph-files/.
@@ -158,47 +160,47 @@ cp -R /tmp/postinstall/ceph-host/* /ceph-host/.
 mv /ceph-files/rpms/* /chef-files/.
 rm -rf /ceph-files/rpms
 
-chown -R {{ user.name }}:{{ user.name }} /ceph-files
-chown -R {{ user.name }}:{{ user.name }} /ceph-host
-chown -R {{ user.name }}:{{ user.name }} /chef-files
+chown -R {{ primary_user.name }}:{{ primary_user.name }} /ceph-files
+chown -R {{ primary_user.name }}:{{ primary_user.name }} /ceph-host
+chown -R {{ primary_user.name }}:{{ primary_user.name }} /chef-files
 
-cat /ceph-host/bootstrap/data/environment/{{ node.environment }}/hosts >> /etc/hosts
+cat /ceph-host/data/{{ location }}/{{ data_center }}/hosts >> /etc/hosts
 
 # Allow root login to begin with. Chef recipe will disable later in process.
 sed -i "s/#PermitRootLogin yes/PermitRootLogin yes/" /etc/ssh/sshd_config
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
 # Add a public key here to authorized_keys but make sure to set permission to 0600
-mkdir --mode=0700 -p /home/{{ user.name }}/.ssh
-cat <<EOM >/home/{{ user.name }}/.ssh/authorized_keys
+mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
+cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
 {{ user.key }}
 EOM
-cp /ceph-host/bootstrap/data/environment/{{ node.environment }}/{{ user.private_key }} /home/{{ user.name }}/.ssh/id_rsa
-chmod 0600 /home/{{ user.name }}/.ssh/authorized_keys
-chmod 0600 /home/{{ user.name }}/.ssh/id_rsa
-chown -R {{ user.name }}:{{ user.group }} /home/{{ user.name }}/.ssh
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
+chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
+chmod 0600 /home/{{ primary_user.name }}/.ssh/id_rsa
+chown -R {{ primary_user.name }}:{{ primary_user.group }} /home/{{ primary_user.name }}/.ssh
 
-cp /ceph-host/bootstrap/data/environment/{{ node.environment }}/*.pem /tmp
-cp /ceph-host/bootstrap/data/environment/{{ node.environment }}/*.crt /tmp
-cp /ceph-host/bootstrap/data/environment/{{ node.environment }}/*.key /tmp
-cp /ceph-host/bootstrap/data/environment/{{ node.environment_short }}/README.txt /home/{{ user.name }}
-chown {{ user.name }}:{{ user.group }} /home/{{ user.name }}/README.txt
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/*.pem /tmp
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/*.crt /tmp
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/*.key /tmp
+cp /ceph-host/bootstrap/data/environment/{{ environment_short }}/README.txt /home/{{ primary_user.name }}
+chown {{ primary_user.name }}:{{ primary_user.group }} /home/{{ primary_user.name }}/README.txt
 
 # Setup sudoer
-echo "%{{ user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ user.name }}
+echo "%{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
 sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
-echo "{{ user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ user.name }}
+echo "{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
 
-{% if cobbler.kickstart.redhat.management.type %}
-{{ cobbler.kickstart.redhat.management.commands.C1 }}
-{{ cobbler.kickstart.redhat.management.commands.C2 }}
-{{ cobbler.kickstart.redhat.management.commands.C3 }}
+{% if subscription.type %}
+{{ subscription.commands.C1 }}
+{{ subscription.commands.C2 }}
+{{ subscription.commands.C3 }}
 # Go ahead and create a script in /tmp if the network has issues during the process.
 cat <<EOM >/tmp/rhelsub.sh
 # service network restart
-{{ cobbler.kickstart.redhat.management.commands.C1 }}
-{{ cobbler.kickstart.redhat.management.commands.C2 }}
-{{ cobbler.kickstart.redhat.management.commands.C3 }}
+{{ subscription.commands.C1 }}
+{{ subscription.commands.C2 }}
+{{ subscription.commands.C3 }}
 yum update -y
 EOM
 chmod +x /tmp/rhelsub.sh
@@ -211,11 +213,11 @@ cp /tmp/postinstall/ceph-host/data/templates/isolinux.cfg /tmp/build/iso/isolinu
 # TODAY=$(date +'%Y-%m-%d')
 rm -rf /tmp/build/iso/.rr_moved
 # mkisofs
-genisoimage -r -J -N -d -hide-rr-moved -R -T -no-emul-boot -boot-load-size 4 -boot-info-table -V "{{ ISO.volume_id }}" -p "{{ ISO.packer }}" -A "{{ ISO.volume_id }}" -b isolinux/isolinux.bin -c isolinux/boot.cat -x "lost+found" -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o /tmp/{{ cobbler.kickstart.os.distro }} /tmp/build/iso
-implantisomd5 /tmp/{{ cobbler.kickstart.os.distro }}
+genisoimage -r -J -N -d -hide-rr-moved -R -T -no-emul-boot -boot-load-size 4 -boot-info-table -V "{{ ISO.volume_id }}" -p "{{ ISO.packer }}" -A "{{ ISO.volume_id }}" -b isolinux/isolinux.bin -c isolinux/boot.cat -x "lost+found" -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o /tmp/{{ os.distro }} /tmp/build/iso
+implantisomd5 /tmp/{{ os.distro }}
 
-chown -R {{ user.name }}:{{ user.group }} /tmp/postinstall
-chown {{ user.name }}:{{ user.group }} /tmp/{{ cobbler.kickstart.os.distro }}
+chown -R {{ primary_user.name }}:{{ primary_user.group }} /tmp/postinstall
+chown {{ primary_user.name }}:{{ primary_user.group }} /tmp/{{ os.distro }}
 
 # Sanity check for nics - Depending on nic, they may need a onetime restart so just do it and have it remove itself
 cat <<EOM >/etc/init.d/onetime.sh

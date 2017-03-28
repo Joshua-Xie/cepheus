@@ -1,0 +1,44 @@
+---
+# CentOS specific data
+
+# IMPORTANT: Whatever data is here will be appended to the overall `build.yaml` that will be located `public` or
+# `private` based on the value passed to the intial ./CEPH_UP script
+
+# IMPORTANT: No section below can exist in other yaml files be used in the files being appended. For example,
+# 'os' section can not already exist in 'build.yaml'. However, it can and should be in other OS related yaml files.
+
+os:
+    type: centos
+    version: 7.2
+    name: centos-7.2
+    arch: x86_64
+    distro: centos-7-x86_64-minimal.iso
+    breed: redhat
+    iso:
+        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+
+chef_repo: # (required files for build)
+    knife_acl_version: 0.0.12
+    client:
+        version: 12.19.36
+        package: chef-12.19.36-1.el7.x86_64.rpm
+    server:
+        version: 12.13.0
+        package: chef-server-core-12.13.0-1.el7.x86_64.rpm
+
+adc: # (optional) Only required if allowing Cepheus to build out your software load-balancers
+    bgp:
+        bird: # (required files for build)
+            version: 1.5.0
+            package: bird-1.5.0-1.x86_64.rpm
+
+pxe_boot: # (optional) Only used for the PXE Boot method
+    iso:
+        name: centos-7-x86_64-minimal.iso
+        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+
+ceph_repo:
+    create: false
+    branch: stable
+    arch: x86_64
+    revision: 0.el7

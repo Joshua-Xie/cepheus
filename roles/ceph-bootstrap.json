@@ -6,7 +6,7 @@
     "run_list": [
       "recipe[cepheus::build-env]",
       "recipe[cepheus::ansible]",
-      "role[cobbler]",
+      "role[pxe_boot]",
       "role[monitoring]"
     ],
     "description": "A bootstrap (admin) node in a ceph cluster",

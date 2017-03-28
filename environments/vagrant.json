@@ -204,7 +204,7 @@
         "passwd": "$6$Salt$xvQkYaQ4urNWmnjpinAZSR/ZOaRy/aacKh4j18ayq/.mswLqleFZI5zaD1BCg2Fdzy1BjpBv9VIgVgt6YoA8T0",
         "NOTE": "password of vbox is: $6$Salt$xvQkYaQ4urNWmnjpinAZSR/ZOaRy/aacKh4j18ayq/.mswLqleFZI5zaD1BCg2Fdzy1BjpBv9VIgVgt6YoA8T0"
       },
-      "cobbler": {
+      "pxe_boot": {
         "web_user": "cobbler",
         "pxe_interface": "enp0s3",
         "server": "10.0.100.20",

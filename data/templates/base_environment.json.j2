@@ -42,7 +42,7 @@
         "name": "{{ bootstrap.name }}",
         "env": "{{ boostrap.env }}",
         "interfaces": [
-        {%- for item in interfaces %}
+        {%- for item in bootstrap.interfaces %}
           {"name": "{{ item.device }}", "ip": "{{ item.ip }}", "netmask": "{{ item.netmask }}", "gateway": "{{ item.gateway }}", "mac": "{{ item.mac }}"}{%- if not loop.last %},{% endif %}
         {%- endfor %}
         ]
@@ -228,23 +228,23 @@
         "passwd": "{{ ipmi.passwd }}"
         {#- "NOTE": "password of vbox is: $6$Salt$xvQkYaQ4urNWmnjpinAZSR/ZOaRy/aacKh4j18ayq/.mswLqleFZI5zaD1BCg2Fdzy1BjpBv9VIgVgt6YoA8T0" #}
       },
-      "cobbler": {
+      "pxe_boot": {
         "web_user": "cobbler",
-        "pxe_interface": "{{ cobbler.interface }}",
-        "server": "{{ cobbler.server }}",
+        "pxe_interface": "{{ pxe_boot.interface }}",
+        "server": "{{ pxe_boot.server }}",
         "kickstart": {
           "root": {
-            "passwd": "{{ cobbler.kickstart.root.passwd }}",
+            "passwd": "{{ pxe_boot.kickstart.root.passwd }}",
             "passwd_type": "--iscrypted",
-            "key": "{{ cobbler.kickstart.root.key }}"
+            "key": "{{ pxe_boot.kickstart.root.key }}"
           },
           "file": {
             "osd": "cepheus_node_rhel_osd.ks",
             "nonosd": "cepheus_node_rhel_nonosd.ks"
           },
           "bootloader": {
-            "passwd": "{{ cobbler.kickstart.bootloader.passwd }}",
-            "passwd_type": "{{ cobbler.kickstart.bootloader.passwd_type }}"
+            "passwd": "{{ pxe_boot.kickstart.bootloader.passwd }}",
+            "passwd_type": "{{ pxe_boot.kickstart.bootloader.passwd_type }}"
           },
           "users": [
             {
@@ -279,11 +279,11 @@
         "dhcp": {
           "shared_network": "cepheus",
           "single": {
-            "netmask": "{{ cobbler.kickstart.dhcp.single.netmask }}",
-            "gateway": "{{ cobbler.kickstart.dhcp.single.gateway }}"
+            "netmask": "{{ pxe_boot.kickstart.dhcp.single.netmask }}",
+            "gateway": "{{ pxe_boot.kickstart.dhcp.single.gateway }}"
           },
           "subnets":[
-          {%- for item in cobbler.kickstart.dhcp.subnets %}
+          {%- for item in pxe_boot.kickstart.dhcp.subnets %}
             {"subnet": "{{ item.subnet }}", "tag": "{{ item.tag }}", "dhcp_range": ["{{ item.dhcp_range|join('","') }}"], "netmask": "{{ item.netmask }}", "router": "{{ item.router }}"}{%- if not loop.last %},{% endif %}
           {%- endfor %}
           ]
@@ -325,22 +325,22 @@
           "xmlrpc": 25151
         },
         "os": {
-          "name": "{{ cobbler.kickstart.os.name }}",
-          "version": "{{ cobbler.kickstart.os.version }}",
-          "arch": "{{ cobbler.kickstart.os.arch }}",
-          "distro": "{{ cobbler.kickstart.os.distro }}",
-          "breed": "{{ cobbler.kickstart.os.breed }}"
+          "name": "{{ os.name }}",
+          "version": "{{ os.version }}",
+          "arch": "{{ os.arch }}",
+          "distro": "{{ os.distro }}",
+          "breed": "{{ os.breed }}"
         },
         {%- if os.type == "rhel" %}
         "redhat": {
           "management": {
-            "type": {%- if cobbler.kickstart.redhat.management.type == True %} true, {% else %} false, {%- endif %}
-            "server": "{{ cobbler.kickstart.redhat.management.server }}",
-            "key": "{{ cobbler.kickstart.redhat.management.key }}"
+            "type": {%- if subscription.type == True %} true, {% else %} false, {%- endif %}
+            "server": "{{ subscription.server }}",
+            "key": "{{ subscription.key }}"
           }
         },
         {%- endif %}
-        "repo_mirror": false
+        "repo_mirror": {%- if pxe_boot.kickstart.repo_mirror == True %} true {% else %} false {%- endif %}
       },
       "ceph": {
         "cluster": "{{ ceph.cluster }}",

@@ -12,10 +12,7 @@
 # IMPORTANT: No section below can exist in other yaml files be used in the files being appended. For example,
 # 'environment' section can not already exist in other yaml files. The except are OS specific yaml files.
 
-# Can only be `public` or `private`.
-location: public
-
-# 'method' can only be `repo` or `pxe`. If `pxe` then the 'cobbler' section of the given OS yaml is used.
+# 'method' can only be `repo` or `pxe`. If `pxe` then the 'pxe_boot' section of the given OS yaml is used.
 method: repo
 
 # NB: Chef client/server data is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
@@ -43,7 +40,7 @@ cache:
     rpm: rpms
     deb: debs
     python: python
-    cobbler: cobbler
+    pxe_boot: pxe_boot
     iso: isos
     loader: loaders
 
