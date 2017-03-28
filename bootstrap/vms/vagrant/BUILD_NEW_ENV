@@ -350,26 +350,26 @@ if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
   do_on_node $vm "sudo pip install --index-url=http://pypi.python.org/simple/ --trusted-host pypi.python.org pyyaml"
 
   # Build the initial bootstrap_chef.sh script in the data center specific folder
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/bootstrap/data/environment/$env/bootstrap_chef.sh.j2 -o /tmp/build/iso/postinstall/ceph-host/bootstrap/data/environment/$env/$dc/bootstrap_chef.sh"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/bootstrap/data/environment/$env/bootstrap_chef.sh.j2 -o /tmp/build/iso/postinstall/ceph-host/bootstrap/data/environment/$env/$dc/bootstrap_chef.sh"
   do_on_node $vm "sudo chmod +x /tmp/build/iso/postinstall/ceph-host/bootstrap/data/environment/$env/$dc/bootstrap_chef.sh"
 
   # Build base.sh script
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/bootstrap/data/environment/$env/base.sh.j2 -o /tmp/build/iso/postinstall/ceph-host/bootstrap/data/environment/$env/scripts/base.sh"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/bootstrap/data/environment/$env/base.sh.j2 -o /tmp/build/iso/postinstall/ceph-host/bootstrap/data/environment/$env/scripts/base.sh"
   do_on_node $vm "sudo chmod +x /tmp/build/iso/postinstall/ceph-host/bootstrap/data/environment/$env/scripts/base.sh"
 
   # Build Data - isolinux.cfg
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/isolinux.cfg.j2 -o /tmp/build/iso/isolinux/isolinux.cfg"
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/cepheus_bootstrap_rhel.ks.j2 -o /tmp/build/iso/ks/cepheus_bootstrap_rhel.ks"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/isolinux.cfg.j2 -o /tmp/build/iso/isolinux/isolinux.cfg"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/cepheus_bootstrap_rhel.ks.j2 -o /tmp/build/iso/ks/cepheus_bootstrap_rhel.ks"
 
   # NOTE: Yes, it's true...the output is another .j2 becase it does multiple passes.
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/$env.json.j2 -o /tmp/build/iso/postinstall/ceph-host/environments/$env.json.j2"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/$env.json.j2 -o /tmp/build/iso/postinstall/ceph-host/environments/$env.json.j2"
 
   # Overrides dummy operations.pub in files/default
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/operations.pub.j2 -o /tmp/build/iso/postinstall/ceph-host/cookbooks/cepheus/files/default/operations.pub"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/operations.pub.j2 -o /tmp/build/iso/postinstall/ceph-host/cookbooks/cepheus/files/default/operations.pub"
 
   # Build kickstart template to be used by Chef
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/cepheus_node_rhel_nonosd.ks.erb.j2 -o /tmp/build/iso/postinstall/ceph-host/cookbooks/cepheus/templates/default/cepheus_node_rhel_nonosd.ks.erb"
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/cepheus_node_rhel_osd.ks.erb.j2 -o /tmp/build/iso/postinstall/ceph-host/cookbooks/cepheus/templates/default/cepheus_node_rhel_osd.ks.erb"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/cepheus_node_rhel_nonosd.ks.erb.j2 -o /tmp/build/iso/postinstall/ceph-host/cookbooks/cepheus/templates/default/cepheus_node_rhel_nonosd.ks.erb"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /ceph-host/bootstrap/data/environment/$BUILD_ENV/base-seed.yaml -i /ceph-host/data/templates/cepheus_node_rhel_osd.ks.erb.j2 -o /tmp/build/iso/postinstall/ceph-host/cookbooks/cepheus/templates/default/cepheus_node_rhel_osd.ks.erb"
 
   do_on_node $vm "cp /ceph-host/bootstrap/data/environment/$BUILD_ENV/rack01-node-seed.yaml /tmp/."
   do_on_node $vm "cp /ceph-host/bootstrap/data/environment/$BUILD_ENV/rack02-node-seed.yaml /tmp/."
@@ -379,7 +379,7 @@ if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
   do_on_node $vm "sed '/---/d' /tmp/rack02-node-seed.yaml >> /tmp/rack-node-seed.yaml"
   do_on_node $vm "sed '/---/d' /tmp/rack03-node-seed.yaml >> /tmp/rack-node-seed.yaml"
 
-  do_on_node $vm "sudo /ceph-host/data/templates/jinja_render.py -d /tmp/rack-node-seed.yaml -i /tmp/build/iso/postinstall/ceph-host/environments/$env.json.j2 -o /tmp/build/iso/postinstall/ceph-host/environments/$env.json"
+  do_on_node $vm "sudo /ceph-host/data/templates/template_engine.py -d /tmp/rack-node-seed.yaml -i /tmp/build/iso/postinstall/ceph-host/environments/$env.json.j2 -o /tmp/build/iso/postinstall/ceph-host/environments/$env.json"
   do_on_node $vm "sudo rm -f /tmp/build/iso/postinstall/ceph-host/environments/$env.json.j2"
 
   # Build ISO with custom kickstart

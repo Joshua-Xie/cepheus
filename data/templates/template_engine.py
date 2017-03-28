@@ -36,20 +36,27 @@ import json
 
 # All three file paths must be full paths to each.
 def render_template(data_file, in_file, out_file):
-    #env = Environment(autoescape=False, loader=FileSystemLoader('/')), trim_blocks=True)
-    env = Environment(loader=FileSystemLoader('/'))
-    env.filters['jsonify'] = json.dumps
+    try:
+        #env = Environment(autoescape=False, loader=FileSystemLoader('/')), trim_blocks=True)
+        env = Environment(loader=FileSystemLoader('/'))
+        env.filters['jsonify'] = json.dumps
 
-    with open(data_file) as data:
-        dict =  yaml.load(data)
+        with open(data_file) as data:
+            dict =  yaml.load(data)
 
-    # Render template and print generated config to console
-    template = env.get_template(in_file)
+        # Render template and print generated config to console
+        template = env.get_template(in_file)
 
-    with open(out_file, 'w') as f:
-        output = template.render(dict)
-        f.write(output)
-
+        with open(out_file, 'w') as f:
+            output = template.render(dict)
+            f.write(output)
+    except Exception as e:
+        print
+        print '-'*60
+        print "Cepheus' Template Engine stopped due to the following error ===> ", e
+        print '-'*60
+        print
+        exit(1)
 
 # dict is json dictionary of the values to sub
 def render_string(in_string, dict):

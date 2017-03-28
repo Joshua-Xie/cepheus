@@ -17,6 +17,20 @@ os:
     iso:
         url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
 
+# Unique ISO data for OS
+ISO:
+  volume_id: "CentOS-7.2 Server.x86_64"
+
+{% if environment == "vagrant" %}
+# Name of the VBox Storage Controller
+vagrant:
+    storage_controller: "SATA Controller"
+    # bento/centos-7.2+ has an ssh issue
+    box: "bento/centos-7.1"
+    front_end_adapter_ip: 10.121.2.1
+    back_end_adapter_ip: 10.121.2.1
+{% endif %}
+
 chef_repo: # (required files for build)
     knife_acl_version: 0.0.12
     client:
@@ -42,3 +56,78 @@ ceph_repo:
     branch: stable
     arch: x86_64
     revision: 0.el7
+
+security:
+    firewall:
+        enable: false
+        use: rules
+        zone: public
+        rules:
+            - name: ceph
+              roles:
+                  - ceph-mon
+                  - ceph-osd
+                  - ceph-rgd
+                  - ceph-rgw
+                  - ceph-mds
+                  - ceph-admin
+                  - ceph-restapi
+                  - ceph-adc
+              type: rich-rule
+              zone: public
+              permanent: true
+              rules:
+                  - "rule family='ipv4' source address='10.0.100.0/24' accept"
+                  - "rule family='ipv4' source address='10.0.100.0/24' service name='ssh' accept"
+
+            ## All of the ones below are examples. You can get creative.
+            # - name: ceph-osd
+            #   roles:
+            #       - ceph-osd
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' accept"
+            # - name: ceph-rgw
+            #   roles:
+            #       - ceph-rgw
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' port port='8080-8089' protocol='tcp' accept"
+            # - name: ssh
+            #   roles:
+            #       - ceph-bootstrap
+            #       - ceph-mon
+            #       - ceph-osd
+            #       - ceph-rgd
+            #       - ceph-rgw
+            #       - ceph-mds
+            #       - ceph-admin
+            #       - ceph-restapi
+            #       - ceph-adc
+            #   type: service
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - ssh
+            # - name: bootstrap-internal
+            #   roles:
+            #       - ceph-bootstrap
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' accept"
+            # - name: adc
+            #   roles:
+            #       - ceph-adc
+            #   type: service
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - http
+            #       - https
+            ##

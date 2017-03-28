@@ -44,11 +44,15 @@ device2_2U: &device2_2U enp0s9
 # These can be any data files you want. A normal example is putting your rack data into a separate yaml for each rack
 # and then add them here to be included in the final build of `build.yaml` which everything will eventually derive from.
 data_files:
-    - "rhel.yaml"
+    - "centos.yaml"
     - "pxe_boot.yaml"
     - "rack_01.yaml"
     - "rack_02.yaml"
     - "rack_03.yaml"
+
+# Environment specific files that need to run through the template engine
+environment_files:
+    - "bootstrap/vms/environment_config_yaml"
 
 # Root/sudo related items
 root:

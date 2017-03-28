@@ -4,10 +4,12 @@
 
 # PXE Booting related
 ISO:
-  volume_id: "RHEL-7.2 Server.x86_64"
   packer: LambdaStack
 
+# This data will not show up in the final Chef environment.json file unless `method` is set to 'pxe'
 pxe_boot:
+  # This enable flag is present for those installations that are pxe_booting but want to turn it off
+  enable: true
   interface: enp0s3
   server: 10.0.100.20
   kickstart:

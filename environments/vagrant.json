@@ -8,6 +8,7 @@
   "override_attributes": {
     "cepheus": {
       "environment": "vagrant",
+      "method": "repo",
       "NOTE": "Development below is set to TRUE here so that the dev environment will also be setup.",
       "development": {
           "enabled": true,
@@ -205,6 +206,7 @@
         "NOTE": "password of vbox is: $6$Salt$xvQkYaQ4urNWmnjpinAZSR/ZOaRy/aacKh4j18ayq/.mswLqleFZI5zaD1BCg2Fdzy1BjpBv9VIgVgt6YoA8T0"
       },
       "pxe_boot": {
+        "enable": false,
         "web_user": "cobbler",
         "pxe_interface": "enp0s3",
         "server": "10.0.100.20",

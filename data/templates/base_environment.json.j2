@@ -9,6 +9,7 @@
   "override_attributes": {
     "cepheus": {
       "environment": "{{ environment }}",
+      "method": "{{ method }}",
       "repo": {
         {#- Pins the current version of ceph or any other packaged in the array at the moment of install. #}
         "packages": [
@@ -146,7 +147,7 @@
           "banner": "/etc/banner"
         },
         "firewall": {
-          "enable": {%- if security.firewall.enable == True %}true{% else %}false{%- endif %},
+          "enable": {%- if security.firewall.enable == True %}true,{% else %}false,{%- endif %}
           "zone": "{{ security.firewall.zone }}",
           "use": "{{ security.firewall.use }}",
           "rules": [
@@ -228,7 +229,9 @@
         "passwd": "{{ ipmi.passwd }}"
         {#- "NOTE": "password of vbox is: $6$Salt$xvQkYaQ4urNWmnjpinAZSR/ZOaRy/aacKh4j18ayq/.mswLqleFZI5zaD1BCg2Fdzy1BjpBv9VIgVgt6YoA8T0" #}
       },
+      {% if method == "pxe" %}
       "pxe_boot": {
+        "enable": {%- if pxe_boot.enable == True %}true,{% else %}false,{%- endif %}
         "web_user": "cobbler",
         "pxe_interface": "{{ pxe_boot.interface }}",
         "server": "{{ pxe_boot.server }}",
@@ -342,6 +345,7 @@
         {%- endif %}
         "repo_mirror": {%- if pxe_boot.kickstart.repo_mirror == True %} true {% else %} false {%- endif %}
       },
+      {% endif %}
       "ceph": {
         "cluster": "{{ ceph.cluster }}",
         "repo": {

@@ -17,6 +17,17 @@ os:
     iso:
         url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
 
+# Unique ISO data for OS
+ISO:
+  volume_id: "RHEL-7.2 Server.x86_64"
+
+{% if environment == "vagrant" %}
+# Name of the VBox Storage Controller
+vagrant:
+    storage_controller: "SATA Controller"
+    box: "bento/centos-7.1"
+{% endif %}
+
 # Subscription Manager - Satellite Server
 subscription:
     type: true

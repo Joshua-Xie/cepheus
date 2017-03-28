@@ -137,13 +137,13 @@ cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTE
 # Build bootstrapping environment based on yaml data
 BUILD=data/build.sh
 echo "===> Generating $REPO_ROOT/$BUILD from $REPO_ROOT/data/common.yaml..."
-$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
+$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
 sudo chmod +x $REPO_ROOT/$BUILD
 
 # Add all other data files to the final build.yaml
 BUILD_DATA=data/data_files.sh
 echo "===> Generating $REPO_ROOT/$BUILD_DATA from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml..."
-$REPO_ROOT/data/templates/jinja_render.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
+$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
 sudo chmod +x $REPO_ROOT/$BUILD_DATA
 
 ## Execution phase of scripts - after being built above!
