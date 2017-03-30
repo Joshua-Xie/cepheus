@@ -9,3 +9,13 @@ The `local` sub-folder name holds the default vagrant build information as an ex
 ANY files located in the `public` folder and NOT the sub-folders should be considered common to all data centers.
 
 OS specific data files should be in both 'public' and 'private'. Once passed through the template engine the output will go into the sub-folder of the specified data center.
+
+#### Racks on different subnets and PXE Booting
+
+Depending on the ToR (top of rack) switch you use, if you put each rack on a different subnet then you may need to do something like the following:
+
+>IP helper-address `ip address of dhcp for pxe booting`
+>
+>set forwarding-option dhcp-relay server-group DHCP_SERVERS `ip address of dhcp of pxe booting`
+
+The above may not be complete for your environment so get with your network team to determine the best way to pxe boot off of different subnets based on dhcp of your pxe server.

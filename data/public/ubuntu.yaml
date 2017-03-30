@@ -29,6 +29,12 @@ ceph_repo:
     arch: x86_64
     revision:
 
+adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
+    bgp:
+        bird: # (required files for build)
+            version: 1.5.0
+            package:
+
 # Change this to support the correct firewall
 security:
     firewall:

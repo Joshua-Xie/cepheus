@@ -1,0 +1,179 @@
+---
+
+# Inventory file that contains all of the info of each Ceph node in the cluster.
+
+inventory:
+    # NIC device names based on the hardware
+    # Only here as a reference since they are actually defined in the environment.yaml
+    # device1_1U: &device1_1U enp0s8
+    # device2_1U: &device2_1U enp0s9
+    # device1_2U: &device1_2U enp0s8
+    # device2_2U: &device2_2U enp0s9
+
+    nodes:
+        # This node's primary role is Bootstrap. Because of that it will not be in the Cobbler system list so *NO* mac addresses needed!
+        # It's mainly here for automation and completness.
+        - name: ceph-boostrap
+          description: Bootstrap node that drives everything
+          location: rack_01
+          ipmi:
+              name: ceph-boostrap-mgmt
+              ip: 10.123.85.130
+          roles:
+              - bootstrap
+          # Profile is PXE related so bootstrap node is empty
+          profile: ""
+          bond:
+              name: bond0
+              enable: false
+              mtu: 1500
+              options: "mode=4 miimon=100 xmit_hash_policy=layer3+4"
+              interfaces:
+                  - *device1_1U
+                  - *device1_2U
+          interfaces:
+                # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
+                - profile: public
+                  device: *device1_1U
+                  ip: 10.0.100.20
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24
+                - profile: cluster
+                  device: *device2_1U
+                  ip: 10.121.2.20
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24
+
+        - name: ceph-vm1
+          description: Hyperconverged node with every Ceph process running
+          location: rack_01
+          ipmi:
+              name: ceph-vm1-mgmt
+              ip: 10.123.85.131
+          roles:
+              - mon
+              - osd
+              - rgw
+              - admin
+          # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
+          profile: ceph_osd_node
+          bond:
+              name: bond0
+              enable: false
+              mtu: 1500
+              options: "mode=4 miimon=100 xmit_hash_policy=layer3+4"
+              interfaces:
+                  - *device1_1U
+                  - *device1_2U
+          interfaces:
+                # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
+                - profile: public
+                  device: *device1_1U
+                  ip: 10.0.100.21
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24
+                - profile: cluster
+                  device: *device2_1U
+                  ip: 10.121.2.21
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24
+
+        - name: ceph-vm2
+          description: Hyperconverged node with every Ceph process running
+          location: rack_02
+          ipmi:
+              name: ceph-vm2-mgmt
+              ip: 10.123.85.132
+          roles:
+              - mon
+              - osd
+              - rgw
+              - admin
+          # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
+          profile: ceph_osd_node
+          bond:
+              name: bond0
+              enable: false
+              mtu: 1500
+              options: "mode=4 miimon=100 xmit_hash_policy=layer3+4"
+              interfaces:
+                  - *device1_1U
+                  - *device1_2U
+          interfaces:
+                # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
+                - profile: public
+                  device: *device1_1U
+                  ip: 10.0.100.22
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24
+                - profile: cluster
+                  device: *device2_1U
+                  ip: 10.121.2.22
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24
+
+        - name: ceph-vm3
+          description: Hyperconverged node with every Ceph process running
+          location: rack_03
+          ipmi:
+              name: ceph-vm3-mgmt
+              ip: 10.123.85.133
+          roles:
+              - mon
+              - osd
+              - rgw
+              - admin
+          # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
+          profile: ceph_osd_node
+          bond:
+              name: bond0
+              enable: false
+              mtu: 1500
+              options: "mode=4 miimon=100 xmit_hash_policy=layer3+4"
+              interfaces:
+                  - *device1_1U
+                  - *device1_2U
+          interfaces:
+                # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
+                - profile: public
+                  device: *device1_1U
+                  ip: 10.0.100.23
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24
+                - profile: cluster
+                  device: *device2_1U
+                  ip: 10.121.2.23
+                  mac: ""
+                  # TORs - Gateway
+                  gateway: ""
+                  mtu: 1500
+                  netmask: 255.255.255.0
+                  cidr: 24

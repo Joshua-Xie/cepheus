@@ -108,7 +108,7 @@ download_file /{{ cache.rpm }}/{{ chef_repo.server.package }} https://packages.c
 
 # BIRD is a little different
 echo "===> Downloading Bird..."
-ftp_file /{{ cache.rpm }}/{{ adc.bgp.bird.package }} ftp://bird.network.cz/pub/bird/redhat/{{ adc.bgp.bird.package }}
+ftp_file /{{ cache.rpm }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/pub/bird/redhat/{{ adc_repo.bgp.bird.package }}
 
 # Most important cookbook
 # If set then it will not download but remove from cache and use the development version that should be set in the cepheus/cookbooks directory.

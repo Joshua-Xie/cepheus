@@ -1,0 +1,301 @@
+---
+
+# Contains only Ceph specific data
+
+ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
+    cluster: ceph
+    name: luminous
+    version: 10.2.6
+
+    tcmalloc: # This becomes the default after Jewel
+        enable: true
+
+    ec:
+        enable: true
+        profile: cepheus
+        plugin: jerasure
+        directory: "/usr/lib64/ceph/erasure-code"
+        ruleset_root: hdd
+        ruleset_failure_domain: host
+        technique: reed_sol_van
+        # These numbers are based on the number of OSD nodes and racks. Adjust to fit the INITIAL cluster - not after the fact
+        k: 2
+        m: 1
+
+    pgs:
+        num: 64
+        calc:
+            total_osds: 612
+            target_pgs_per_osd: 200
+            min_pgs_per_pool: 64
+            replicated_size: 3
+            erasure_size: 11
+    repo:
+        # This will tell ceph-chef cookbook not to create a yum repo because we will use RHEL Sat Server
+        create: false
+
+    restapi: # TODO: Change this later to support the VIP API
+        url: api.example.com
+        ip: 10.121.1.18
+        port: 5080
+
+    mgr:
+        enable: false
+
+    pools:
+        crush_rule: 1
+        radosgw:
+            - name: ".log"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".intent-log"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".rgw"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".rgw.control"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".rgw.gc"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".rgw.root"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".rgw.buckets"
+              data_percent: 95.90
+              type: erasure
+              profile: cepheus
+              crush_ruleset: 1
+              crush_ruleset_name: hdd
+
+            - name: ".rgw.buckets.index"
+              data_percent: 2
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".rgw.buckets.extra"
+              data_percent: 1
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".users"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".users.uid"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".users.email"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".users.swift"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: ".usage"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+    radosgw:
+        bucket_shards: 5
+        rados_handles: 1
+        civetweb_threads: 100
+        settings:
+            pg_num: 64
+            pgp_num: 64
+            size: 3
+            options: ""
+            force: false
+            calc: true
+            crush_ruleset: 1
+            chooseleaf: host
+            chooseleaf_type: 1
+            type: erasure
+            # OSD nodes per rack - helps determine crushmap feature for erasure coding
+            nodes_per_rack: 17
+        # This may need to move to a DB later...
+        default_url: s3.example.com
+        debug:
+            logs:
+                enable: true
+                level: 2
+        logs:
+            ops:
+                enable: true
+            usage:
+                enable: true
+        # Quotas are in MB
+        users:
+            - uid: radosgw
+              name: Admin
+              admin_caps: "users=*;buckets=*;metadata=*;usage=*;zone=*"
+              # Keys are not required and NOT there for real users.
+              access_key: ""
+              secret_key: ""
+              email: ""
+              max_buckets: 0
+              # status can be: enable, suspend or remove. Remove will remove the user and purge all data! You will then need
+              # to remove the entry block here after the user has been removed from the cluster.
+              status: enable
+              key_type: s3
+              quota:
+                    user:
+                        # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                        status: disable
+                        size: -1
+                        objects: -1
+                    buckets:
+                        - name: fill_test
+                          # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                          status: disable
+                          size: -1
+                          objects: -1
+              zones:
+                  # Must have at least one empty zone
+                  - ""
+                  # - development example zone
+
+              # buckets are for the initial bucket to create if desired. The first 3 users here are system users so we create the buckets.
+              # The remaining users are real users and there are no buckets unless we know them and want to place them here
+              buckets:
+                  - fill_test
+            - uid: cepheus_log_admin
+              name: "Ceheus Log Admin"
+              admin_caps: ""
+              access_key: ""
+              secret_key: ""
+              email: ""
+              max_buckets: 0
+              status: enable
+              key_type: s3
+              quota:
+                    user:
+                        # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                        status: disable
+                        size: -1
+                        objects: -1
+                    buckets:
+                        - name: cepheus_logs
+                          # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                          status: disable
+                          size: -1
+                          objects: -1
+              zones:
+                  # Must have at least one empty zone
+                  - ""
+                  # - development example zone
+              buckets:
+                  - cepheus_logs
+            - uid: tester
+              name: Tester
+              admin_caps: "usage=read; user=read; bucket=*"
+              access_key: ""
+              secret_key: ""
+              email: ""
+              max_buckets: 3
+              status: enable
+              key_type: s3
+              quota:
+                    user:
+                        # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
+                        status: enable
+                        size: 10
+                        objects: -1
+                        # NOTE: buckets are missing for quotas here just to show it can
+              zones:
+                  # Must have at least one empty zone
+                  - ""
+                  # - development example zone
+        federated:
+            enable: false
+            # master_zone must match one of the vip names.
+            master_zone: dev
+            master_zone_port: 8080
+            enable_regions_zones: false
+            # Region represent cluster (datacenter)
+            regions:
+                - *data_center
+            # Zones represent network tiers
+            zones:
+                # Must have at least one empty zone
+                - ""
+
+    osd:
+        journal:
+            # Production may be something like 20000
+            size: 3000
+        rebalance: false
+        niceness: -10
+        crush:
+            update: false # true for production...
+            update_on_start: true # false for production...
+            chooseleaf_type: 1
+        device: "/dev/"
+        devices:
+            - device: sdb
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false
+            - device: sdc
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false
+            - device: sdd
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false
+            - device: sde
+              data_type: hdd
+              journal: sdf
+              journal_type: ssd
+              encrypted: false

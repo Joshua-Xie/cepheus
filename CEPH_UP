@@ -159,9 +159,8 @@ source $REPO_ROOT/$BUILD
 #
 ## Execution phase end block
 
-# test environment build
-
-$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/test.json
+# Build environments file for Chef
+$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
 
 # Change later to support new repo build system...
 if [[ $BUILD_ENVIRONMENT == "vagrant" ]]; then

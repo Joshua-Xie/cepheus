@@ -27,6 +27,7 @@
 # prod-dc101.json or something like it.
 
 from jinja2 import Environment, FileSystemLoader
+import traceback
 import os
 import yaml
 import argparse
@@ -35,7 +36,17 @@ import json
 
 
 # All three file paths must be full paths to each.
-def render_template(data_file, in_file, out_file):
+def render_template(data_file, in_file, out_file, json_arg):
+    dict = ""
+
+    # If the -j flag was passed then convert the yaml to pretty json in sorted order
+    if json_arg:
+        with open(data_file) as data:
+            dict =  yaml.load(data)
+        print json.dumps(dict, indent=4, sort_keys=True)
+        exit(0)
+
+    # Start the template processing
     try:
         #env = Environment(autoescape=False, loader=FileSystemLoader('/')), trim_blocks=True)
         env = Environment(loader=FileSystemLoader('/'))
@@ -50,29 +61,55 @@ def render_template(data_file, in_file, out_file):
         with open(out_file, 'w') as f:
             output = template.render(dict)
             f.write(output)
+
     except Exception as e:
+        # Print out error, traceback and debug info...
         print
-        print '-'*60
+        print '='*60
         print "Cepheus' Template Engine stopped due to the following error ===> ", e
         print '-'*60
+        print 'Debugging Output:'
+        print traceback.print_exc(file=sys.stdout)
+        print '-'*60
+        print 'Data dictionary:'
+        print
+        print json.dumps(dict, indent=4, sort_keys=True)
+        print '='*60
+        print "Cepheus' Template Engine stopped due to the following error ===> ", e
+        print 'Scan up to see traceback and JSON data'
+        print '='*60
         print
         exit(1)
 
+
+# Used to pass a string instead of input file as a template
 # dict is json dictionary of the values to sub
 def render_string(in_string, dict):
     return Environment().from_string(in_string).render(dict)
 
 
+# Standard way of calling...
+# ./template_engine -i <template file> -d <yaml file> -o <output file>
+
+# Just to dump JSON data from yaml...
+# ./template_engine -d <yaml file> -j
 if __name__ == '__main__':
-    p = argparse.ArgumentParser(description='Jinja2 Renderer', prog='Jinja_render')
+    p = argparse.ArgumentParser(description='Template Engine', prog='Template_Engine')
     p.add_argument('--input_file', '-i', help='The template input file.')
     p.add_argument('--output_file', '-o', help='The rendered output file.')
     p.add_argument('--data_file', '-d', help='The YAML data file.')
+    p.add_argument('-j', action='store_true', help='Output the data dictionary as json.')
 
     options = p.parse_args()
 
-    if not options.input_file or not options.output_file or not options.data_file:
-        p.print_help()
-        sys.exit()
+    if options.j:
+        # Will only produce a dump of the data to stdout
+        if not options.data_file:
+            p.print_help()
+            sys.exit()
+    else:
+        if not options.input_file or not options.output_file or not options.data_file:
+            p.print_help()
+            sys.exit()
 
-    render_template(options.data_file, options.input_file, options.output_file)
+    render_template(options.data_file, options.input_file, options.output_file, options.j)
