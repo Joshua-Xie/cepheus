@@ -144,6 +144,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               crush_ruleset_name: hdd_replicated
 
     radosgw:
+        default_port: 8080
         bucket_shards: 5
         rados_handles: 1
         civetweb_threads: 100
@@ -266,6 +267,9 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
             zones:
                 # Must have at least one empty zone
                 - ""
+    mon:
+        port: 6789
+        niceness: -10
 
     osd:
         journal:

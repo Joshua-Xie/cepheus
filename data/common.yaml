@@ -15,7 +15,8 @@
 # 'method' can only be `repo` or `pxe`. If `pxe` then the 'pxe_boot' section of the given OS yaml is used.
 method: repo
 
-# NB: Chef client/server data is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
+# NB: Chef client/server data that is OS specific is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
+# NB: Basic Chef info is found in the envrionment.yaml file.
 
 # Base Chef Cookbook for all of Ceph
 # Change the '-' to '_' of the cookbook name (ceph-chef)

@@ -13,6 +13,10 @@
           {"name": "", "version": "", "pin": true}
         ]
       },
+      "development": {
+          "enabled": false,
+          "user": "vagrant"
+      },
       "cron": {
         "logs": {
             "enable": false,
@@ -200,25 +204,37 @@
       },
 
       "servers": [
-            {"name": "ceph-boostrap", "roles": ["bootstrap"], "profile": "",
-            "network": [
-                    "{"profile": public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.20", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}},
-                    "{"profile": cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.20", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}}
+            {"name": "ceph-boostrap",
+            "roles": ["bootstrap"],
+            "profile": "",
+            "static":false,
+            "interfaces": [
+                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.20", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.20", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
             ]},
-            {"name": "ceph-vm1", "roles": ["mon","osd","rgw","admin"], "profile": "ceph_osd_node",
-            "network": [
-                    "{"profile": public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.21", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}},
-                    "{"profile": cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.21", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}}
+            {"name": "ceph-vm1",
+            "roles": ["mon","osd","rgw","admin"],
+            "profile": "ceph_osd_node",
+            "static":false,
+            "interfaces": [
+                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.21", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.21", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
             ]},
-            {"name": "ceph-vm2", "roles": ["mon","osd","rgw","admin"], "profile": "ceph_osd_node",
-            "network": [
-                    "{"profile": public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.22", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}},
-                    "{"profile": cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.22", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}}
+            {"name": "ceph-vm2",
+            "roles": ["mon","osd","rgw","admin"],
+            "profile": "ceph_osd_node",
+            "static":false,
+            "interfaces": [
+                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.22", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.22", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
             ]},
-            {"name": "ceph-vm3", "roles": ["mon","osd","rgw","admin"], "profile": "ceph_osd_node",
-            "network": [
-                    "{"profile": public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.23", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}},
-                    "{"profile": cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.23", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}}
+            {"name": "ceph-vm3",
+            "roles": ["mon","osd","rgw","admin"],
+            "profile": "ceph_osd_node",
+            "static":false,
+            "interfaces": [
+                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.23", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.23", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
             ]}
       ],
 
@@ -267,6 +283,7 @@
             "options": "mode=4 miimon=100 xmit_hash_policy=layer3+4",
             "nm_controlled": "no"
           }
+
         },
         "radosgw": {
           "port": 8080,

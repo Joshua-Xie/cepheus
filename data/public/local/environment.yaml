@@ -54,6 +54,17 @@ data_files:
 environment_files:
     - "bootstrap/vms/environment_config_yaml"
 
+# Place all files that fall under the `cookbooks` directory normally such as recipes, recipe templates, etc
+cookbooks_files:
+    - "cookbooks/cepheus/recipes/cobbler-install.rb"
+    - "cookbooks/cepheus/recipes/cobbler-sync.rb"
+    - "templates/default/cobbler.dhcp.template.erb"
+
+# Info to setup development environment as well
+development:
+    enable: false
+    user: vagrant
+
 # Root/sudo related items
 root:
     # Used in bootstrap kickstart file only for now which is used only for PXE booting
@@ -134,9 +145,10 @@ ipmi:
   passwd:
 
 chef:
-  owner: vagrant
-  group: vagrant
-  server: http://10.0.100.20:4000
+    owner: vagrant
+    group: vagrant
+    server: http://10.0.100.20:4000
+    validation_client_name: cepheus-validator
 
 monitoring:
   collectd:

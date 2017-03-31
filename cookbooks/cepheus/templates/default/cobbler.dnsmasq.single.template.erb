@@ -15,7 +15,7 @@ addn-hosts = /var/lib/cobbler/cobbler_hosts
 #domain=<%= node['cepheus']['domain_name'] %>
 listen-address=<%= node['cepheus']['pxe_boot']['server'] %>
 interface=<%= node['cepheus']['pxe_boot']['pxe_interface'] %>
-dhcp-range=<%= @range %>,<%= node['cepheus']['pxe_boot']['dhcp']['single']['netmask'] %>
+dhcp-range=<%= @range %>,<%= node['cepheus']['pxe_boot']['dhcp']['subnets'][0]['netmask'] %>
 dhcp-option=3,$next_server
 dhcp-lease-max=1000
 dhcp-authoritative

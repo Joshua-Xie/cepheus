@@ -50,6 +50,9 @@ export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
 export BUILD_OS=centos
 
+# NB: May want to add an option for 'build' or 'update' so only the template_engine runs and the files can then be
+# uploaded to Chef for management.
+
 while getopts cbglrsvn:e:d:p:o:t: opt; do
     case $opt in
         b)
@@ -160,6 +163,7 @@ source $REPO_ROOT/$BUILD
 ## Execution phase end block
 
 # Build environments file for Chef
+echo "===> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."
 $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
 
 # Change later to support new repo build system...

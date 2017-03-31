@@ -33,6 +33,8 @@ sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml
 
 # Build from other data files listed in the environment.yaml.
 # Pass the data files through the template engine first.
+echo "===> Data_files being processed..."
+
 {%- for item in data_files %}
 if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} ]]; then
     $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ item }}

@@ -16,6 +16,10 @@
           {"name": "", "version": "", "pin": true}
         ]
       },
+      "development": {
+          "enabled": {%- if development.enable == True %} true, {% else %} false, {%- endif %}
+          "user": "{{ development.user }}"
+      },
       "cron": {
         "logs": {
             "enable": {%- if cron.logs.enable == True %} true, {% else %} false, {%- endif %}
@@ -229,10 +233,13 @@
 
       "servers": [
           {%- for item in inventory.nodes %}
-            {"name": "{{ item.name }}", "roles": [{%- for role in item.roles %}"{{role}}"{%- if not loop.last %},{% endif %}{%- endfor %}], "profile": "{{ item.profile }}",
-            "network": [
+            {"name": "{{ item.name }}",
+            "roles": [{%- for role in item.roles %}"{{role}}"{%- if not loop.last %},{% endif %}{%- endfor %}],
+            "profile": "{{ item.profile }}",
+            "static": {%- if item.static == True %}true,{% else %}false,{%- endif %}
+            "interfaces": [
                 {%- for interface in item.interfaces %}
-                    "{"profile": {{ interface.profile }}", "interface": "{{ interface.device }}", "mac": "{{ interface.mac }}", "ip": "{{ interface.ip }}", "netmask": "{{ interface.netmask }}", "gateway": "{{ interface.gateway }}", "mtu": {{ interface.mtu }}}}{%- if not loop.last %},{% endif %}
+                    {"profile": "{{ interface.profile }}", "interface": "{{ interface.device }}", "mac": "{{ interface.mac }}", "ip": "{{ interface.ip }}", "netmask": "{{ interface.netmask }}", "gateway": "{{ interface.gateway }}", "mtu": {{ interface.mtu }}}{%- if not loop.last %},{% endif %}
                 {%- endfor %}
             ]}{%- if not loop.last %},{% endif %}
           {%- endfor %}
@@ -241,14 +248,15 @@
       {% if method == "pxe" %}
       "pxe_boot": {
         "enable": {%- if pxe_boot.enable == True %}true,{% else %}false,{%- endif %}
-        "web_user": "cobbler",
+        "web_user": "{{ pxe_boot.web_user }}",
+        "http_port": {{ pxe_boot.http_port }},
         "pxe_interface": "{{ pxe_boot.interface }}",
         "server": "{{ pxe_boot.server }}",
         "kickstart": {
           "root": {
-            "passwd": "{{ pxe_boot.kickstart.root.passwd }}",
-            "passwd_type": "--iscrypted",
-            "key": "{{ pxe_boot.kickstart.root.key }}"
+            "passwd": "{{ pxe_boot.user.root.passwd }}",
+            "passwd_type": "{{ pxe_boot.user.root.passwd_type }}",
+            "key": "{{ pxe_boot.user.root.key }}"
           },
           "file": {
             "osd": "cepheus_node_rhel_osd.ks",
@@ -260,35 +268,37 @@
           },
           "users": [
             {
-              "name": "{{ user.name }}",
-              "passwd": "{{ user.passwd }}",
-              "passwd_type": "--iscrypted",
-              "key": "{{ user.key }}",
+              "name": "{{ primary_user.name }}",
+              "passwd": "{{ primary_user.passwd }}",
+              "passwd_type": "{{ primary_user.passwd_type }}",
+              "key": "{{ primary_user.key }}",
               "shell": "/bin/bash",
-              "comment": "{{ user.comment }}",
-              "groups": "{{ user.group }}",
-              "sudo": true
+              "comment": "{{ primary_user.comment }}",
+              "groups": "{{ primary_user.group }}",
+              "sudo": {%- if primary_user.sudo == True %}true{% else %}false{%- endif %}
             }
           ]
         },
         "profiles": [
-          {"name": "ceph_osd_node", "file_type": "osd", "comment": "OSD type nodes either dedicated OSD or converged with other services like MON and RGW."},
-          {"name": "ceph_non_osd_node", "file_type": "nonosd", "comment": "NON-OSD type nodes. Services like MON, RGW or MDS."}
+            {%- for item in pxe_boot.profiles %}
+              {"name": "{{ item.name }}", "comment": "{{ item.comment }}"}{%- if not loop.last %},{% endif %}
+            {%- endfor %}
         ],
         "dhcp": {
-          "shared_network": "cepheus",
+          "shared_network": "{{ pxe_boot.dhcp.shared_network }}",
+          "use": "{{ pxe_boot.dhcp.use }}",
           "single": {
-            "netmask": "{{ pxe_boot.kickstart.dhcp.single.netmask }}",
-            "gateway": "{{ pxe_boot.kickstart.dhcp.single.gateway }}"
+            "netmask": "{{ pxe_boot.dhcp.single.netmask }}",
+            "gateway": "{{ pxe_boot.dhcp.single.gateway }}"
           },
           "subnets":[
-          {%- for item in pxe_boot.kickstart.dhcp.subnets %}
-            {"subnet": "{{ item.subnet }}", "tag": "{{ item.tag }}", "dhcp_range": ["{{ item.dhcp_range|join('","') }}"], "netmask": "{{ item.netmask }}", "router": "{{ item.router }}"}{%- if not loop.last %},{% endif %}
+          {%- for item in pxe_boot.dhcp.subnets %}
+            {"subnet": "{{ item.subnet }}", "tag": "{{ item.tag }}", "dhcp_range": ["{{ item.dhcp_range|join('","') }}"], "netmask": "{{ item.netmask }}", "gateway": "{{ item.gateway }}"}{%- if not loop.last %},{% endif %}
           {%- endfor %}
           ]
          },
         {#- "NOTE1": "NOTE: Each subnet represents a routable rack so dhcp will need to manage each subnet with the TOR using IP-helper for dhcp requests by nodes in the given rack.", #}
-        {#- "NOTE2": "NOTE: You could just have one subnet for a single L2 span set of racks.", #}
+        {#- "NOTE2": "NOTE: You could just have a single subnet for a single L2 span set of racks.", #}
         {#- "NOTE3": "NOTE: /27 for subnet mask of each rack. DNS could be added to each subnet entry above but the global DNS entry below is good enough for this.", #}
         "raid": false,
 
@@ -326,6 +336,7 @@
           "xmlrpc": 25151
         },
         "os": {
+          "type": "{{ os.type }}",
           "name": "{{ os.name }}",
           "version": "{{ os.version }}",
           "arch": "{{ os.arch }}",
@@ -335,13 +346,14 @@
         {%- if os.type == "rhel" %}
         "redhat": {
           "management": {
-            "type": {%- if subscription.type == True %} true, {% else %} false, {%- endif %}
+            "enable": {%- if subscription.enable == True %} true, {% else %} false, {%- endif %}
+            "type": "{{ subscription.type }}",
             "server": "{{ subscription.server }}",
             "key": "{{ subscription.key }}"
           }
         },
         {%- endif %}
-        "repo_mirror": {%- if pxe_boot.kickstart.repo_mirror == True %} true {% else %} false {%- endif %}
+        "repo_mirror": {%- if pxe_boot.repo_mirror == True %} true {% else %} false {%- endif %}
       },
       {% endif %}
       "ceph": {
@@ -379,8 +391,10 @@
           }
         },
         "mon": {
-          "port": 6789,
-          "niceness": -10,
+          "port": {{ ceph.mon.port }},
+          "niceness": {{ ceph.mon.niceness }},
+
+          {#- NB: Need to remove the bond portion of here and the recipe #}
           "bond": {
             "enable": {%- if bond.enable == True %} true, {% else %} false, {%- endif %}
             "name": "{{ bond.name }}",
@@ -390,9 +404,10 @@
             "options": "{{ bond.options }}",
             "nm_controlled": "no"
           }
+
         },
         "radosgw": {
-          "port": 8080,
+          "port": {{ ceph.radosgw.default_port }},
           "default_url": "{{ ceph.radosgw.default_url }}",
           "debug": {
             "logs": {
@@ -581,7 +596,7 @@
       "server_url": "{{ chef.server }}",
       "cache_path": "/var/chef/cache",
       "backup_path": "/var/chef/backup",
-      "validation_client_name": "cepheus-validator",
+      "validation_client_name": "{{ chef.validation_client_name }}",
       "run_path": "/var/chef"
     }
   }

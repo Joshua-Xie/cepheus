@@ -8,43 +8,68 @@ ISO:
 
 # This data will not show up in the final Chef environment.json file unless `method` is set to 'pxe'
 pxe_boot:
-  # This enable flag is present for those installations that are pxe_booting but want to turn it off
-  enable: true
-  interface: enp0s3
-  server: 10.0.100.20
-  kickstart:
-    root:
-      passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
-      key: operations.pub
+    # This enable flag is present for those installations that are pxe_booting but want to turn it off
+    enable: true
+    web_user: cobbler
+    environment: vagrant
+    interface: enp0s3
+    netboot: true
+    http_port: 80
+    server: 10.0.100.20
+    # Use this environment as a repo_mirror
+    repo_mirror: false
+
+    user:
+        root:
+            passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
+            passwd_type: "--iscrypted"
+            key: operations.pub
+
     # NOTE: Any empty value *MUST* be "" or python will put "None"
     bootloader:
-      passwd: ""
-      passwd_type: ""
+        passwd: ""
+        passwd_type: ""
+
+    # DHCP is used in pxe booting. Should just enable the primary interface on the given node to search
     dhcp:
-      single:
-        netmask: 255.255.255.0
-        gateway: 10.121.1.2
-      # Subnets represent having more than one network subnet as in the single one above
-      subnets:
-        - subnet: 10.121.1.0
-          tag: rack01
-          dhcp_range:
-            - 10.121.1.3
-            - 10.121.1.30
-          netmask: 255.255.255.224
-          router: 10.121.1.1
-        - subnet: 10.121.1.32
-          tag: rack02
-          dhcp_range:
-            - 10.121.1.34
-            - 10.121.1.62
-          netmask: 255.255.255.224
-          router: 10.121.1.33
-        - subnet: 10.121.1.64
-          tag: rack03
-          dhcp_range:
-            - 10.121.1.66
-            - 10.121.1.94
-          netmask: 255.255.255.224
-          router: 10.121.1.65
-    repo_mirror: false
+        # Can only be 'single' or 'multi'
+        type: single
+        shared_network: cepheus
+        # Subnets represent having more than one network subnet as in the single one above
+        # Below is an example of how to have each rack on a different subnet
+        subnets:
+            -   subnet: 10.121.1.0
+                tag: cluster
+                dhcp_range:
+                    -   10.121.1.3
+                    -   10.121.1.254
+                netmask: 255.255.255.0
+                gateway: 10.121.1.1
+            # These are to show how to do a multi-subnet dhcp
+            # -   subnet: 10.121.1.0
+            #     tag: rack01
+            #     dhcp_range:
+            #         -   10.121.1.3
+            #         -   10.121.1.30
+            #     netmask: 255.255.255.224
+            #     gateway: 10.121.1.1
+            # -   subnet: 10.121.1.32
+            #     tag: rack02
+            #     dhcp_range:
+            #         -   10.121.1.34
+            #         -   10.121.1.62
+            #     netmask: 255.255.255.224
+            #     gateway: 10.121.1.33
+            # -   subnet: 10.121.1.64
+            #     tag: rack03
+            #     dhcp_range:
+            #         -   10.121.1.66
+            #         -   10.121.1.94
+            #     netmask: 255.255.255.224
+            #     gateway: 10.121.1.65
+
+    profiles:
+        -   name: ceph_osd_node
+            comment: "OSD type nodes either dedicated OSD or converged with other services like MON and RGW."
+        -   name: ceph_non_osd_node
+            comment: "NON-OSD type nodes. Services like MON, RGW or MDS."

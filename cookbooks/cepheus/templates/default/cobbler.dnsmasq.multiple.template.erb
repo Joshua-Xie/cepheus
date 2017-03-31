@@ -24,7 +24,7 @@ dhcp-boot=net:ia64,$elilo
 # Multiple subnets (each rack) that will be answered on one interface
 <% node['cepheus']['pxe_boot']['dhcp']['subnets'].each do |subnet| %>
 dhcp-range=<%= subnet['tag'] %>,<%= subnet['dhcp_range'].join(',') %>,<%= subnet['netmask'] %>
-dhcp-option=<%= subnet['tag'] %>,3,<%= subnet['router'] %>
+dhcp-option=<%= subnet['tag'] %>,3,<%= subnet['gateway'] %>
 <% end -%>
 
 $insert_cobbler_system_definitions

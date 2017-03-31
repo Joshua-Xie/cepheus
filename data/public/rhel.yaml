@@ -14,6 +14,8 @@ os:
     arch: x86_64
     distro: rhel-server-7.2-x86_64.iso
     breed: redhat
+    # pxe_boot file extension - This will get used when creating the OS specific kickstart file using the profile name and this extension
+    kickstart_ext: ks
     iso:
         url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
 
@@ -30,7 +32,9 @@ vagrant:
 
 # Subscription Manager - Satellite Server
 subscription:
-    type: true
+    enable: true
+    # Can only be 'sat' or 'rhn'
+    type: sat
     server: rhncapsule.repo.example.com
     key: cloud-storage-example-x86_64-server-7.2
     commands:

@@ -39,6 +39,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
+                  pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
@@ -48,6 +50,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  # Only one interface needs pxe gateway
+                  pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
@@ -64,6 +68,7 @@ inventory:
               - rgw
               - admin
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
+          # *MUST* match one of the profiles in pxe_boot.yaml
           profile: ceph_osd_node
           bond:
               name: bond0
@@ -81,6 +86,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
+                  pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
@@ -90,6 +97,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  pxe_gateway: ""
+                  # Only one interface needs pxe gateway
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
@@ -106,6 +115,7 @@ inventory:
               - rgw
               - admin
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
+          # *MUST* match one of the profiles in pxe_boot.yaml
           profile: ceph_osd_node
           bond:
               name: bond0
@@ -123,6 +133,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
+                  pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
@@ -132,6 +144,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  # Only one interface needs pxe gateway
+                  pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
@@ -148,6 +162,7 @@ inventory:
               - rgw
               - admin
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
+          # *MUST* match one of the profiles in pxe_boot.yaml
           profile: ceph_osd_node
           bond:
               name: bond0
@@ -165,6 +180,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
+                  pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
@@ -174,6 +191,8 @@ inventory:
                   mac: ""
                   # TORs - Gateway
                   gateway: ""
+                  # Only one interface needs pxe gateway
+                  pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24

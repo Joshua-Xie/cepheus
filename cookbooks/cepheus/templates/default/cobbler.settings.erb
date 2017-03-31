@@ -168,7 +168,7 @@ func_master: overlord.example.org
 
 # change this port if Apache is not running plaintext on port
 # 80.  Most people can leave this alone.
-http_port: 80
+http_port: <%= node['cepheus']['pxe_boot']['http_port'] %>
 
 # kernel options that should be present in every cobbler installation.
 # kernel options can also be applied at the distro/profile/system
@@ -312,6 +312,7 @@ consoles: "/var/consoles"
 # will request to toggle the --netboot-enabled record at the end of their installation.
 #nopxe_with_triggers: 1
 
+<% if node['cepheus']['pxe_boot']['os']['type'] == 'rhel' %>
 # Are you using a Red Hat management platform in addition to Cobbler?
 # Cobbler can help you register to it.  Choose one of the following:
 #   "off"    : I'm not using Red Hat Network, Satellite, or Spacewalk
@@ -347,7 +348,7 @@ redhat_management_key: <%= node['cepheus']['pxe_boot']['redhat']['management']['
 # a single org in your satellite, it's probably safe to turn this
 # on and then you can use CobblerWeb alongside a Satellite install.
 redhat_management_permissive: 0
-
+<% end %>
 # if set to 1, allows /usr/bin/cobbler-register (part of the koan package)
 # to be used to remotely add new cobbler system records to cobbler.
 # this effectively allows for registration of new hardware from system
