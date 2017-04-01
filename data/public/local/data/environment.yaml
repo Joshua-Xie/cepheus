@@ -59,6 +59,7 @@ cookbooks_files:
     - "cookbooks/cepheus/recipes/cobbler-install.rb"
     - "cookbooks/cepheus/recipes/cobbler-sync.rb"
     - "templates/default/cobbler.dhcp.template.erb"
+    - "templates/default/zabbix-userparameter-radosgw.conf.erb"
 
 # Info to setup development environment as well
 development:
@@ -118,7 +119,7 @@ bootstrap:
     # Host name
     name: ceph-bootstrap
     # Used by scripts in the cookboks. The user MUST be correct. The default user is `operations`
-    env: /home/operations/cepheus/environments
+    env: /home/vagrant/cepheus/environments
     # ks - Kickstart file in RHEL/CentOS
     ks: cepheus_bootstrap_rhel.ks
     # Roles are important. Roles define what gets installed and what purpose the node plays in your cluster.
@@ -146,6 +147,7 @@ ipmi:
 
 chef:
     owner: vagrant
+    # May want the group part of the default group of the owner above.
     group: vagrant
     server: http://10.0.100.20:4000
     validation_client_name: cepheus-validator

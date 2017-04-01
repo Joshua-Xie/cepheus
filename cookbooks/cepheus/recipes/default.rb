@@ -70,6 +70,9 @@ else
   # Yum versionlock - Check the yum-versionlock recipe for details...
   package 'yum-versionlock'
   package 'kexec-tools'
+  package 'python2-boto3' do
+    :upgrade
+  end
 end
 
 package 'python-pip' do
@@ -92,7 +95,7 @@ execute 'set-scripts-perm' do
 end
 
 # Create user(s) if not already existing
-node['cepheus']['pxe_boot']['kickstart']['users'].each do | user_value |
+node['cepheus']['users'].each do | user_value |
   user user_value['name'] do
     comment user_value['comment']
     shell user_value['shell']

@@ -56,7 +56,7 @@ if node['cepheus']['method'] == 'pxe'
 
     {%- if os.type == "rhel" %}
     # Update the Red Hat Satellite/Capsule/RHN info
-    if node['cepheus']['pxe_boot']['redhat']['management']['enable']
+    if node['cepheus']['os']['subscription']['enable']
       bash 'pxe_boot-rhel-mgt' do
         user 'root'
         code <<-EOH
@@ -76,9 +76,7 @@ if node['cepheus']['method'] == 'pxe'
         bash 'add-to-pxe_boot' do
           user 'root'
           code <<-EOH
-            {%- for profile in pxe_boot.profiles %}
-                cobbler system add --name=#{server['name']} --profile=#{server['profile']} --static=true --interface=#{server['network']['public']['interface']} --mac=#{server['network']['public']['mac']} --ip-address=#{server['network']['public']['ip']} --netmask=#{server['network']['public']['netmask']} --if-gateway=#{server['network']['public']['gateway']} --hostname=#{server['name']} --mtu=#{server['network']['public']['mtu']}
-            {% endfor %}
+            cobbler system add --name=#{server['name']} --profile=#{server['profile']}
           EOH
           not_if "cobbler system list | grep #{server['name']}"
           only_if "cobbler profile list | grep #{server['profile']}"

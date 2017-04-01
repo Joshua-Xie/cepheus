@@ -245,6 +245,28 @@
           {%- endfor %}
       ],
 
+      "primary_user": {
+        "name": "{{ primary_user.name }}",
+        "passwd": "{{ primary_user.passwd }}",
+        "passwd_type": "{{ primary_user.passwd_type }}",
+        "key": "{{ primary_user.key }}",
+        "shell": "/bin/bash",
+        "comment": "{{ primary_user.comment }}",
+        "groups": "{{ primary_user.group }}",
+        "sudo": {%- if primary_user.sudo == True %}true{% else %}false{%- endif %}
+      },
+
+      {#- System users #}
+      "users": [
+          {%- for user in users %}
+            {
+            "name": "{{ user.name }}", "group": "{{ user.group }}", "comment": "{{ user.comment }}", "passwd": "{{ user.passwd }}",
+            "passwd_type": "{{ user.passwd_type }}", "key": "{{ user.key }}", "private_key": "{{ user.private_key }}",
+            "sudo": {% if user.sudo == True %}true{% else %}false{% endif %}, "ceph_group": {% if user.ceph_group == True %}true{% else %}false{% endif %}
+            }{%- if not loop.last %},{% endif %}
+          {%- endfor %}
+      ],
+
       {% if method == "pxe" %}
       "pxe_boot": {
         "enable": {%- if pxe_boot.enable == True %}true,{% else %}false,{%- endif %}
@@ -266,18 +288,6 @@
             "passwd": "{{ pxe_boot.kickstart.bootloader.passwd }}",
             "passwd_type": "{{ pxe_boot.kickstart.bootloader.passwd_type }}"
           },
-          "users": [
-            {
-              "name": "{{ primary_user.name }}",
-              "passwd": "{{ primary_user.passwd }}",
-              "passwd_type": "{{ primary_user.passwd_type }}",
-              "key": "{{ primary_user.key }}",
-              "shell": "/bin/bash",
-              "comment": "{{ primary_user.comment }}",
-              "groups": "{{ primary_user.group }}",
-              "sudo": {%- if primary_user.sudo == True %}true{% else %}false{%- endif %}
-            }
-          ]
         },
         "profiles": [
             {%- for item in pxe_boot.profiles %}
@@ -335,27 +345,25 @@
           "https": 443,
           "xmlrpc": 25151
         },
-        "os": {
-          "type": "{{ os.type }}",
-          "name": "{{ os.name }}",
-          "version": "{{ os.version }}",
-          "arch": "{{ os.arch }}",
-          "distro": "{{ os.distro }}",
-          "breed": "{{ os.breed }}"
-        },
+        "repo_mirror": {%- if pxe_boot.repo_mirror == True %} true {% else %} false {%- endif %}
+      },
+      {% endif %}
+      "os": {
+        "type": "{{ os.type }}",
+        "name": "{{ os.name }}",
+        "version": "{{ os.version }}",
+        "arch": "{{ os.arch }}",
+        "distro": "{{ os.distro }}",
+        "breed": "{{ os.breed }}"
         {%- if os.type == "rhel" %}
-        "redhat": {
-          "management": {
+        ,"subscription": {
             "enable": {%- if subscription.enable == True %} true, {% else %} false, {%- endif %}
             "type": "{{ subscription.type }}",
             "server": "{{ subscription.server }}",
             "key": "{{ subscription.key }}"
-          }
-        },
+          },
         {%- endif %}
-        "repo_mirror": {%- if pxe_boot.repo_mirror == True %} true {% else %} false {%- endif %}
       },
-      {% endif %}
       "ceph": {
         "cluster": "{{ ceph.cluster }}",
         "repo": {

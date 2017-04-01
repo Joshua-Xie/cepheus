@@ -40,7 +40,7 @@
       },
       "bootstrap": {
         "name": "ceph-bootstrap",
-        "env": "/home/operations/cepheus/environments",
+        "env": "/home/vagrant/cepheus/environments",
         "interfaces": [
           {"name": "enp0s8", "ip": "10.0.100.20", "netmask": "255.255.255.0", "gateway": "None", "mac": "None"},
           {"name": "enp0s9", "ip": "10.121.2.2", "netmask": "255.255.255.0", "gateway": "None", "mac": "None"}
@@ -238,7 +238,38 @@
             ]}
       ],
 
+      "primary_user": {
+        "name": "vagrant",
+        "passwd": "$6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/",
+        "passwd_type": "--iscrypted",
+        "key": "ceph_bootstrap.pub",
+        "shell": "/bin/bash",
+        "comment": "Vagrant user",
+        "groups": "wheel",
+        "sudo":true
+      },
+      "users": [
+            {
+            "name": "operations", "group": "wheel", "comment": "Operations user", "passwd": "$6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/",
+            "passwd_type": "--iscrypted", "key": "ceph_bootstrap.pub", "private_key": "operations",
+            "sudo": true, "ceph_group": true
+            },
+            {
+            "name": "vagrant", "group": "wheel", "comment": "Vagrant user", "passwd": "$6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/",
+            "passwd_type": "--iscrypted", "key": "ceph_bootstrap.pub", "private_key": "operations",
+            "sudo": true, "ceph_group": true
+            }
+      ],
+
       
+      "os": {
+        "type": "centos",
+        "name": "centos-7.2",
+        "version": "7.2",
+        "arch": "x86_64",
+        "distro": "centos-7-x86_64-minimal.iso",
+        "breed": "redhat"
+      },
       "ceph": {
         "cluster": "ceph",
         "repo": {

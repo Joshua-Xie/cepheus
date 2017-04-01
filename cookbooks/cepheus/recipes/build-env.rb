@@ -27,19 +27,16 @@ ceph_chef_adc_hosts_content = 'export CEPH_ADC_HOSTS=( '
 ceph_chef_admin_hosts_content = 'export CEPH_ADMIN_HOSTS=( '
 ceph_chef_mon_hosts_content = 'export CEPH_MON_HOSTS=( '
 ceph_chef_osd_hosts_content = 'export CEPH_OSD_HOSTS=( '
-ceph_chef_osd_rack01_hosts_content = 'export CEPH_OSD_RACK01_HOSTS=( '
-ceph_chef_osd_rack02_hosts_content = 'export CEPH_OSD_RACK02_HOSTS=( '
-ceph_chef_osd_rack03_hosts_content = 'export CEPH_OSD_RACK03_HOSTS=( '
 ceph_chef_rgw_hosts_content = 'export CEPH_RGW_HOSTS=( '
 ceph_chef_hosts_content = 'export CEPH_CHEF_HOSTS=( '
 ceph_chef_bootstrap_content = 'export CEPH_CHEF_BOOTSTRAP='
 
 # Server list
-node['cepheus']['pxe_boot']['servers'].each do | server |
+node['cepheus']['servers'].each do | server |
   server['roles'].each do | role |
     case role
     when 'bootstrap'
-      ceph_chef_bootstrap_content += (server['name'] + "\n" + 'export CEPH_CHEF_BOOTSTRAP_IP=' + server['network']['public']['ip'])
+      ceph_chef_bootstrap_content += (server['name'] + "\n" + 'export CEPH_CHEF_BOOTSTRAP_IP=' + server['interfaces'][0]['ip'])
     when 'adc'
       ceph_chef_adc_hosts_content += (server['name'] + ' ')
     when 'admin'
@@ -48,24 +45,6 @@ node['cepheus']['pxe_boot']['servers'].each do | server |
       ceph_chef_mon_hosts_content += (server['name'] + ' ')
     when 'osd'
       ceph_chef_osd_hosts_content += (server['name'] + ' ')
-      if server['name'].include? 'r1n'
-        ceph_chef_osd_rack01_hosts_content += (server['name'] + ' ')
-      end
-      if server['name'].include? 'r2n'
-        ceph_chef_osd_rack02_hosts_content += (server['name'] + ' ')
-      end
-      if server['name'].include? 'r3n'
-        ceph_chef_osd_rack03_hosts_content += (server['name'] + ' ')
-      end
-      if server['name'].include? 'r1a'
-        ceph_chef_osd_rack01_hosts_content += (server['name'] + ' ')
-      end
-      if server['name'].include? 'r2b'
-        ceph_chef_osd_rack02_hosts_content += (server['name'] + ' ')
-      end
-      if server['name'].include? 'r3c'
-        ceph_chef_osd_rack03_hosts_content += (server['name'] + ' ')
-      end
     when 'rgw'
       ceph_chef_rgw_hosts_content += (server['name'] + ' ')
     end
@@ -78,13 +57,10 @@ ceph_chef_adc_hosts_content += ')'
 ceph_chef_admin_hosts_content += ')'
 ceph_chef_mon_hosts_content += ')'
 ceph_chef_osd_hosts_content += ')'
-ceph_chef_osd_rack01_hosts_content += ')'
-ceph_chef_osd_rack02_hosts_content += ')'
-ceph_chef_osd_rack03_hosts_content += ')'
 ceph_chef_rgw_hosts_content += ')'
 ceph_chef_hosts_content += ')'
 
-user_rec = node['cepheus']['pxe_boot']['kickstart']['users'].first
+user_rec = node['cepheus']['primary_user']
 env = node['cepheus']['bootstrap']['env']
 
 # NOTE: file_name is also the variable names
@@ -98,7 +74,7 @@ env = node['cepheus']['bootstrap']['env']
     when 'ceph_chef_mon_hosts'
       content "#{ceph_chef_mon_hosts_content}"
     when 'ceph_chef_osd_hosts'
-      content "#{ceph_chef_osd_hosts_content}\n#{ceph_chef_osd_rack01_hosts_content}\n#{ceph_chef_osd_rack02_hosts_content}\n#{ceph_chef_osd_rack03_hosts_content}"
+      content "#{ceph_chef_osd_hosts_content}"
     when 'ceph_chef_rgw_hosts'
       content "#{ceph_chef_rgw_hosts_content}"
     when 'ceph_chef_bootstrap'

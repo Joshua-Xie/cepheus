@@ -1,0 +1,13 @@
+---
+# WIP file at the moment
+
+# Data Template Files for a given environment
+
+# Environment is *always* done first
+
+# Put the data templates below *without* the 'j2' extension
+data_templates:
+    -   adc.yaml
+    -   ceph.yaml
+    -   inventory.yaml
+    -   pxe_boot.yaml

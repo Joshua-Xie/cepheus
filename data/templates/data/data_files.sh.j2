@@ -28,17 +28,43 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # NB: Output directories for this process already exists
 # NB: The `build.yaml` will get created by combining all of the required yamls.
 
-sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/environment.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
-# sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/$BUILD_OS.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 
 # Build from other data files listed in the environment.yaml.
 # Pass the data files through the template engine first.
 echo "===> Data_files being processed..."
 
 {%- for item in data_files %}
-if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} ]]; then
-    $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ item }}
+# Check data center folder first else use location specific version...
+if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} ]]; then
+    # Double check to make sure template there are no 'template' residuals remaining
+    echo "Checking 1 - $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}"
+    set +e
+    J2=$(grep {% raw %}"{%"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }})
+    if [[ -z $J2 ]]; then
+        J2=$(grep {% raw %}"{{"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }})
+    fi
+    set -e
+    if [[ ! -z $J2 ]]; then
+        $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
+    fi
+    sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+else
+    # Double check to make sure template there are no 'template' residuals remaining
+    echo "Checking 0 - $REPO_ROOT/data/$BUILD_LOCATION/{{ item }}"
+    set +e
+    J2=$(grep {% raw %}"{%"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/{{ item }})
+    if [[ -z $J2 ]]; then
+        J2=$(grep {% raw %}"{{"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/{{ item }})
+    fi
+    set -e
+    if [[ ! -z $J2 ]]; then
+        # Go ahead and move the output to the 'data' folder to be used since it's modified...
+        $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
+        sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+    else
+        sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+    fi
 fi
 
-sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 {%- endfor %}

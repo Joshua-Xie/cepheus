@@ -128,7 +128,7 @@ fi
 
 # Python
 {%- for item in python %}
-download_file /python/{{ item.name }}-{{ item.verion }}.tar.gz http://pyyaml.org/download/pyyaml/{{ item.name }}-{{ item.version }}.tar.gz
+download_file /python/{{ item.name }}-{{ item.verion }}.tar.gz {{ item.url }}{%- if item.inline %}{{ item.name }}-{{ item.version }}.tar.gz{%- endif %}
 {%- endfor %}
 
 # Cookbooks

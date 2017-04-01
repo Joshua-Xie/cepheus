@@ -22,8 +22,6 @@ os:
 # Unique ISO data for OS
 ISO:
   volume_id: "CentOS-7.2 Server.x86_64"
-
-
 # Name of the VBox Storage Controller
 vagrant:
     storage_controller: "SATA Controller"

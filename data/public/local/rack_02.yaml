@@ -1,5 +1,0 @@
----
-
-# Rack specific yaml file - TO BE USED ONLY as part of larger generated 'build.yaml'
-
-rack_02: example

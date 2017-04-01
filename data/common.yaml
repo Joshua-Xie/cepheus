@@ -24,14 +24,17 @@ ceph_chef: # (required file - cookbook - for build)
     version: 1.1.4
     # These gems are required for the `ceph-chef`
     gems: # (required files for build)
-        - name: netaddr
-          version: 1.5.1
-        - name: chef-sugar
-          version: 3.4.0
+        -   name: netaddr
+            version: 1.5.1
+        -   name: chef-sugar
+            version: 3.4.0
 
-python: # (required files for build)
-    - name: PyYAML
-      version: 3.12
+# If `inline` is true then substitute the name and verison inline else use url as specified
+python: # (required files for build and runtime)
+    -   name: PyYAML
+        version: 3.12
+        inline: true
+        url: http://pyyaml.org/download/pyyaml/
 
 # Cache directories in the format of base/{cookbook,gem...}
 cache:

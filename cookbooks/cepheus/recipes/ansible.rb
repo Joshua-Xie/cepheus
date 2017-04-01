@@ -40,7 +40,7 @@ ceph_chef_rgw_hosts_content = ''
 ceph_chef_bootstrap_content = ''
 
 # Server list
-node['cepheus']['pxe_boot']['servers'].each do | server |
+node['cepheus']['servers'].each do | server |
   server['roles'].each do | role |
     case role
     when 'bootstrap'

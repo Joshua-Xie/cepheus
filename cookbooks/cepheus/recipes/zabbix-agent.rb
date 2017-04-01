@@ -23,11 +23,16 @@ cookbook_file '/etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX' do
   mode 00644
 end
 
-if node['cepheus']['pxe_boot']['redhat']['management']['type'] == 'off'
-  yum_repository 'zabbix' do
-    baseurl node['cepheus']['zabbix']['repository']
-    gpgkey node['cepheus']['zabbix']['repository_key']
-  end
+case node['platform']
+when 'ubuntu'
+
+else
+    if node['cepheus']['os']['type'] != 'rhel' || (node['cepheus']['os']['type'] == 'rhel' && !node['cepheus']['os']['subscription']['enable'])
+      yum_repository 'zabbix' do
+        baseurl node['cepheus']['zabbix']['repository']
+        gpgkey node['cepheus']['zabbix']['repository_key']
+      end
+    end
 end
 
 %w{zabbix-agent zabbix-sender}.each do |pkg|

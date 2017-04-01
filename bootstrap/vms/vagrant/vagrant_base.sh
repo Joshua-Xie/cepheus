@@ -23,6 +23,8 @@
 # Note: This setting is only valid until something downstream (another script) overrides it.
 ERR=${1:-''}
 
+export REPO_ROOT=$(git rev-parse --show-toplevel)
+
 export BOOTSTRAP_CHEF_ENV=${BOOTSTRAP_CHEF_ENV:-"vagrant"}
 
 source $REPO_ROOT/bootstrap/vms/base_environment.sh

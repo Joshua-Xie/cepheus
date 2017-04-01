@@ -86,7 +86,7 @@ cheetah_import_whitelist:
 createrepo_flags: "-c cache -s sha"
 
 # if no kickstart is specified to profile add, use this template
-# default_kickstart: /var/lib/cobbler/kickstarts/<%= node['cepheus']['pxe_boot']['kickstart']['file']['nonosd'] %>
+# default_kickstart:
 
 # configure all installed systems to use these nameservers by default
 # unless defined differently in the profile.  For DHCP configurations
@@ -312,14 +312,14 @@ consoles: "/var/consoles"
 # will request to toggle the --netboot-enabled record at the end of their installation.
 #nopxe_with_triggers: 1
 
-<% if node['cepheus']['pxe_boot']['os']['type'] == 'rhel' %>
+<% if node['cepheus']['os']['type'] == 'rhel' %>
 # Are you using a Red Hat management platform in addition to Cobbler?
 # Cobbler can help you register to it.  Choose one of the following:
 #   "off"    : I'm not using Red Hat Network, Satellite, or Spacewalk
 #   "hosted" : I'm using Red Hat Network
 #   "site"   : I'm using Red Hat Satellite Server or Spacewalk
 # You will also want to read: https://github.com/cobbler/cobbler/wiki/Tips-for-RHN
-redhat_management_type: <%= node['cepheus']['pxe_boot']['redhat']['management']['type'] %>
+redhat_management_type: <%= node['cepheus']['os']['subscription']['type'] %>
 
 # if redhat_management_type is enabled, choose your server
 #   "management.example.org" : For Satellite or Spacewalk
@@ -328,13 +328,13 @@ redhat_management_type: <%= node['cepheus']['pxe_boot']['redhat']['management'][
 # within Cobbler Web and Cobbler XMLRPC.  Using RHN Hosted for this is not supported.
 # This feature can be used even if redhat_management_type is off, you just have
 # to have authn_spacewalk selected in modules.conf
-redhat_management_server: <%= node['cepheus']['pxe_boot']['redhat']['management']['server'] %>
+redhat_management_server: <%= node['cepheus']['os']['subscription']['server'] %>
 
 # specify the default Red Hat authorization key to use to register
 # system.  If left blank, no registration will be attempted.  Similarly
 # you can set the --redhat-management-key to blank on any system to
 # keep it from trying to register.
-redhat_management_key: <%= node['cepheus']['pxe_boot']['redhat']['management']['key'] %>
+redhat_management_key: <%= node['cepheus']['os']['subscription']['key'] %>
 
 # if using authn_spacewalk in modules.conf to let cobbler authenticate
 # against Satellite/Spacewalk's auth system, by default it will not allow per user

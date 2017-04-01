@@ -6,6 +6,9 @@
 /bootstrap/vms/base_environment.sh
 /data/build.sh
 /data/data_files.sh
+/data/data_templates.sh
+
+/tmp/
 
 # Private data
 /data/private/*.yaml

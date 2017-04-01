@@ -17,7 +17,10 @@
 # limitations under the License.
 #
 
-execute 'firewalld-stop' do
-  command 'sudo systemctl stop firewalld'
-  only_if "sudo systemctl status firewalld | grep running"
+if node['cepheus']['init_style'] != 'upstart'
+    execute 'firewalld-stop' do
+      command 'sudo systemctl stop firewalld'
+      only_if "sudo systemctl status firewalld | grep running"
+    end
+else
 end

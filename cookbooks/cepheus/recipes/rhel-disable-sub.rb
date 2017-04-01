@@ -21,7 +21,7 @@
 # This recipe disables the rhel subscription repo. You would use this if you were doing a repo_mirror on the
 # bootstrap node instead of using Satellite/Capsule server for yum updates etc.
 
-if node['cepheus']['pxe_boot']['os']['breed'] == 'redhat' && node['cepheus']['pxe_boot']['repo_mirror']
+if node['cepheus']['os']['breed'] == 'redhat' && node['cepheus']['pxe_boot']['repo_mirror']
   execute 'rhel-disable-repo' do
     command 'subscription-manager config --rhsm.manage_repos=0'
   end

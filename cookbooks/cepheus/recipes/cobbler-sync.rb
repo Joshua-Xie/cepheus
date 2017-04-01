@@ -26,13 +26,13 @@ if node['cepheus']['method'] == 'pxe'
     bash 'import-distro-distribution-pxe_boot' do
       user 'root'
       code <<-EOH
-        mount -o loop /tmp/#{node['cepheus']['pxe_boot']['os']['distro']} /mnt
-        cobbler import --name=#{node['cepheus']['pxe_boot']['os']['name']} --path=/mnt --breed=#{node['cepheus']['pxe_boot']['os']['breed']} --arch=#{node['cepheus']['pxe_boot']['os']['arch']}
-        cobbler distro edit --name=#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']} --kopts="ksdevice= inst.repo=http://#{node['cepheus']['pxe_boot']['server']}/cblr/ks_mirror/#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']}"
+        mount -o loop /tmp/#{node['cepheus']['os']['distro']} /mnt
+        cobbler import --name=#{node['cepheus']['os']['name']} --path=/mnt --breed=#{node['cepheus']['os']['breed']} --arch=#{node['cepheus']['os']['arch']}
+        cobbler distro edit --name=#{node['cepheus']['os']['name']}-#{node['cepheus']['os']['arch']} --kopts="ksdevice= inst.repo=http://#{node['cepheus']['pxe_boot']['server']}/cblr/ks_mirror/#{node['cepheus']['os']['name']}-#{node['cepheus']['os']['arch']}"
         umount /mnt
       EOH
-      not_if "cobbler distro list | grep #{node['cepheus']['pxe_boot']['os']['name']}"
-      only_if "test -f /tmp/#{node['cepheus']['pxe_boot']['os']['distro']}"
+      not_if "cobbler distro list | grep #{node['cepheus']['os']['name']}"
+      only_if "test -f /tmp/#{node['cepheus']['os']['distro']}"
     end
 
     # NOTE: By default, cobbler import above will create a profile with the name of the import + arch
