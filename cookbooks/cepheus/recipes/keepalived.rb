@@ -17,46 +17,38 @@
 # limitations under the License.
 #
 
-package 'keepalived' do
-  action :upgrade
-end
+if node['cepheus']['adc']['keepalived']['enable']
+    package 'keepalived' do
+      action :upgrade
+    end
 
-# Installs killall
-package 'psmisc'
+    # Installs killall
+    package 'psmisc'
 
-# Set the config
-# NOTE: If the virtual_router_id is
-template "/etc/keepalived/keepalived.conf" do
-  source 'keepalived.conf.erb'
-  variables lazy {
-    {
-      :adc_nodes => adc_nodes,
-      :server => get_keepalived_server
-    }
-  }
-end
+    # Set the config
+    # NOTE: If the virtual_router_id is
+    template "/etc/keepalived/keepalived.conf" do
+      source 'keepalived.conf.erb'
+      variables lazy {
+        {
+          :adc_nodes => adc_nodes,
+          :server => get_keepalived_server
+        }
+      }
+    end
 
-# All for binding additional IPs not found in ifcfg files.
-# Sets ipv4 forwarding rule
-template "/etc/sysctl.d/99-sysctl.conf" do
-  source '99-sysctl.conf.erb'
-end
+    if node['cepheus']['init_style'] == 'upstart'
+    else
+      # Broke out the service resources for better idempotency.
+      service 'keepalived' do
+        action [:enable]
+        only_if "sudo systemctl status keepalived | grep disabled"
+      end
 
-execute 'update-sysctl' do
-  command 'sysctl -p'
-end
-
-if node['cepheus']['init_style'] == 'upstart'
-else
-  # Broke out the service resources for better idempotency.
-  service 'keepalived' do
-    action [:enable]
-    only_if "sudo systemctl status keepalived | grep disabled"
-  end
-
-  service 'keepalived' do
-    action [:start]
-    supports :restart => true, :status => true
-    subscribes :restart, "template[/etc/keepalived/keepalived.conf]"
-  end
+      service 'keepalived' do
+        action [:start]
+        supports :restart => true, :status => true
+        subscribes :restart, "template[/etc/keepalived/keepalived.conf]"
+      end
+    end
 end

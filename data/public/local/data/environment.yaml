@@ -131,19 +131,19 @@ bootstrap:
         ip: 10.0.100.20
         mtu: 1500
         netmask: 255.255.255.0
-        gateway:
-        mac:
+        gateway: ""
+        mac: ""
       - device: *device2_1U
         ip: 10.121.2.2
         mtu: 1500
         netmask: 255.255.255.0
-        gateway:
-        mac:
+        gateway: ""
+        mac: ""
 
 # Hardware vendor specific
 ipmi:
-  user:
-  passwd:
+  user: ""
+  passwd: ""
 
 chef:
     owner: vagrant
@@ -165,28 +165,34 @@ monitoring:
       slow_osd: 0
 
 cron:
-  # Log processing to push logs into Cepheus
-  logs:
-    enable: false
-    ceph:
-      radosgw:
-        uid: cepheus_log_admin
-        name: "Cepheus Log Admin"
-        access_key: "whatever_your_access_key"
-        secret_key: "whatever_your_secret_key"
-        endpoint: "whatever_your_endpoint"
-        port: 80
-        bucket: cepheus_logs
-    patterns:
-      - directory: "/var/log/ceph"
-        pattern: "*.log-*.gz"
-      - directory: "/var/log/radosgw"
-        pattern: "ceph.client.radosgw.*.log-*.gz"
-      # Broken out here to show that you can if you wanted to push the data to a different bucket
-      - directory: "/var/log/radosgw"
-        pattern: "civetweb.access.*.log-*.gz"
-        # Bucket here is to show that down the road we can add this feature maybe if we want to put the access logs in a different bucket
-        #bucket: cepheus_logs_access
+    radosgw:
+        # The radosgw-stats.sh gets created based on the environment/data center and runs every 30 minutes
+        # to push stats to graphite to be graphed elsewhere
+        stats:
+            minute: "/30"
+            command: "/usr/local/bin/radosgw-stats.sh"
+
+    # Log processing to push logs into Cepheus
+    logs:
+        enable: false
+        radosgw:
+            uid: cepheus_log_admin
+            name: "Cepheus Log Admin"
+            access_key: "whatever_your_access_key"
+            secret_key: "whatever_your_secret_key"
+            endpoint: "whatever_your_endpoint"
+            port: 80
+            bucket: cepheus_logs
+        patterns:
+            -   directory: "/var/log/ceph"
+                pattern: "*.log-*.gz"
+            -   directory: "/var/log/radosgw"
+                pattern: "ceph.client.radosgw.*.log-*.gz"
+            # Broken out here to show that you can if you wanted to push the data to a different bucket
+            -   directory: "/var/log/radosgw"
+                pattern: "civetweb.access.*.log-*.gz"
+                # Bucket here is to show that down the road we can add this feature maybe if we want to put the access logs in a different bucket
+                #bucket: cepheus_logs_access
 
 # Supermicro node NICs look like:
 #   NOTE: 1U nodes have the following interface names:
@@ -205,11 +211,11 @@ network:
     mtu: 1500
   cluster:
     interface: *device2_2U
-    gateway_enable: true # false for production
+    gateway_enable: True # false for production
     cidr:
-        - 110.121.2.0/24
+        - 10.121.2.0/24
     route:
-        cidr: 10.121.2.0/24
+        cidr: ""
     netmask: 255.255.255.0
     # Change the MTU on production systems to 9000
     mtu: 1500
@@ -220,7 +226,11 @@ bond:
   name: bond0
   enable: false
   mtu: 1500
-  options: "mode=4 miimon=100 xmit_hash_policy=layer3+4"
+  # NB: Hardware level options
+  # options: "mode=4 miimon=100 xmit_hash_policy=layer3+4"
+  # NB: VBox level options
+  options: "mode=1 miimon=100 fail_over_mac=1"
+
   interfaces:
     - *device1_1U
     - *device1_2U
@@ -236,3 +246,6 @@ ntp:
     - 1.pool.ntp.org
     - 2.pool.ntp.org
     - 3.pool.ntp.org
+
+# Determine if the 'ceph' repo should be created. This is usually 'true' except for 'rhel' under 'subscription'
+ceph_repo_create: true

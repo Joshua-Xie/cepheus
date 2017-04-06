@@ -20,6 +20,19 @@ include_recipe 'cepheus::ceph-conf'
 
 include_recipe 'ceph-chef::system'
 
+# NB: Check this...
+# Moved from keepalived recipe. Need to make tuning apart of this to stream line the process more...
+
+# All for binding additional IPs not found in ifcfg files.
+# Sets ipv4 forwarding rule
+template "/etc/sysctl.d/99-sysctl.conf" do
+  source '99-sysctl.conf.erb'
+end
+
+execute 'update-sysctl' do
+  command 'sysctl -p'
+end
+
 # Substitute the OSD number for 0 below to check to check for 'non-besteffort' scheduler
 # sudo iotop --batch --iter 1 | grep 'ceph-osd -i 0' | grep -v be/4
 

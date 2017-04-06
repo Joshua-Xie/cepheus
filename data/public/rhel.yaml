@@ -23,7 +23,7 @@ os:
 ISO:
   volume_id: "RHEL-7.2 Server.x86_64"
 
-{%- if environment == "vagrant" %}
+{% if environment == "vagrant" %}
 # Name of the VBox Storage Controller
 vagrant:
     storage_controller: "SATA Controller"
@@ -59,12 +59,18 @@ adc_repo: # (optional) Only required if allowing Cepheus to build out your softw
             package: bird-1.5.0-1.x86_64.rpm
 
 ceph_repo:
-    create: false
     branch: stable
     arch: x86_64
     revision: 0.el7
 
 security:
+    sshd:
+        permit_root_login: "no"
+        login_grace_time: "2m"
+        max_auth_tries: 6
+        max_sessions: 10
+        banner: "/etc/banner"
+
     firewall:
         enable: false
         use: rules

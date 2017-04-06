@@ -21,7 +21,7 @@ method: repo
 # Base Chef Cookbook for all of Ceph
 # Change the '-' to '_' of the cookbook name (ceph-chef)
 ceph_chef: # (required file - cookbook - for build)
-    version: 1.1.4
+    version: 1.1.8
     # These gems are required for the `ceph-chef`
     gems: # (required files for build)
         -   name: netaddr

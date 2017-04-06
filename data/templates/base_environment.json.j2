@@ -23,24 +23,29 @@
       "cron": {
         "logs": {
             "enable": {%- if cron.logs.enable == True %} true, {% else %} false, {%- endif %}
-            "ceph": {
-                "radosgw": {
-                    {#- Builds a cron file that injects the Cepheus logs into RGW and allows the normal logrotate to remove the old logs #}
-                    {#- This allows any process with the 'log' credentials to extract the logs for use in other products like Splunk #}
-                    "uid": "{{ cron.logs.ceph.radosgw.uid }}",
-                    "name": "{{ cron.logs.ceph.radosgw.name }}",
-                    "access_key": "{{ cron.logs.ceph.radosgw.access_key }}",
-                    "secret_key": "{{ cron.logs.ceph.radosgw.secret_key }}",
-                    "endpoint": "{{ cron.logs.ceph.radosgw.endpoint }}",
-                    "port": {{ cron.logs.ceph.radosgw.port }},
-                    "bucket": "{{ cron.logs.ceph.radosgw.bucket }}"
-                }
+            "radosgw": {
+                {#- Builds a cron file that injects the Cepheus logs into RGW and allows the normal logrotate to remove the old logs #}
+                {#- This allows any process with the 'log' credentials to extract the logs for use in other products like Splunk #}
+                "uid": "{{ cron.logs.radosgw.uid }}",
+                "name": "{{ cron.logs.radosgw.name }}",
+                "access_key": "{{ cron.logs.radosgw.access_key }}",
+                "secret_key": "{{ cron.logs.radosgw.secret_key }}",
+                "endpoint": "{{ cron.logs.radosgw.endpoint }}",
+                "port": {{ cron.logs.radosgw.port }},
+                "bucket": "{{ cron.logs.radosgw.bucket }}"
             },
             "patterns": [
             {%- for item in cron.logs.patterns %}
-                {"directory": "{{ item.directory }}", "pattern": "{{ item.pattern }}", "bucket": {%- if item.bucket %}"{{ item.bucket }}"{% else %}"{{ cron.logs.ceph.radosgw.bucket }}"{%- endif %}}{%- if not loop.last %},{% endif %}
+                {"directory": "{{ item.directory }}", "pattern": "{{ item.pattern }}", "bucket": {%- if item.bucket %}"{{ item.bucket }}"{% else %}"{{ cron.logs.radosgw.bucket }}"{%- endif %}}{%- if not loop.last %},{% endif %}
             {%- endfor %}
             ]
+        },
+        "radosgw": {
+            "stats": {
+                "user": "{{ primary_user.name }}",
+                "minute": "{{ cron.radosgw.stats.minute }}",
+                "command": "{{ cron.radosgw.stats.command }}"
+            }
         }
       },
       "bootstrap": {
@@ -67,7 +72,7 @@
           "nm_controlled": "no"
         },
         "stats": {
-            "enable": {%- if adc.haproxy.enable == True %} true, {% else %} false, {%- endif %}
+            "enable": {%- if adc.haproxy.stats.enable == True %} true, {% else %} false, {%- endif %}
             "user": "{{ adc.haproxy.user }}",
             "passwd": "{{ adc.haproxy.passwd }}",
             "port": {{ adc.haproxy.port }}
@@ -130,18 +135,18 @@
           {%- endfor %}
           {%- endif %}
           ]
-        }
-      },
+        },
 
-      "keepalived": {
-        "enable": {%- if adc.keepalived.enable == True %} true, {% else %} false, {%- endif %}
-        "passwd": "{{ adc.keepalived.passwd }}",
-        "checks": true,
-        "servers": [
-        {%- for item in adc.keepalived.servers %}
-          {"name": "{{ item.name }}", "weight": "{{ item.weight }}", "interface": "{{ item.interface }}"}{%- if not loop.last %},{% endif %}
-        {%- endfor %}
-        ]
+        "keepalived": {
+          "enable": {%- if adc.keepalived.enable == True %} true, {% else %} false, {%- endif %}
+          "passwd": "{{ adc.keepalived.passwd }}",
+          "checks": {%- if adc.keepalived.checks == True %} true, {% else %} false, {%- endif %}
+          "servers": [
+          {%- for item in adc.keepalived.servers %}
+            {"name": "{{ item.name }}", "weight": "{{ item.weight }}", "interface": "{{ item.interface }}", "priority": {{ item.priority }}}{%- if not loop.last %},{% endif %}
+          {%- endfor %}
+          ]
+        }
       },
 
       "chef": {
@@ -150,11 +155,11 @@
       },
       "security": {
         "sshd": {
-          "permit_root_login": "no",
-          "login_grace_time": "2m",
-          "max_auth_tries": 6,
-          "max_sessions": 10,
-          "banner": "/etc/banner"
+          "permit_root_login": "{{ security.sshd.permit_root_login }}",
+          "login_grace_time": "{{ security.sshd.login_grace_time }}",
+          "max_auth_tries": {{ security.sshd.max_auth_tries }},
+          "max_sessions": {{ security.sshd.max_sessions }},
+          "banner": "{{ security.sshd.banner }}"
         },
         "firewall": {
           "enable": {%- if security.firewall.enable == True %}true,{% else %}false,{%- endif %}
@@ -236,7 +241,6 @@
             {"name": "{{ item.name }}",
             "roles": [{%- for role in item.roles %}"{{role}}"{%- if not loop.last %},{% endif %}{%- endfor %}],
             "profile": "{{ item.profile }}",
-            "static": {%- if item.static == True %}true,{% else %}false,{%- endif %}
             "interfaces": [
                 {%- for interface in item.interfaces %}
                     {"profile": "{{ interface.profile }}", "interface": "{{ interface.device }}", "mac": "{{ interface.mac }}", "ip": "{{ interface.ip }}", "netmask": "{{ interface.netmask }}", "gateway": "{{ interface.gateway }}", "mtu": {{ interface.mtu }}}{%- if not loop.last %},{% endif %}
@@ -367,7 +371,7 @@
       "ceph": {
         "cluster": "{{ ceph.cluster }}",
         "repo": {
-          "create": {%- if ceph_repo.create == True %} true, {% else %} false, {%- endif %}
+          "create": {%- if ceph_repo_create == True %} true, {% else %} false, {%- endif %}
           "version": {
             "name": "{{ ceph.name }}",
             "number": "{{ ceph.version }}",
@@ -427,6 +431,12 @@
             "ops": {%- if ceph.radosgw.logs.ops.enable == True %} true, {% else %} false, {%- endif %}
             "usage": {%- if ceph.radosgw.logs.usage.enable == True %} true {% else %} false {%- endif %}
           },
+          "gc": {
+            "max_objects": {{ ceph.radosgw.gc.max_objects }},
+            "obj_min_wait": {{ ceph.radosgw.gc.obj_min_wait }},
+            "processor_max_time": {{ ceph.radosgw.gc.processor_max_time }},
+            "processor_period": {{ ceph.radosgw.gc.processor_period }}
+          },
           "users": [
             {%- for user in ceph.radosgw.users %}
               {"uid": "{{ user.uid }}", "name": "{{ user.name }}", "email": "{{ user.email }}", "admin_caps": "{{ user.admin_caps }}", "access_key": "{{ user.access_key }}", "secret_key": "{{ user.secret_key }}", "max_buckets": {{ user.max_buckets }}, "status": "{{ user.status }}", "key_type": "{{ user.key_type }}", "quota": {"user": { "status": "{{ user.quota.user.status }}", "size": {{ user.quota.user.size }}, "objects": {{ user.quota.user.objects }} }, "buckets": [{%- for bucket in user.quota.buckets %}{"name": "{{ bucket.name }}", "status": "{{ bucket.status }}", "size": {{ bucket.size }}, "objects": {{ bucket.objects }}}{%- if not loop.last %},{% endif %}{%- endfor %}]}, "zones": ["{{ user.zones|join('","') }}"], "buckets": ["{{ user.buckets|join('","') }}"] }{%- if not loop.last %},{% endif %}
@@ -459,7 +469,7 @@
           {#- Move this data to the seed yamls if we need to make them more dynamic for different clusters. #}
           "devices": [
               {%- for item in ceph.osd.devices %}
-                {"data": "{{ ceph.osd.device }}{{ item.device }}", "data_type": "{{ item.data_type }}", "journal": "{{ ceph.osd.device }}{{ item.journal }}", "journal_type": "{{ item.journal_type }}", "encrypted": "{{ item.encrypted }}"}{%- if not loop.last %},{% endif %}
+                {"data": "{{ ceph.osd.device }}{{ item.device }}", "data_type": "{{ item.data_type }}", "journal": "{{ ceph.osd.device }}{{ item.journal }}", "journal_type": "{{ item.journal_type }}", "encrypted": {% if item.encrypted == True %}true{% else %}false{%- endif %}}{%- if not loop.last %},{% endif %}
               {%- endfor %}
           ],
           "crush": {
@@ -502,20 +512,20 @@
               "zone_instances": [
                 {%- for item in adc.vip.vips %}
                   {%- if item.type == "rgw" %}
-                  {"name": "{{ item.name }}", "port": "{{ item.backend_port }}", "region": "{{ item.region }}", "url": "{{ item.url }}", "rgw_thread_pool": {{ item.rgw_thread_pool }}, "handles": {{ item.handles }}, "threads": {{ item.threads }}}{%- if not loop.last %},{% endif %}
+                  {"name": "{{ item.name }}", "port": {{ item.backend_port }}, "region": "{{ item.region }}", "url": "{{ item.url }}", "rgw_thread_pool": {{ item.rgw_thread_pool }}, "handles": {{ item.handles }}, "threads": {{ item.threads }}}{%- if not loop.last %},{% endif %}
                   {%- endif %}
                 {%- endfor %}
               ],
               "regions": ["{{ ceph.radosgw.federated.regions|join('", "') }}"],
               "enable_regions_zones": {%- if ceph.radosgw.federated.enable_regions_zones == True %} true, {% else %} false, {%- endif %}
               "master_zone": "{{ ceph.radosgw.federated.master_zone }}",
-              "master_zone_port": "{{ ceph.radosgw.federated.master_zone_port }}"
+              "master_zone_port": {{ ceph.radosgw.federated.master_zone_port }}
             },
             {#- The data_percent below should equal 100%. If Federated then the calculation will take those pools into account. #}
             {#- NOTE: IMPORTANT - ONLY 'buckets' (data) can be erasure coded. Others need to be replicated. #}
             "pools": [
                 {%- for item in ceph.pools.radosgw %}
-                  {"name": "{{ item.name }}", "data_percent": {{ item.data_percent }}, "type": "{{ item.type }}", "profile": "{{ item.profile }}", "crush_ruleset": {{ item.crush_ruleset }}, "crush_ruleset_name": "{{ item.crush_ruleset_name }}"}{%- if not loop.last %},{% endif %}
+                  {"name": "{{ item.name }}", "data_percent": {{ "{:,.2f}".format(item.data_percent) }}, "type": "{{ item.type }}", "profile": "{{ item.profile }}", "crush_ruleset": {{ item.crush_ruleset }}, "crush_ruleset_name": "{{ item.crush_ruleset_name }}"}{%- if not loop.last %},{% endif %}
                 {%- endfor %}
             ],
             {#- If federated then the settings below apply to the federated pools else the non-federated pools. #}

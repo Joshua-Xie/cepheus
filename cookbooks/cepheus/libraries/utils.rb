@@ -116,15 +116,15 @@ def get_ip(interface)
       end
     end
   else
-    servers = node['cepheus']['']['servers']
+    servers = node['cepheus']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
-        if interface == server['network']['public']['interface']
-          val = server['network']['public']['ip']
-        else
-          val = server['network']['cluster']['ip']
+        server['interfaces'].each do | server_interface |
+            if interface == server_interface['profile']
+                val = server_interface['ip']
+                break
+            end
         end
-        break
       end
     end
   end
@@ -141,15 +141,15 @@ def get_gateway(interface)
       end
     end
   else
-    servers = node['cepheus']['pxe_boot']['servers']
+    servers = node['cepheus']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
-        if interface == server['network']['public']['interface']
-          val = server['network']['public']['gateway']
-        else
-          val = server['network']['cluster']['gateway']
+        server['interfaces'].each do | server_interface |
+            if interface == server['profile']
+                val = server_interface['gateway']
+                break
+            end
         end
-        break
       end
     end
   end
@@ -166,15 +166,15 @@ def get_mac_address(interface)
       end
     end
   else
-    servers = node['cepheus']['pxe_boot']['servers']
+    servers = node['cepheus']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
-        if interface == server['network']['public']['interface']
-          val = server['network']['public']['mac']
-        else
-          val = server['network']['cluster']['mac']
-        end
-        break
+          server['interfaces'].each do | server_interface |
+              if interface == server['profile']
+                  val = server_interface['mac']
+                  break
+              end
+          end
       end
     end
   end
@@ -191,15 +191,15 @@ def get_netmask(interface)
       end
     end
   else
-    servers = node['cepheus']['pxe_boot']['servers']
+    servers = node['cepheus']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
-        if interface == server['network']['public']['interface']
-          val = server['network']['public']['netmask']
-        else
-          val = server['network']['cluster']['netmask']
-        end
-        break
+          server['interfaces'].each do | server_interface |
+              if interface == server['profile']
+                  val = server_interface['netmask']
+                  break
+              end
+          end
       end
     end
   end
@@ -214,11 +214,15 @@ def get_bond_ip
     interface = node['cepheus']['bootstrap']['interfaces'].first
     val = interface['ip']
   else
-    servers = node['cepheus']['pxe_boot']['servers']
+    servers = node['cepheus']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
-        val = server['network']['public']['ip']
-        break
+          server['interfaces'].each do | server_interface |
+              if interface == server['profile']
+                  val = server_interface['ip']
+                  break
+              end
+          end
       end
     end
   end
@@ -231,7 +235,7 @@ def get_bond_gateway
     interface = node['cepheus']['bootstrap']['interfaces'].first
     val = interface['gateway']
   else
-    servers = node['cepheus']['pxe_boot']['servers']
+    servers = node['cepheus']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
         # IMPORTANT - VirtualBox environment should be named vagrant.json or vbox.json
@@ -239,9 +243,13 @@ def get_bond_gateway
         if node.chef_environment == 'vagrant' || node.chef_environment == 'vbox'
           val = ''
         else
-          val = server['network']['public']['gateway']
+            server['interfaces'].each do | server_interface |
+                if "public" == server['profile']
+                    val = server_interface['gateway']
+                    break
+                end
+            end
         end
-        break
       end
     end
   end
@@ -254,11 +262,15 @@ def get_bond_netmask
     interface = node['cepheus']['bootstrap']['interfaces'].first
     val = interface['netmask']
   else
-    servers = node['cepheus']['pxe_boot']['servers']
+    servers = node['cepheus']['servers']
     servers.each do | server |
       if server['name'] == node['hostname']
-        val = server['network']['public']['netmask']
-        break
+          server['interfaces'].each do | server_interface |
+              if "public" == server['profile']
+                  val = server_interface['netmask']
+                  break
+              end
+          end
       end
     end
   end
@@ -310,7 +322,12 @@ def get_bgp_interface_ip
     # Always the 'public' interface
     sys_server = get_server
     if sys_server
-      val = sys_server['network']['public']['ip']
+        sys_server['interfaces'].each do | server_interface |
+            if "public" == server['profile']
+                val = server_interface['ip']
+                break
+            end
+        end
     end
   end
   val
@@ -318,7 +335,7 @@ end
 
 def get_server
   val = nil
-  servers = node['cepheus']['pxe_boot']['servers']
+  servers = node['cepheus']['servers']
   servers.each do | server |
     if server['name'] == node['hostname']
       val = server
@@ -330,7 +347,7 @@ end
 
 def get_keepalived_server
   val = nil
-  servers = node['cepheus']['keepalived']['servers']
+  servers = node['cepheus']['adc']['keepalived']['servers']
   servers.each do | server |
     if server['name'] == node['hostname']
       val = server
@@ -344,7 +361,7 @@ def get_adc_backend_nodes
   results = []
   # RGW are backend nodes...
   rgw_nodes = radosgw_nodes
-  servers = node['cepheus']['pxe_boot']['servers']
+  servers = node['cepheus']['servers']
   rgw_nodes.each do | rgw |
     servers.each do | server |
       if server['name'] == rgw['hostname']
@@ -368,7 +385,7 @@ def get_adc_backend_federated_nodes
   results = []
   # Get the list of backend servers
   nodes = node['cepheus']['adc']['backend']['servers']
-  servers = node['cepheus']['pxe_boot']['servers']
+  servers = node['cepheus']['servers']
   nodes.each do | bes |
     servers.each do | server |
       if server['name'] == bes['name']

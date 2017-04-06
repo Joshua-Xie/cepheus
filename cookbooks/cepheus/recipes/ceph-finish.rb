@@ -26,8 +26,8 @@ execute 'symlink-librados' do
 end
 
 # Add user to 'ceph' group if it exists. Can only run after Ceph is installed.
-if node['cepheus']['ceph']['version'] != 'hammer'
-    node['cepheus']['pxe_boot']['kickstart']['users'].each do | user_value |
+if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
+    node['cepheus']['users'].each do | user_value |
         execute "add_user_to_ceph_#{user_value['name']}" do
           command "usermod -a -G ceph #{user_value['name']}"
           ignore_failure true

@@ -31,3 +31,10 @@ cron 'log-injection-daily' do
   hour    '4'
   command "/usr/local/bin/cepheus_log_injection.py daily"
 end
+
+# Put in loop of cron jobs to create
+cron 'radosgw-stats' do
+  user    "#{node['cepheus']['cron']['radosgw']['stats']['user']}"
+  minute  "#{node['cepheus']['cron']['radosgw']['stats']['minute']}"
+  command "#{node['cepheus']['cron']['radosgw']['stats']['command']}"
+end

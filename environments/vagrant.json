@@ -20,30 +20,35 @@
       "cron": {
         "logs": {
             "enable": false,
-            "ceph": {
-                "radosgw": {
-                    "uid": "cepheus_log_admin",
-                    "name": "Cepheus Log Admin",
-                    "access_key": "whatever_your_access_key",
-                    "secret_key": "whatever_your_secret_key",
-                    "endpoint": "whatever_your_endpoint",
-                    "port": 80,
-                    "bucket": "cepheus_logs"
-                }
+            "radosgw": {
+                "uid": "cepheus_log_admin",
+                "name": "Cepheus Log Admin",
+                "access_key": "whatever_your_access_key",
+                "secret_key": "whatever_your_secret_key",
+                "endpoint": "whatever_your_endpoint",
+                "port": 80,
+                "bucket": "cepheus_logs"
             },
             "patterns": [
                 {"directory": "/var/log/ceph", "pattern": "*.log-*.gz", "bucket":"cepheus_logs"},
                 {"directory": "/var/log/radosgw", "pattern": "ceph.client.radosgw.*.log-*.gz", "bucket":"cepheus_logs"},
                 {"directory": "/var/log/radosgw", "pattern": "civetweb.access.*.log-*.gz", "bucket":"cepheus_logs"}
             ]
+        },
+        "radosgw": {
+            "stats": {
+                "user": "vagrant",
+                "minute": "/30",
+                "command": "/usr/local/bin/radosgw-stats.sh"
+            }
         }
       },
       "bootstrap": {
         "name": "ceph-bootstrap",
         "env": "/home/vagrant/cepheus/environments",
         "interfaces": [
-          {"name": "enp0s8", "ip": "10.0.100.20", "netmask": "255.255.255.0", "gateway": "None", "mac": "None"},
-          {"name": "enp0s9", "ip": "10.121.2.2", "netmask": "255.255.255.0", "gateway": "None", "mac": "None"}
+          {"name": "enp0s8", "ip": "10.0.100.20", "netmask": "255.255.255.0", "gateway": "", "mac": ""},
+          {"name": "enp0s9", "ip": "10.121.2.2", "netmask": "255.255.255.0", "gateway": "", "mac": ""}
         ]
       },
 
@@ -57,17 +62,17 @@
           "type": "Bond",
           "mtu": 1500,
           "interfaces": ["enp0s8","enp0s8"],
-          "options": "mode=4 miimon=100 xmit_hash_policy=layer3+4",
+          "options": "mode=1 miimon=100 fail_over_mac=1",
           "nm_controlled": "no"
         },
         "stats": {
-            "enable": false,
+            "enable": true, 
             "user": "haproxy",
             "passwd": "haproxy",
             "port": 1936
         },
         "connections": {
-          "max": 6000,
+          "max": 1000,
           "balance": "roundrobin"
         },
 
@@ -75,7 +80,7 @@
           "path": "/etc/ssl/private"
         },
         "vip": {
-          "prefix": "10.121.0.16",
+          "prefix": "10.121.16.16",
           "netmask": "255.255.255.240",
           "cidr": 28,
           "port": {
@@ -84,14 +89,14 @@
           }
         },
         "vips": [
-          {"name": "www", "ip": "10.121.16.17", "cidr": 28, "interface": "enp0s8", "backend_label": "web-ui-backend", "ssl": false, "cert": "wildcard.s3.www.example.com.pem", "ssl_files": ["wildcard.s3.www.example.com.pem"], "url": "www.example.com"},
-          {"name": "api", "ip": "10.121.16.18", "cidr": 28, "interface": "enp0s8", "backend_label": "restful-api-backend", "ssl": false, "cert": "wildcard.s3.api.example.com.pem", "ssl_files": ["wildcard.s3.api.example.com.pem"], "url": "api.example.com"},
-          {"name": "dev", "ip": "10.121.16.19", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-backend", "ssl": false, "cert": "wildcard.s3.vagrant.dev.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.dev.example.com.pem"], "url": "s3.vagrant.dev.example.com"},
-          {"name": "prod", "ip": "10.121.16.20", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-backend", "ssl": false, "cert": "wildcard.s3.vagrant.prod.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.prod.example.com.pem"], "url": "s3.vagrant.prod.example.com"}
+          {"name": "www", "ip": "10.121.16.20", "cidr": 28, "interface": "enp0s8", "backend_label": "web-ui-backend", "ssl": false, "cert": "wildcard.s3.www.example.com.pem", "ssl_files": ["wildcard.s3.www.example.com.pem"], "url": "www.example.com"},
+          {"name": "api", "ip": "10.121.16.19", "cidr": 28, "interface": "enp0s8", "backend_label": "restful-api-backend", "ssl": false, "cert": "wildcard.s3.api.example.com.pem", "ssl_files": ["wildcard.s3.api.example.com.pem"], "url": "api.example.com"},
+          {"name": "dev", "ip": "10.121.16.18", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-backend", "ssl": false, "cert": "wildcard.s3.vagrant.dev.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.dev.example.com.pem"], "url": "s3.vagrant.dev.example.com"},
+          {"name": "prod", "ip": "10.121.16.17", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-backend", "ssl": false, "cert": "wildcard.s3.vagrant.prod.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.prod.example.com.pem"], "url": "s3.vagrant.prod.example.com"}
         ],
         "bgp": {
           "enable": false,
-          "asn": 65032,
+          "asn": 65001,
           "interface": "enp0s8",
           "roles": [
             {"name": "ceph-vm1", "role": "primary"},
@@ -108,18 +113,18 @@
             {"name": "ceph-vm2", "instance": "", "type": "rgw", "weight": "6", "port": 8080, "options": "check inter 2s rise 2 fall 3"},
             {"name": "ceph-vm3", "instance": "", "type": "rgw", "weight": "6", "port": 8080, "options": "check inter 2s rise 2 fall 3"}
           ]
-        }
-      },
+        },
 
-      "keepalived": {
-        "enable": false,
-        "passwd": "keepalived",
-        "checks": true,
-        "servers": [
-          {"name": "ceph-vm3", "weight": "5", "interface": "enp0s8"},
-          {"name": "ceph-vm2", "weight": "5", "interface": "enp0s8"},
-          {"name": "ceph-vm1", "weight": "5", "interface": "enp0s8"}
-        ]
+        "keepalived": {
+          "enable": false,
+          "passwd": "keepalived",
+          "checks": true, 
+          "servers": [
+            {"name": "ceph-vm3", "weight": "5", "interface": "enp0s8", "priority": 90},
+            {"name": "ceph-vm2", "weight": "5", "interface": "enp0s8", "priority": 100},
+            {"name": "ceph-vm1", "weight": "5", "interface": "enp0s8", "priority": 110}
+          ]
+        }
       },
 
       "chef": {
@@ -199,42 +204,38 @@
         }
       },
       "ipmi": {
-        "user": "None",
-        "passwd": "None"
+        "user": "",
+        "passwd": ""
       },
 
       "servers": [
             {"name": "ceph-boostrap",
             "roles": ["bootstrap"],
             "profile": "",
-            "static":false,
             "interfaces": [
-                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.20", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
-                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.20", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
+                    {"profile": "public", "interface": "enp0s3", "mac": "08:00:27:E3:84:01", "ip": "10.0.100.20", "netmask": "255.255.255.0", "gateway": "10.0.100.2", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s8", "mac": "08:00:27:3E:CB:B0", "ip": "10.121.2.3", "netmask": "255.255.255.0", "gateway": "10.121.2.2", "mtu": 1500}
             ]},
             {"name": "ceph-vm1",
-            "roles": ["mon","osd","rgw","admin"],
-            "profile": "ceph_osd_node",
-            "static":false,
+            "roles": ["mon","osd","rgw","adc","admin"],
+            "profile": "ceph_non_osd_node",
             "interfaces": [
-                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.21", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
-                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.21", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
+                    {"profile": "public", "interface": "enp0s3", "mac": "08:00:27:E3:84:01", "ip": "10.0.100.21", "netmask": "255.255.255.0", "gateway": "10.0.100.2", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s8", "mac": "08:00:27:3E:CB:B0", "ip": "10.121.2.3", "netmask": "255.255.255.0", "gateway": "10.121.2.2", "mtu": 1500}
             ]},
             {"name": "ceph-vm2",
-            "roles": ["mon","osd","rgw","admin"],
-            "profile": "ceph_osd_node",
-            "static":false,
+            "roles": ["mon","osd","rgw","adc","admin"],
+            "profile": "ceph_non_osd_node",
             "interfaces": [
-                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.22", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
-                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.22", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
+                    {"profile": "public", "interface": "enp0s3", "mac": "08:00:27:EB:EC:61", "ip": "10.0.100.22", "netmask": "255.255.255.0", "gateway": "10.0.100.2", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s8", "mac": "08:00:27:C5:9F:40", "ip": "10.121.2.4", "netmask": "255.255.255.0", "gateway": "10.121.2.2", "mtu": 1500}
             ]},
             {"name": "ceph-vm3",
-            "roles": ["mon","osd","rgw","admin"],
-            "profile": "ceph_osd_node",
-            "static":false,
+            "roles": ["mon","osd","rgw","adc","admin"],
+            "profile": "ceph_non_osd_node",
             "interfaces": [
-                    {"profile": "public", "interface": "enp0s8", "mac": "", "ip": "10.0.100.23", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500},
-                    {"profile": "cluster", "interface": "enp0s9", "mac": "", "ip": "10.121.2.23", "netmask": "255.255.255.0", "gateway": "", "mtu": 1500}
+                    {"profile": "public", "interface": "enp0s3", "mac": "08:00:27:8B:9F:3F", "ip": "10.0.100.23", "netmask": "255.255.255.0", "gateway": "10.0.100.2", "mtu": 1500},
+                    {"profile": "cluster", "interface": "enp0s8", "mac": "08:00:27:1B:3B:E7", "ip": "10.121.2.5", "netmask": "255.255.255.0", "gateway": "10.121.2.2", "mtu": 1500}
             ]}
       ],
 
@@ -273,10 +274,10 @@
       "ceph": {
         "cluster": "ceph",
         "repo": {
-          "create": false,
+          "create": true, 
           "version": {
-            "name": "luminous",
-            "number": "10.2.6",
+            "name": "hammer",
+            "number": "0.94.10",
             "branch": "stable",
             "revision": "0.el7",
             "arch": "x86_64"
@@ -311,7 +312,7 @@
             "type": "Bond",
             "mtu": 1500,
             "interfaces": ["enp0s8","enp0s8"],
-            "options": "mode=4 miimon=100 xmit_hash_policy=layer3+4",
+            "options": "mode=1 miimon=100 fail_over_mac=1",
             "nm_controlled": "no"
           }
 
@@ -329,6 +330,12 @@
             "ops": true, 
             "usage": true 
           },
+          "gc": {
+            "max_objects": 64,
+            "obj_min_wait": 3600,
+            "processor_max_time": 1800,
+            "processor_period": 1800
+          },
           "users": [
               {"uid": "radosgw", "name": "Admin", "email": "", "admin_caps": "users=*;buckets=*;metadata=*;usage=*;zone=*", "access_key": "", "secret_key": "", "max_buckets": 0, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "disable", "size": -1, "objects": -1 }, "buckets": [{"name": "fill_test", "status": "disable", "size": -1, "objects": -1}]}, "zones": [""], "buckets": ["fill_test"] },
               {"uid": "cepheus_log_admin", "name": "Ceheus Log Admin", "email": "", "admin_caps": "", "access_key": "", "secret_key": "", "max_buckets": 0, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "disable", "size": -1, "objects": -1 }, "buckets": [{"name": "cepheus_logs", "status": "disable", "size": -1, "objects": -1}]}, "zones": [""], "buckets": ["cepheus_logs"] },
@@ -345,7 +352,7 @@
             "token_cache_size": 1000,
             "revocation_interval": 1200
           },
-          "rgw_num_rados_handles": 1,
+          "rgw_num_rados_handles": 5,
           "civetweb_num_threads": 100,
           "bond": {
             "enable": false,
@@ -353,16 +360,16 @@
             "type": "Bond",
             "mtu": 1500,
             "interfaces": ["enp0s8","enp0s8"],
-            "options": "mode=4 miimon=100 xmit_hash_policy=layer3+4",
+            "options": "mode=1 miimon=100 fail_over_mac=1",
             "nm_controlled": "no"
           }
         },
         "osd": {
           "devices": [
-                {"data": "/dev/sdb", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": "False"},
-                {"data": "/dev/sdc", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": "False"},
-                {"data": "/dev/sdd", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": "False"},
-                {"data": "/dev/sde", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": "False"}
+                {"data": "/dev/sdb", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": false},
+                {"data": "/dev/sdc", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": false},
+                {"data": "/dev/sdd", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": false},
+                {"data": "/dev/sde", "data_type": "hdd", "journal": "/dev/sdf", "journal_type": "ssd", "encrypted": false}
           ],
           "crush": {
             "update": false,
@@ -396,29 +403,29 @@
               "enable": false,
               "multisite_replication": false,
               "zone_instances": [
-                  {"name": "dev", "port": "8080", "region": "local", "url": "s3.vagrant.dev.example.com", "rgw_thread_pool": 100, "handles": 5, "threads": 100},
-                  {"name": "prod", "port": "8081", "region": "local", "url": "s3.vagrant.prod.example.com", "rgw_thread_pool": 100, "handles": 5, "threads": 100}
+                  {"name": "dev", "port": 8080, "region": "local", "url": "s3.vagrant.dev.example.com", "rgw_thread_pool": 100, "handles": 5, "threads": 100},
+                  {"name": "prod", "port": 8081, "region": "local", "url": "s3.vagrant.prod.example.com", "rgw_thread_pool": 100, "handles": 5, "threads": 100}
               ],
               "regions": ["local"],
               "enable_regions_zones": false,
               "master_zone": "dev",
-              "master_zone_port": "8080"
+              "master_zone_port": 8080
             },
             "pools": [
-                  {"name": ".log", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".intent-log", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".rgw", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".rgw.control", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".rgw.gc", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".rgw.root", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".rgw.buckets", "data_percent": 95.9, "type": "erasure", "profile": "cepheus", "crush_ruleset": 1, "crush_ruleset_name": "hdd"},
-                  {"name": ".rgw.buckets.index", "data_percent": 2, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".rgw.buckets.extra", "data_percent": 1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".users", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".users.uid", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".users.email", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".users.swift", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
-                  {"name": ".usage", "data_percent": 0.1, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"}
+                  {"name": ".log", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".intent-log", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".rgw", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".rgw.control", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".rgw.gc", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".rgw.root", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".rgw.buckets", "data_percent": 95.90, "type": "erasure", "profile": "cepheus", "crush_ruleset": 1, "crush_ruleset_name": "hdd"},
+                  {"name": ".rgw.buckets.index", "data_percent": 2.00, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".rgw.buckets.extra", "data_percent": 1.00, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".users", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".users.uid", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".users.email", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".users.swift", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"},
+                  {"name": ".usage", "data_percent": 0.10, "type": "replicated", "profile": "", "crush_ruleset": 0, "crush_ruleset_name": "hdd_replicated"}
             ],
             "settings": {
               "pg_num": 64,
@@ -431,7 +438,7 @@
               "chooseleaf": "host",
               "chooseleaf_type": 1,
               "type": "erasure",
-              "nodes_per_rack": 17
+              "nodes_per_rack": 1
             },
             "remove": {
               "names": []
@@ -439,18 +446,18 @@
           },
           "pgs": {
             "calc": {
-              "total_osds": 612,
+              "total_osds": 12,
               "target_pgs_per_osd": 200,
               "min_pgs_per_pool": 64,
               "replicated_size": 3,
-              "erasure_size": 11
+              "erasure_size": 3
             },
             "num": 64
           }
         },
         "restapi": {
           "url": "api.example.com",
-          "ip": "10.121.1.18",
+          "ip": "10.121.1.21",
           "port": 5080
         }
       },
@@ -467,10 +474,10 @@
           "interface": "enp0s9",
           "gateway_enable": false,
           "cidr": [
-            "110.121.2.0/24"
+            "10.121.2.0/24"
           ],
           "route": {
-            "cidr": "10.121.2.0/24"
+            "cidr": ""
           },
           "mtu": 1500
         }

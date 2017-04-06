@@ -93,4 +93,5 @@ end
 service 'zabbix-agent' do
   provider Chef::Provider::Service::Systemd
   action [:enable]
+  ignore_failure true
 end

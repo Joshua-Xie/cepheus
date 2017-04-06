@@ -4,8 +4,8 @@
 
 ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
     cluster: ceph
-    name: luminous
-    version: 10.2.6
+    name: hammer #luminous
+    version: 0.94.10 #10.2.6
 
     tcmalloc: # This becomes the default after Jewel
         enable: true
@@ -25,18 +25,15 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     pgs:
         num: 64
         calc:
-            total_osds: 612
+            total_osds: 12
             target_pgs_per_osd: 200
             min_pgs_per_pool: 64
             replicated_size: 3
-            erasure_size: 11
-    repo:
-        # This will tell ceph-chef cookbook not to create a yum repo because we will use RHEL Sat Server
-        create: false
+            erasure_size: 3
 
     restapi: # TODO: Change this later to support the VIP API
         url: api.example.com
-        ip: 10.121.1.18
+        ip: 10.121.1.21
         port: 5080
 
     mgr:
@@ -146,7 +143,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     radosgw:
         default_port: 8080
         bucket_shards: 5
-        rados_handles: 1
+        rados_handles: 5
         civetweb_threads: 100
         settings:
             pg_num: 64
@@ -160,7 +157,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
             chooseleaf_type: 1
             type: erasure
             # OSD nodes per rack - helps determine crushmap feature for erasure coding
-            nodes_per_rack: 17
+            nodes_per_rack: 1
         # This may need to move to a DB later...
         default_url: s3.example.com
         debug:
@@ -172,6 +169,13 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                 enable: true
             usage:
                 enable: true
+        # NB: Change the 'gc' items to happen more frequently than the defaults.
+        gc:
+            max_objects: 64
+            obj_min_wait: 3600
+            processor_max_time: 1800
+            processor_period: 1800
+
         # Quotas are in MB
         users:
             - uid: radosgw
@@ -199,6 +203,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                           size: -1
                           objects: -1
               zones:
+                  # NB: *MAY* need to look at this and have true empty [] array instead of [""]
                   # Must have at least one empty zone
                   - ""
                   # - development example zone

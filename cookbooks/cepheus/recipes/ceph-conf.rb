@@ -106,6 +106,12 @@ node.default['ceph']['radosgw']['logs']['usage']['enable'] = true #node['cepheus
 node.default['ceph']['radosgw']['debug']['logs']['enable'] = node['cepheus']['ceph']['radosgw']['debug']['logs']['enable']
 node.default['ceph']['radosgw']['debug']['logs']['level'] = node['cepheus']['ceph']['radosgw']['debug']['logs']['level']
 
+# GC related...
+node.default['ceph']['radosgw']['gc']['max_objects'] = node['cepheus']['ceph']['radosgw']['gc']['max_objects']
+node.default['ceph']['radosgw']['gc']['obj_min_wait'] = node['cepheus']['ceph']['radosgw']['gc']['obj_min_wait']
+node.default['ceph']['radosgw']['gc']['processor_max_time'] = node['cepheus']['ceph']['radosgw']['gc']['processor_max_time']
+node.default['ceph']['radosgw']['gc']['processor_period'] = node['cepheus']['ceph']['radosgw']['gc']['processor_period']
+
 # Add whatever users and buckets you want the cookbook to automatically set up for you in the  node['cepheus']['ceph']['radosgw']['users']
 node.default['ceph']['radosgw']['users'] = node['cepheus']['ceph']['radosgw']['users']
 

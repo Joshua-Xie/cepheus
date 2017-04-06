@@ -11,17 +11,22 @@
 adc:
     enable: false
     interface: *device1_1U
+    # NB: Add 'haproxy' section to template and then update Chef recipes to support it and then remove this comment :)
     haproxy:
+        stats:
+            enable: true
         enable: false
         port: 1936
         user: haproxy
         passwd: haproxy
         balance: roundrobin
-        max_connections: 6000
+        # NB: Raise in production
+        max_connections: 1000
     # Keepalived nodes should have at least two but maybe one per rack
     keepalived:
         enable: false
         passwd: keepalived
+        checks: true
         servers:
             - name: ceph-vm3
               weight: 5
@@ -38,7 +43,7 @@ adc:
     # BGP uses the keepalived servers - Make sure the peer names DO NOT have spaces.
     bgp:
         enable: false
-        asn: 65032
+        asn: 65001
         interface: *device1_1U
         roles:
             - name: ceph-vm1
@@ -53,7 +58,7 @@ adc:
               label: bgp_peer2
               ip: 10.121.16.9
     vip:
-        prefix: 10.121.0.16
+        prefix: 10.121.16.16
         netmask: 255.255.255.240
         cidr: 28
         vips:
@@ -61,7 +66,7 @@ adc:
             # IMPORTANT: NON RGW VIPS MUST be first for template to work without re-working it!
             # WWW is the Web UI for the cluster
             - name: www
-              ip: 10.121.16.17
+              ip: 10.121.16.20
               interface: *device1_1U
               type: web
               backend_label: web-ui-backend
@@ -76,7 +81,7 @@ adc:
               region: *data_center
             # API is the RESTful api for the cluster
             - name: api
-              ip: 10.121.16.18
+              ip: 10.121.16.19
               interface: *device1_1U
               type: api
               backend_label: restful-api-backend
@@ -90,7 +95,7 @@ adc:
               backend_port: 8089
               region: *data_center
             - name: dev
-              ip: 10.121.16.19
+              ip: 10.121.16.18
               interface: *device1_1U
               type: rgw
               backend_label: radosgw-http-backend
@@ -107,7 +112,7 @@ adc:
               handles: 5
               threads: 100
             - name: prod
-              ip: 10.121.16.20
+              ip: 10.121.16.17
               interface: *device1_1U
               type: rgw
               backend_label: radosgw-http-backend

@@ -34,22 +34,22 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: *device1_1U
+                  device: enp0s3 #*device1_1U
                   ip: 10.0.100.20
-                  mac: ""
+                  mac: "08:00:27:E3:84:01"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.0.100.2"
                   # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
                   pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: *device2_1U
-                  ip: 10.121.2.20
-                  mac: ""
+                  device: enp0s8 #*device2_1U
+                  ip: 10.121.2.3
+                  mac: "08:00:27:3E:CB:B0"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.121.2.2"
                   # Only one interface needs pxe gateway
                   pxe_gateway: ""
                   mtu: 1500
@@ -66,10 +66,11 @@ inventory:
               - mon
               - osd
               - rgw
+              - adc
               - admin
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
           # *MUST* match one of the profiles in pxe_boot.yaml
-          profile: ceph_osd_node
+          profile: ceph_non_osd_node
           bond:
               name: bond0
               enable: false
@@ -81,22 +82,22 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: *device1_1U
+                  device: enp0s3 #*device1_1U
                   ip: 10.0.100.21
-                  mac: ""
+                  mac: "08:00:27:E3:84:01"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.0.100.2"
                   # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
                   pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: *device2_1U
-                  ip: 10.121.2.21
-                  mac: ""
+                  device: enp0s8 #*device2_1U
+                  ip: 10.121.2.3
+                  mac: "08:00:27:3E:CB:B0"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.121.2.2"
                   pxe_gateway: ""
                   # Only one interface needs pxe gateway
                   mtu: 1500
@@ -113,10 +114,11 @@ inventory:
               - mon
               - osd
               - rgw
+              - adc
               - admin
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
           # *MUST* match one of the profiles in pxe_boot.yaml
-          profile: ceph_osd_node
+          profile: ceph_non_osd_node
           bond:
               name: bond0
               enable: false
@@ -128,22 +130,22 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: *device1_1U
+                  device: enp0s3 #*device1_1U
                   ip: 10.0.100.22
-                  mac: ""
+                  mac: "08:00:27:EB:EC:61"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.0.100.2"
                   # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
                   pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: *device2_1U
-                  ip: 10.121.2.22
-                  mac: ""
+                  device: enp0s8 #*device2_1U
+                  ip: 10.121.2.4
+                  mac: "08:00:27:C5:9F:40"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.121.2.2"
                   # Only one interface needs pxe gateway
                   pxe_gateway: ""
                   mtu: 1500
@@ -160,10 +162,11 @@ inventory:
               - mon
               - osd
               - rgw
+              - adc
               - admin
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
           # *MUST* match one of the profiles in pxe_boot.yaml
-          profile: ceph_osd_node
+          profile: ceph_non_osd_node
           bond:
               name: bond0
               enable: false
@@ -175,22 +178,22 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: *device1_1U
+                  device: enp0s3 #*device1_1U
                   ip: 10.0.100.23
-                  mac: ""
+                  mac: "08:00:27:8B:9F:3F"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.0.100.2"
                   # Make the first interface the pxe gateway - `gateway` and `pxe_gateway` should be equal for first interface on each node.
                   pxe_gateway: ""
                   mtu: 1500
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: *device2_1U
-                  ip: 10.121.2.23
-                  mac: ""
+                  device: enp0s8 #*device2_1U
+                  ip: 10.121.2.5
+                  mac: "08:00:27:1B:3B:E7"
                   # TORs - Gateway
-                  gateway: ""
+                  gateway: "10.121.2.2"
                   # Only one interface needs pxe gateway
                   pxe_gateway: ""
                   mtu: 1500

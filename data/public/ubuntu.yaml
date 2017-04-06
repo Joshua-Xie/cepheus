@@ -18,7 +18,7 @@ os:
 ISO:
   volume_id: "Ubuntu Server.x86_64"
 
-{%- if environment == "vagrant" %}
+{% if environment == "vagrant" %}
 # Name of the VBox Storage Controller
 vagrant:
     storage_controller: "SATAController"
@@ -26,7 +26,6 @@ vagrant:
 {% endif %}
 
 ceph_repo:
-    create: false
     branch: stable
     arch: x86_64
     revision:
@@ -39,6 +38,12 @@ adc_repo: # (optional) Only required if allowing Cepheus to build out your softw
 
 # Change this to support the correct firewall
 security:
+    sshd:
+        permit_root_login: "no"
+        login_grace_time: "2m"
+        max_auth_tries: 6
+        max_sessions: 10
+        banner: "/etc/banner"
     firewall:
         enable: false
         use: rules
