@@ -319,7 +319,7 @@
         },
         "radosgw": {
           "port": 8080,
-          "default_url": "s3.example.com",
+          "default_url": "ceph-vm1.example.com",
           "debug": {
             "logs": {
               "level": 2,
@@ -337,9 +337,9 @@
             "processor_period": 1800
           },
           "users": [
-              {"uid": "radosgw", "name": "Admin", "email": "", "admin_caps": "users=*;buckets=*;metadata=*;usage=*;zone=*", "access_key": "", "secret_key": "", "max_buckets": 0, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "disable", "size": -1, "objects": -1 }, "buckets": [{"name": "fill_test", "status": "disable", "size": -1, "objects": -1}]}, "zones": [""], "buckets": ["fill_test"] },
-              {"uid": "cepheus_log_admin", "name": "Ceheus Log Admin", "email": "", "admin_caps": "", "access_key": "", "secret_key": "", "max_buckets": 0, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "disable", "size": -1, "objects": -1 }, "buckets": [{"name": "cepheus_logs", "status": "disable", "size": -1, "objects": -1}]}, "zones": [""], "buckets": ["cepheus_logs"] },
-              {"uid": "tester", "name": "Tester", "email": "", "admin_caps": "usage=read; user=read; bucket=*", "access_key": "", "secret_key": "", "max_buckets": 3, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "enable", "size": 10, "objects": -1 }, "buckets": []}, "zones": [""], "buckets": [""] }
+              {"uid": "radosgw", "name": "Admin", "email": "", "admin_caps": "users=*;buckets=*;metadata=*;usage=*;zone=*", "access_key": "", "secret_key": "", "max_buckets": 0, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "disable", "size": -1, "objects": -1 }, "buckets": [{"name": "fill_test", "status": "disable", "size": -1, "objects": -1}]}, "zones": [], "buckets": ["fill_test"]},
+              {"uid": "cepheus_log_admin", "name": "Ceheus Log Admin", "email": "", "admin_caps": "", "access_key": "", "secret_key": "", "max_buckets": 0, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "disable", "size": -1, "objects": -1 }, "buckets": [{"name": "cepheus_logs", "status": "disable", "size": -1, "objects": -1}]}, "zones": [], "buckets": ["cepheus_logs"]},
+              {"uid": "tester", "name": "Tester", "email": "", "admin_caps": "usage=read; user=read; bucket=*", "access_key": "", "secret_key": "", "max_buckets": 3, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "enable", "size": 10, "objects": -1 }, "buckets": []}, "zones": [], "buckets": []}
           ],
           "keystone": {
             "auth": false,

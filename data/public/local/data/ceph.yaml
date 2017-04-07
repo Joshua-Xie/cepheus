@@ -158,8 +158,8 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
             type: erasure
             # OSD nodes per rack - helps determine crushmap feature for erasure coding
             nodes_per_rack: 1
-        # This may need to move to a DB later...
-        default_url: s3.example.com
+        # Make sure the 'hosts' or 'dns' can find this domain
+        default_url: ceph-vm1.example.com
         debug:
             logs:
                 enable: true
@@ -203,10 +203,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                           size: -1
                           objects: -1
               zones:
-                  # NB: *MAY* need to look at this and have true empty [] array instead of [""]
-                  # Must have at least one empty zone
-                  - ""
-                  # - development example zone
+                  # Empty zone
 
               # buckets are for the initial bucket to create if desired. The first 3 users here are system users so we create the buckets.
               # The remaining users are real users and there are no buckets unless we know them and want to place them here
@@ -234,9 +231,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                           size: -1
                           objects: -1
               zones:
-                  # Must have at least one empty zone
-                  - ""
-                  # - development example zone
+                  # Empty zone
               buckets:
                   - cepheus_logs
             - uid: tester
@@ -256,9 +251,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                         objects: -1
                         # NOTE: buckets are missing for quotas here just to show it can
               zones:
-                  # Must have at least one empty zone
-                  - ""
-                  # - development example zone
+                  # Empty zone
         federated:
             enable: false
             # master_zone must match one of the vip names.
@@ -270,8 +263,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                 - *data_center
             # Zones represent network tiers
             zones:
-                # Must have at least one empty zone
-                - ""
+                # Empty zone
     mon:
         port: 6789
         niceness: -10
