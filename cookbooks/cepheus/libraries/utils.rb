@@ -345,6 +345,20 @@ def get_server
   val
 end
 
+# Get IP of given profile for given server
+def get_server_profile_ip(server, profile)
+  val = nil
+  if server
+    server['interfaces'].each do | server_interface |
+        if "public" == server['profile']
+            val = server_interface['ip']
+            break
+        end
+    end
+  end
+  val
+end
+
 def get_keepalived_server
   val = nil
   servers = node['cepheus']['adc']['keepalived']['servers']
@@ -369,7 +383,7 @@ def get_adc_backend_nodes
         svr['name'] = server['name']
         svr['instance'] = nil
         svr['type'] = get_backend_str_attr(server['name'], 'type')
-        svr['ip'] = server['network']['public']['ip']
+        svr['ip'] = get_server_profile_ip(server, 'public')
         svr['port'] = get_backend_int_attr(server['name'], 'port')
         svr['weight'] = get_backend_int_attr(server['name'], 'weight')
         svr['options'] = get_backend_str_attr(server['name'], 'options')
@@ -391,7 +405,7 @@ def get_adc_backend_federated_nodes
       if server['name'] == bes['name']
         svr = {}
         svr['name'] = server['name']
-        svr['ip'] = server['network']['public']['ip']
+        svr['ip'] = get_server_profile_ip(server, 'public')
         svr['type'] = bes['type']
         svr['instance'] = bes['instance']
         svr['port'] = bes['port']
