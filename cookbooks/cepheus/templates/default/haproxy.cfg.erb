@@ -88,6 +88,6 @@ backend <%="#{vip['backend_label']}"%>
   http-check expect status 200
 <% @backend_nodes.each do | backend_node | -%>
   <%= "server #{backend_node['name']} #{backend_node['ip']}:#{backend_node['port']} weight #{backend_node['weight']} #{backend_node['options']}" %>
-<% end -%>
+<% end %>
 <% end -%>
 <% end -%>

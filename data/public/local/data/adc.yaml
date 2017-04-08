@@ -98,7 +98,7 @@ adc:
               ip: 10.121.16.18
               interface: *device1_1U
               type: rgw
-              backend_label: radosgw-http-backend
+              backend_label: radosgw-http-dev-backend
               ssl: false
               cert: wildcard.s3.vagrant.dev.example.com.pem
               # Since using a wildcard the ssl_files can be just one file. However, the recipe will build from the ssl_files if more are present
@@ -115,7 +115,7 @@ adc:
               ip: 10.121.16.17
               interface: *device1_1U
               type: rgw
-              backend_label: radosgw-http-backend
+              backend_label: radosgw-http-prod-backend
               ssl: false
               cert: wildcard.s3.vagrant.prod.example.com.pem
               # Since using a wildcard the ssl_files can be just one file. However, the recipe will build from the ssl_files if more are present

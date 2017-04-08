@@ -1,0 +1,15 @@
+---
+
+# Contains only OpenStack specific data
+
+openstack:
+    keystone:
+        radosgw:
+            enable: false
+            admin:
+                token: ""
+                url: ""
+                port: 35357
+            accepted_roles: "admin Member _member_"
+            token_cache_size: 1000
+            revocation_interval: 1200

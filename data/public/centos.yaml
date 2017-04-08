@@ -58,6 +58,26 @@ ceph_repo:
     arch: x86_64
     revision: 0.el7
 
+# Make sure the following settings are tuned for your OS and drives
+system:
+    scheduler:
+        device:
+            enable: true
+            type: cfq
+
+    sysctl:
+        enable: true
+        sysctls:
+            -   "kernel.pid_max=4194303"
+            -   "fs.file-max=26234859"
+            -   "net.core.rmem_max=67108864"
+            -   "net.core.wmem_max=67108864"
+            -   "net.core.rmem_default=33554432"
+            -   "net.core.wmem_default=33554432"
+            -   "net.ipv4.tcp_rmem=\"16777216 33554432 67108864\""
+            -   "net.ipv4.tcp_wmem=\"16777216 33554432 67108864\""
+            -   "net.core.optmem_max=33554432"
+
 security:
     sshd:
         permit_root_login: "no"

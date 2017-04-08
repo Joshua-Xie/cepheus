@@ -202,11 +202,11 @@
       "system": {
         "scheduler": {
             "device": {
-                "enable": true,
-                "type": "cfq",
+                "enable": {%- if system.scheduler.device.enable == True %}true,{% else %}false,{%- endif %}
+                "type": "{{ system.scheduler.device.type }}",
                 "ceph": {
-                    "class": "idle",
-                    "priority": 7
+                    "class": "{{ ceph.system.class }}",
+                    "priority": {{ ceph.system.priority }}
                 },
                 "devices": [
                     {%- for item in ceph.osd.devices %}
@@ -216,17 +216,11 @@
             }
         },
         "sysctl": {
-            "enable": true,
+            "enable": {%- if system.sysctl.enable == True %}true,{% else %}false,{%- endif %}
             "sysctls": [
-              "kernel.pid_max=4194303",
-              "fs.file-max=26234859",
-              "net.core.rmem_max=67108864",
-              "net.core.wmem_max=67108864",
-              "net.core.rmem_default=33554432",
-              "net.core.wmem_default=33554432",
-              "net.ipv4.tcp_rmem=\"16777216 33554432 67108864\"",
-              "net.ipv4.tcp_wmem=\"16777216 33554432 67108864\"",
-              "net.core.optmem_max=33554432"
+                {%- for item in system.sysctl.sysctls %}
+                    "{{ item }}"{%- if not loop.last %},{% endif %}
+                {%- endfor %}
             ]
         }
       },
@@ -368,6 +362,21 @@
           },
         {%- endif %}
       },
+        "openstack": {
+            "keystone": {
+                "radosgw": {
+                    "enable": {%- if openstack.keystone.radosgw.enable == True %} true, {% else %} false, {%- endif %}
+                    "admin": {
+                        "token": "{{ openstack.keystone.radosgw.admin.token }}",
+                        "url": "{{ openstack.keystone.radosgw.admin.url }}",
+                        "port": {{ openstack.keystone.radosgw.admin.port }}
+                    },
+                    "accepted_roles": "{{ openstack.keystone.radosgw.accepted_roles }}",
+                    "token_cache_size": {{ openstack.keystone.radosgw.token_cache_size }},
+                    "revocation_interval": {{ openstack.keystone.radosgw.revocation_interval }}
+                }
+            }
+        },
       "ceph": {
         "cluster": "{{ ceph.cluster }}",
         "repo": {
@@ -442,17 +451,6 @@
               {"uid": "{{ user.uid }}", "name": "{{ user.name }}", "email": "{{ user.email }}", "admin_caps": "{{ user.admin_caps }}", "access_key": "{{ user.access_key }}", "secret_key": "{{ user.secret_key }}", "max_buckets": {{ user.max_buckets }}, "status": "{{ user.status }}", "key_type": "{{ user.key_type }}", "quota": {"user": { "status": "{{ user.quota.user.status }}", "size": {{ user.quota.user.size }}, "objects": {{ user.quota.user.objects }} }, "buckets": [{%- for bucket in user.quota.buckets %}{"name": "{{ bucket.name }}", "status": "{{ bucket.status }}", "size": {{ bucket.size }}, "objects": {{ bucket.objects }}}{%- if not loop.last %},{% endif %}{%- endfor %}]}, "zones": [{%- for zone in user.zone %}"{{ zone }}"{%- if not loop.last %},{% endif %}{% endfor %}], "buckets": [{%- for bucket in user.buckets %}"{{ bucket }}"{%- if not loop.last %},{% endif %}{% endfor %}]}{%- if not loop.last %},{% endif %}
             {%- endfor %}
           ],
-          "keystone": {
-            "auth": false,
-            "admin": {
-              "token": "",
-              "url": "",
-              "port": 35357
-            },
-            "accepted_roles": "admin Member _member_",
-            "token_cache_size": 1000,
-            "revocation_interval": 1200
-          },
           "rgw_num_rados_handles": {{ ceph.radosgw.rados_handles }},
           "civetweb_num_threads": {{ ceph.radosgw.civetweb_threads }},
           "bond": {

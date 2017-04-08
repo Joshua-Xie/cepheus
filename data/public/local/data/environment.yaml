@@ -45,6 +45,7 @@ device2_2U: &device2_2U enp0s9
 # and then add them here to be included in the final build of `build.yaml` which everything will eventually derive from.
 data_files:
     - "ceph.yaml"
+    - "openstack.yaml"
     - "adc.yaml"
     - "centos.yaml"
     - "pxe_boot.yaml"

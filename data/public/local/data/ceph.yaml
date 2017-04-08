@@ -39,6 +39,11 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     mgr:
         enable: false
 
+    # This goes along with System Scheduler for CFQ
+    system:
+        class: idle
+        priority: 7
+
     pools:
         crush_rule: 1
         radosgw:
