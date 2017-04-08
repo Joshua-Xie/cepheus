@@ -56,13 +56,13 @@ vrrp_instance <%= 100 + index %> {
     <% end %>
   }
   track_script {
-<% if node['cepheus']['keepalived']['checks'] %>
+<% if node['cepheus']['adc']['keepalived']['checks'] %>
     chk_haproxy
 <% end -%>
   }
   authentication {
     auth_type PASS
-    auth_pass <%= node['cepheus']['keepalived']['passwd'] %>
+    auth_pass <%= node['cepheus']['adc']['keepalived']['passwd'] %>
   }
 }
 

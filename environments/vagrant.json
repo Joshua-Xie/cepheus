@@ -53,7 +53,7 @@
       },
 
       "adc": {
-        "enable": false,
+        "enable": true, 
         "tag": "ceph-adc",
         "interface": "enp0s8",
         "bond": {
@@ -116,7 +116,7 @@
         },
 
         "keepalived": {
-          "enable": false,
+          "enable": true, 
           "passwd": "keepalived",
           "checks": true, 
           "servers": [
@@ -276,8 +276,8 @@
         "repo": {
           "create": true, 
           "version": {
-            "name": "hammer",
-            "number": "0.94.10",
+            "name": "luminous",
+            "number": "10.2.6",
             "branch": "stable",
             "revision": "0.el7",
             "arch": "x86_64"

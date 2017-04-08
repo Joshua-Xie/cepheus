@@ -104,7 +104,8 @@ if node['cepheus']['adc']['enable']
       variables lazy {
         {
           :backend_nodes => node['cepheus']['ceph']['pools']['radosgw']['federated']['enable'] ? get_adc_backend_federated_nodes : get_adc_backend_nodes,
-          :server => get_server
+          :server => get_server,
+          :public_ip => get_server_profile_ip(get_server, 'public')
         }
       }
     end
@@ -112,12 +113,14 @@ if node['cepheus']['adc']['enable']
     if node['cepheus']['init_style'] == 'upstart'
     else
       # Broke out the service resources for better idempotency.
-      service 'haproxy' do
+      service 'haproxy-enable' do
+        service_name 'haproxy'
         action [:enable]
         only_if "sudo systemctl status haproxy | grep disabled"
       end
 
-      service 'haproxy' do
+      service 'haproxy-start' do
+        service_name 'haproxy'
         restart_command "service haproxy stop && service haproxy start && sleep 5"
         action [:start]
         supports :restart => true, :status => true

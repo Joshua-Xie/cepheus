@@ -30,7 +30,7 @@ defaults
 
 <% if node['cepheus']['adc']['stats']['enable'] %>
 # Only want the real IP and not the VIPs
-listen stats <%= @server['network']['public']['ip'] %>:<%= node['cepheus']['adc']['stats']['port'] %>
+listen stats <%= @public_ip %>:<%= node['cepheus']['adc']['stats']['port'] %>
     stats enable
     stats uri /
     stats hide-version

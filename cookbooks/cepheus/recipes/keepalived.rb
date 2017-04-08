@@ -40,12 +40,14 @@ if node['cepheus']['adc']['keepalived']['enable']
     if node['cepheus']['init_style'] == 'upstart'
     else
       # Broke out the service resources for better idempotency.
-      service 'keepalived' do
+      service 'keepalived-enable' do
+        service_name 'keepalived'
         action [:enable]
         only_if "sudo systemctl status keepalived | grep disabled"
       end
 
-      service 'keepalived' do
+      service 'keepalived-start' do
+        service_name 'keepalived'
         action [:start]
         supports :restart => true, :status => true
         subscribes :restart, "template[/etc/keepalived/keepalived.conf]"

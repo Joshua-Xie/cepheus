@@ -9,7 +9,7 @@
 # performant as a good 1U with large capacity NICs running HAProxy.
 
 adc:
-    enable: false
+    enable: true
     interface: *device1_1U
     # NB: Add 'haproxy' section to template and then update Chef recipes to support it and then remove this comment :)
     haproxy:
@@ -24,7 +24,7 @@ adc:
         max_connections: 1000
     # Keepalived nodes should have at least two but maybe one per rack
     keepalived:
-        enable: false
+        enable: true
         passwd: keepalived
         checks: true
         servers:

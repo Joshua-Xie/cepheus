@@ -49,8 +49,8 @@ chef_repo: # (required files for build)
         version: 12.19.36
         package: chef-12.19.36-1.el7.x86_64.rpm
     server:
-        version: 12.13.0
-        package: chef-server-core-12.13.0-1.el7.x86_64.rpm
+        version: 12.14.0
+        package: chef-server-core-12.14.0-1.el7.x86_64.rpm
 
 adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
     bgp:
