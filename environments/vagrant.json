@@ -91,8 +91,8 @@
         "vips": [
           {"name": "www", "ip": "10.121.16.20", "cidr": 28, "interface": "enp0s8", "backend_label": "web-ui-backend", "ssl": false, "cert": "wildcard.s3.www.example.com.pem", "ssl_files": ["wildcard.s3.www.example.com.pem"], "url": "www.example.com"},
           {"name": "api", "ip": "10.121.16.19", "cidr": 28, "interface": "enp0s8", "backend_label": "restful-api-backend", "ssl": false, "cert": "wildcard.s3.api.example.com.pem", "ssl_files": ["wildcard.s3.api.example.com.pem"], "url": "api.example.com"},
-          {"name": "dev", "ip": "10.121.16.18", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-backend", "ssl": false, "cert": "wildcard.s3.vagrant.dev.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.dev.example.com.pem"], "url": "s3.vagrant.dev.example.com"},
-          {"name": "prod", "ip": "10.121.16.17", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-backend", "ssl": false, "cert": "wildcard.s3.vagrant.prod.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.prod.example.com.pem"], "url": "s3.vagrant.prod.example.com"}
+          {"name": "dev", "ip": "10.121.16.18", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-dev-backend", "ssl": false, "cert": "wildcard.s3.vagrant.dev.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.dev.example.com.pem"], "url": "s3.vagrant.dev.example.com"},
+          {"name": "prod", "ip": "10.121.16.17", "cidr": 28, "interface": "enp0s8", "backend_label": "radosgw-http-prod-backend", "ssl": false, "cert": "wildcard.s3.vagrant.prod.example.com.pem", "ssl_files": ["wildcard.s3.vagrant.prod.example.com.pem"], "url": "s3.vagrant.prod.example.com"}
         ],
         "bgp": {
           "enable": false,
@@ -174,7 +174,7 @@
       "system": {
         "scheduler": {
             "device": {
-                "enable": true,
+                "enable":true,
                 "type": "cfq",
                 "ceph": {
                     "class": "idle",
@@ -189,17 +189,17 @@
             }
         },
         "sysctl": {
-            "enable": true,
+            "enable":true,
             "sysctls": [
-              "kernel.pid_max=4194303",
-              "fs.file-max=26234859",
-              "net.core.rmem_max=67108864",
-              "net.core.wmem_max=67108864",
-              "net.core.rmem_default=33554432",
-              "net.core.wmem_default=33554432",
-              "net.ipv4.tcp_rmem=\"16777216 33554432 67108864\"",
-              "net.ipv4.tcp_wmem=\"16777216 33554432 67108864\"",
-              "net.core.optmem_max=33554432"
+                    "kernel.pid_max=4194303",
+                    "fs.file-max=26234859",
+                    "net.core.rmem_max=67108864",
+                    "net.core.wmem_max=67108864",
+                    "net.core.rmem_default=33554432",
+                    "net.core.wmem_default=33554432",
+                    "net.ipv4.tcp_rmem=\"16777216 33554432 67108864\"",
+                    "net.ipv4.tcp_wmem=\"16777216 33554432 67108864\"",
+                    "net.core.optmem_max=33554432"
             ]
         }
       },
@@ -265,12 +265,27 @@
       
       "os": {
         "type": "centos",
-        "name": "centos-7.2",
-        "version": "7.2",
+        "name": "centos-7.3",
+        "version": "7.3",
         "arch": "x86_64",
         "distro": "centos-7-x86_64-minimal.iso",
         "breed": "redhat"
       },
+        "openstack": {
+            "keystone": {
+                "radosgw": {
+                    "enable": false,
+                    "admin": {
+                        "token": "",
+                        "url": "",
+                        "port": 35357
+                    },
+                    "accepted_roles": "admin Member _member_",
+                    "token_cache_size": 1000,
+                    "revocation_interval": 1200
+                }
+            }
+        },
       "ceph": {
         "cluster": "ceph",
         "repo": {
@@ -341,17 +356,6 @@
               {"uid": "cepheus_log_admin", "name": "Ceheus Log Admin", "email": "", "admin_caps": "", "access_key": "", "secret_key": "", "max_buckets": 0, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "disable", "size": -1, "objects": -1 }, "buckets": [{"name": "cepheus_logs", "status": "disable", "size": -1, "objects": -1}]}, "zones": [], "buckets": ["cepheus_logs"]},
               {"uid": "tester", "name": "Tester", "email": "", "admin_caps": "usage=read; user=read; bucket=*", "access_key": "", "secret_key": "", "max_buckets": 3, "status": "enable", "key_type": "s3", "quota": {"user": { "status": "enable", "size": 10, "objects": -1 }, "buckets": []}, "zones": [], "buckets": []}
           ],
-          "keystone": {
-            "auth": false,
-            "admin": {
-              "token": "",
-              "url": "",
-              "port": 35357
-            },
-            "accepted_roles": "admin Member _member_",
-            "token_cache_size": 1000,
-            "revocation_interval": 1200
-          },
           "rgw_num_rados_handles": 5,
           "civetweb_num_threads": 100,
           "bond": {

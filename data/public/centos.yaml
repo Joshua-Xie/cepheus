@@ -9,8 +9,8 @@
 
 os:
     type: centos
-    version: 7.2
-    name: centos-7.2
+    version: 7.1
+    name: centos-7.1
     arch: x86_64
     distro: centos-7-x86_64-minimal.iso
     breed: redhat
@@ -21,7 +21,7 @@ os:
 
 # Unique ISO data for OS
 ISO:
-  volume_id: "CentOS-7.2 Server.x86_64"
+  volume_id: "CentOS-7.1 Server.x86_64"
 
 {% if environment == "vagrant" %}
 # Name of the VBox Storage Controller
@@ -68,15 +68,15 @@ system:
     sysctl:
         enable: true
         sysctls:
-            -   "kernel.pid_max=4194303"
-            -   "fs.file-max=26234859"
-            -   "net.core.rmem_max=67108864"
-            -   "net.core.wmem_max=67108864"
-            -   "net.core.rmem_default=33554432"
-            -   "net.core.wmem_default=33554432"
-            -   "net.ipv4.tcp_rmem=\"16777216 33554432 67108864\""
-            -   "net.ipv4.tcp_wmem=\"16777216 33554432 67108864\""
-            -   "net.core.optmem_max=33554432"
+            -   kernel.pid_max=4194303
+            -   fs.file-max=26234859
+            -   net.core.rmem_max=67108864
+            -   net.core.wmem_max=67108864
+            -   net.core.rmem_default=33554432
+            -   net.core.wmem_default=33554432
+            -   net.ipv4.tcp_rmem=\"16777216 33554432 67108864\"
+            -   net.ipv4.tcp_wmem=\"16777216 33554432 67108864\"
+            -   net.core.optmem_max=33554432
 
 security:
     sshd:

@@ -68,3 +68,23 @@ else
 fi
 
 {%- endfor %}
+
+# Process any environment_files
+echo "===> Environment_files being processed..."
+{%- for item in environment_files %}
+
+echo "===> Generating {{ item }}..."
+$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+sudo chmod +x $REPO_ROOT/{{ item }}
+
+{%- endfor %}
+
+# Process any cookbooks_files
+echo "===> Cookbooks_files being processed..."
+{%- for item in cookbooks_files %}
+
+echo "===> Generating {{ item }}..."
+$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+sudo chmod +x $REPO_ROOT/{{ item }}
+
+{%- endfor %}

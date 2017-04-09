@@ -53,14 +53,14 @@ data_files:
 
 # Environment specific files that need to run through the template engine
 environment_files:
-    - "bootstrap/vms/environment_config_yaml"
+    - "bootstrap/vms/environment_config.yaml"
 
 # Place all files that fall under the `cookbooks` directory normally such as recipes, recipe templates, etc
 cookbooks_files:
     - "cookbooks/cepheus/recipes/cobbler-install.rb"
     - "cookbooks/cepheus/recipes/cobbler-sync.rb"
-    - "templates/default/cobbler.dhcp.template.erb"
-    - "templates/default/zabbix-userparameter-radosgw.conf.erb"
+    - "cookbooks/cepheus/templates/default/cobbler.dhcp.template.erb"
+    - "cookbooks/cepheus/templates/default/zabbix-userparameter-radosgw.conf.erb"
 
 # Info to setup development environment as well
 development:

@@ -18,14 +18,12 @@
 #
 
 include_recipe 'cepheus::ceph-conf'
-
 if node['cepheus']['method'] == 'pxe'
     # Generate web_user_pwd and save. NOTE: This attribute 'web_user_pwd' is not in an environment file!
     if node['cepheus']['pxe_boot']['web_user_pwd'].nil?
       ruby_block 'gen-web-user-pwd' do
         block do
-          node.set['cepheus']['pxe_boot']['web_user_pwd'] = %x[ printf "#{node['cepheus']['pxe_boot']['web_user']}:Cobbler:#{secure_password()}" | md5sum | awk '{print $1}' ]
-          node.save
+          node.normal['cepheus']['pxe_boot']['web_user_pwd'] = %x[ printf "#{node['cepheus']['pxe_boot']['web_user']}:Cobbler:#{secure_password()}" | md5sum | awk '{print $1}' ]
         end
       end
     end
@@ -73,49 +71,28 @@ if node['cepheus']['method'] == 'pxe'
     #            {"subnet": "10.121.1.32", "tag": "rack2", "dhcp_range": ["10.121.1.34", "10.121.1.62"], "netmask": "255.255.255.224", "router": "10.121.1.33"},
     #            {"subnet": "10.121.1.64", "tag": "rack3", "dhcp_range": ["10.121.1.66", "10.121.1.94"], "netmask": "255.255.255.224", "router": "10.121.1.65"}
 
-    if node['cepheus']['pxe_boot']['dhcp']['subnets'].length > 1
-      template '/etc/cobbler/dhcp.template' do
-        source 'cobbler.dhcp.multiple.template.erb'
+    template '/etc/cobbler/dhcp.template' do
+        source 'cobbler.dhcp.template.erb'
         mode 00644
-      end
-
-      template '/etc/cobbler/dnsmasq.template' do
+    end
+    template '/etc/cobbler/dnsmasq.template' do
         source 'cobbler.dnsmasq.multiple.template.erb'
         mode 00644
-      end
-    else
-      template '/etc/cobbler/dhcp.template' do
-        source 'cobbler.dhcp.single.template.erb'
-        mode 00644
-        variables(
-            :range => node['cepheus']['pxe_boot']['dhcp']['subnets'][0]['dhcp_range'].join(' '),
-            :subnet => node['cepheus']['pxe_boot']['dhcp']['subnets'][0]['subnet']
-        )
-      end
-
-      template '/etc/cobbler/dnsmasq.template' do
-        source 'cobbler.dnsmasq.single.template.erb'
-        mode 00644
-        variables(
-            :range => node['cepheus']['pxe_boot']['dhcp']['subnets'][0]['dhcp_range'].join(',')
-        )
-      end
     end
+    
 
     template '/etc/cobbler/modules.conf' do
       source 'cobbler.modules.conf.erb'
       mode 00644
     end
-
-    template "/var/lib/cobbler/kickstarts/#{node['cepheus']['pxe_boot']['kickstart']['file']['osd']}" do
-      source "#{node['cepheus']['pxe_boot']['kickstart']['file']['osd']}.erb"
-      mode 00644
-    end
-
-    template "/var/lib/cobbler/kickstarts/#{node['cepheus']['pxe_boot']['kickstart']['file']['nonosd']}" do
-      source "#{node['cepheus']['pxe_boot']['kickstart']['file']['nonosd']}.erb"
-      mode 00644
-    end
+        template "/var/lib/cobbler/kickstarts/{'comment': 'OSD type nodes either dedicated OSD or converged with other services like MON and RGW.', 'name': 'ceph_osd_node'}.ks" do
+            source "{'comment': 'OSD type nodes either dedicated OSD or converged with other services like MON and RGW.', 'name': 'ceph_osd_node'}.ks.erb"
+            mode 00644
+        end
+        template "/var/lib/cobbler/kickstarts/{'comment': 'NON-OSD type nodes. Services like MON, RGW or MDS.', 'name': 'ceph_non_osd_node'}.ks" do
+            source "{'comment': 'NON-OSD type nodes. Services like MON, RGW or MDS.', 'name': 'ceph_non_osd_node'}.ks.erb"
+            mode 00644
+        end
 
     # NOTE: This removes the default SSL from Apache so that Chef Server (NGINX) has no issues. However, this will not allow the web ui of Cobbler to be accessed.
     case node['platform']
@@ -131,8 +108,8 @@ if node['cepheus']['method'] == 'pxe'
     # NOTE: *.iso are blocked from github push/pull via .gitignore so download desired ISO and put it into files directory.
     # if ENV.has_key?('COBBLER_BOOTSTRAP_ISO')
     if !node['cepheus']['pxe_boot']['os']['distro'].empty?
-      cookbook_file "/tmp/#{node['cepheus']['pxe_boot']['os']['distro']}" do
-        source "#{node['cepheus']['pxe_boot']['os']['distro']}"
+      cookbook_file "/tmp/centos-7-x86_64-minimal.iso" do
+        source "centos-7-x86_64-minimal.iso"
         owner 'root'
         group 'root'
         mode 00444
@@ -148,6 +125,7 @@ if node['cepheus']['method'] == 'pxe'
     # cobbler system <whatever commands>
     # cobbler profile <whatever commands>
     # cobbler import <whatever commands>
+
     %w{ grub-x86_64.efi  grub-x86.efi  menu.c32  pxelinux.0 }.each do |ext|
       cookbook_file "/var/lib/cobbler/loaders/#{ext}" do
         source "loaders/#{ext}"

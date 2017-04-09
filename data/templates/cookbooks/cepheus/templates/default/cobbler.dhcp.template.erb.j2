@@ -7,7 +7,7 @@
 # overwritten.
 #
 # ******************************************************************
-
+{% if pxe_boot.enable %}
 ddns-update-style interim;
 
 allow booting;
@@ -91,3 +91,4 @@ group {
         #end for
 }
 #end for
+{% endif %}
