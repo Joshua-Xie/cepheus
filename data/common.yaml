@@ -15,6 +15,8 @@
 # 'method' can only be `repo` or `pxe`. If `pxe` then the 'pxe_boot' section of the given OS yaml is used.
 method: repo
 
+version: 1.1.1
+
 # NB: Chef client/server data that is OS specific is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
 # NB: Basic Chef info is found in the envrionment.yaml file.
 
@@ -39,7 +41,9 @@ ceph_chef: # (required file - cookbook - for build)
             version: 3.4.0
 
 # If `inline` is true then substitute the name and verison inline else use url as specified
-python: # (required files for build and runtime)
+# NB: If there is a python dependency then use the example below and create one or more using the syntax below.
+# It will automatically download if present.
+# python: # (required files for build and runtime)
     # -   name: PyYAML
     #     version: 3.12
     #     inline: true
@@ -142,6 +146,5 @@ build_init_update_files:
 build_update_files:
     -   input: "$REPO_ROOT/data/templates/hosts.j2"
         output: "/etc/hosts"
-
 
 # Other yaml files are appended here during the build process to make a new `build.yaml` file.

@@ -76,7 +76,10 @@ def render_template(data_file, in_file, out_file, json_arg):
         print json.dumps(dict, indent=4, sort_keys=True)
         print '='*60
         print "Cepheus' Template Engine stopped due to the following error ===> ", e
-        print 'Scan up to see traceback and JSON data'
+        print 'Scan up to see traceback and JSON data (traceback at both top and bottom of this output)'
+        print '-'*60
+        print 'Debugging Output:'
+        print traceback.print_exc(file=sys.stdout)
         print '='*60
         print
         exit(1)

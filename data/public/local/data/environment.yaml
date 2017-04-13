@@ -61,6 +61,7 @@ cookbooks_files:
     - "cookbooks/cepheus/recipes/cobbler-sync.rb"
     - "cookbooks/cepheus/templates/default/cobbler.dhcp.template.erb"
     - "cookbooks/cepheus/templates/default/zabbix-userparameter-radosgw.conf.erb"
+    - "cookbooks/cepheus/metadata.rb"
 
 # By default 'ceph-chef' gets downloaded in the 'bootstrap_prereqs.sh' script. However, there are times when you
 # may want a different version. This section will allow for adding environment specific 'staging' like repo endpoints
@@ -149,6 +150,15 @@ primary_user:
     passwd_type: "--iscrypted"
     key: "ceph_bootstrap.pub"
     private_key: operations
+    # Backup is used for Cepheus backups. The default method is 'rsync' and the 'remote' section refers to a remote
+    # 'cluster' and/or 'host' that the rsync process will use to sync this given environment (cluster) to.
+    backup:
+        enable: true
+        remote:
+            enable: true
+            method: rsync
+            # This is usually the bootstrap node on a remote cluster that you are pushing the backup to for HA
+            host: ceph-vm3
     sudo: true
     # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
     # required for ceph commands

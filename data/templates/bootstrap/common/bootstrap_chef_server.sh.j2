@@ -41,31 +41,14 @@ source $REPO_ROOT/bootstrap/common/base.sh
 export CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
 
-# Kickstart should have created it
-# if [[ ! -d "/ceph-files/cobbler" ]]; then
-#   sudo mkdir -p /ceph-files/cobbler/loaders
-#   cp -r /tmp/build/iso/postinstall/ceph-files/cobbler/* /ceph-files/cobbler/
-#   sudo chown -R operations:operations /ceph-files
-# fi
-
-# Kickstart should have created it
-# if [[ ! -d "/tmp/postinstall" ]]; then
-#   mkdir -p /tmp/postinstall
-#   cp -r /tmp/build/iso/postinstall/* /tmp/postinstall/
-#   sudo chown -R operations:operations /tmp/postinstall
-# fi
-
+# Check to see if Chef Server is installed
 set +e
+{% os.type != "ubuntu" %}
 chef_server=$(rpm -qa | grep chef-server)
+{% else %}
+chef-server="<put ubuntu code here>"
+{% endif %}
 set -e
-# if [[ -z $chef_server ]]; then
-#   if [[ ! -d "$REPO_ROOT_FILES" ]]; then
-#     sudo mkdir -p $REPO_ROOT_FILES
-#     sudo cp /tmp/build/iso/postinstall/ceph-files/rpms/* $REPO_ROOT_FILES
-#     sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $REPO_ROOT_FILES
-#   fi
-#   sudo rpm -Uvh $REPO_ROOT_FILES/$CHEF_SERVER_RPM
-# fi
 
 #### NOTE: You can check to see if user 'admin' exists and if org 'cepheus' exists but this is usually only called once.
 # If you *have* to run this again then simply just comment one or both of these lines out before running.
@@ -106,7 +89,7 @@ cd $HOME/cepheus/roles && $KNIFE role from file *.json
 cd $HOME/cepheus/environments && $KNIFE environment from file {{ environment }}.json
 
 $KNIFE node run_list set $CEPH_CHEF_BOOTSTRAP 'role[ceph-bootstrap]' $CHEF_KNIFE_DEBUG
-$KNIFE node environment set $CEPH_CHEF_BOOTSTRAP {{ node.environment_short }} $CHEF_KNIFE_DEBUG
+$KNIFE node environment set $CEPH_CHEF_BOOTSTRAP {{ environment }} $CHEF_KNIFE_DEBUG
 $KNIFE tag create $CEPH_CHEF_BOOTSTRAP 'ceph-bootstrap' $CHEF_KNIFE_DEBUG
 
 mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.ssh/id_rsa

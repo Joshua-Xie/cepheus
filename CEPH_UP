@@ -50,11 +50,12 @@ export BUILD_ENVIRONMENT=vagrant
 export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
 export BUILD_OS=centos
+export BUILD_UPDATE=1
 
 # NB: May want to add an option for 'build' or 'update' so only the template_engine runs and the files can then be
 # uploaded to Chef for management.
 
-while getopts cbglrsvn:e:d:p:o:t: opt; do
+while getopts cbglrsvu:n:e:d:p:o:t: opt; do
     case $opt in
         b)
             # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
@@ -66,6 +67,7 @@ while getopts cbglrsvn:e:d:p:o:t: opt; do
             # VERY verbose. The (-v below) option is meant for `bash` verbose and not Chef. You can combine both.
             CHEF_KNIFE_DEBUG="-VV"
             CHEF_CLIENT_DEBUG="-l debug"
+
             ;;
         d)
             # (optional) NB: Use this option if you want to change the default 'data center' from `local` to something
@@ -128,6 +130,10 @@ while getopts cbglrsvn:e:d:p:o:t: opt; do
         t)
             BOOTSTRAP_TYPE=$OPTARG
             ;;
+        u)
+            # Update the cluster. If nothing exists to update then it will build/create it for the first time.
+            export BUILD_UPDATE=$OPTARG
+            ;;
         v)
             # (optional) Verbose of `bash` commands - not Chef output
             set -x
@@ -189,8 +195,18 @@ source $REPO_ROOT/$BUILD_INIT_UPDATE
 echo "===> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."
 $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
 
-# Change later to support new repo build system...
-if [[ $BUILD_ENVIRONMENT == "vagrant" ]]; then
+# If the environment is for vagrant and BUILD_UPDATE is > 0 then execute the vagrant build environment. If BUILD_UPDATE is
+# 0 then only the other options will be applied. If BUILD_UPDATE is 2 then the vagrant vms will be built and the cepheus
+# environment will automatically get built to make things easier. Or, you can set $BUILD_UPDATE to 1 and then it will only
+# build the vagrant vms and then prepare the bootstrap for building out the other cluster like in a production environment.
+if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -gt 0 ]]; then
     cd $REPO_ROOT/bootstrap/vms/vagrant
     ./CEPH_UP_VAGRANT
+    exit 0
 fi
+
+# Build out or update the given environment.
+
+source $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh
+source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh
+source $REPO_ROOT/bootstrap/common/cepheus_build_update.sh

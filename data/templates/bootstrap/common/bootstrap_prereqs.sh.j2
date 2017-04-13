@@ -145,6 +145,7 @@ if [[ $CEPH_DEV_MODE -ne 0 ]]; then
 fi
 
 # Python
+# NB: If this section is empty it means that no python 'pip like' dependency was asked for so the template_engine skipped it.
 {%- for item in python %}
 download_file /python/{{ item.name }}-{{ item.verion }}.tar.gz {{ item.url }}{%- if item.inline %}{{ item.name }}-{{ item.version }}.tar.gz{%- endif %}
 {%- endfor %}

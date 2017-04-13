@@ -17,6 +17,9 @@
 #
 set -e
 
+REPO_ROOT=/ceph-host
+REPO_ROOT_FILES=/ceph-files
+
 DATE=$1
 VERSION=$2
 
@@ -25,11 +28,15 @@ if [[ -z $DATE ]]; then
 fi
 
 if [[ -z $VERSION ]]; then
-  VERSION=$(grep version $HOME/cepheus/cookbooks/cepheus/metadata.rb | awk '{print $2}' | sed "s/'//g")
+    if [[ -f $HOME/cepheus/cookbooks/cepheus/metadata.rb ]]; then
+        VERSION=$(grep version $HOME/cepheus/cookbooks/cepheus/metadata.rb | awk '{print $2}' | sed "s/'//g")
+    else
+        VERSION="0.0.0"
+    fi
 fi
 
-CLUSTER=$(hostname | awk -F"-" '{print $1}')
-CEPH_CHEF_BOOTSTRAP=$(hostname)
+CLUSTER={{ data_center }}
+CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 
 echo "Backing up Chef Server..."
 
@@ -53,10 +60,10 @@ logger -t CepheusBackup "Cepheus Chef Server backed up - $VERSION-$DATE"
 ####################
 
 # Make backup of current "ceph-host" and "cepheus" version
-if [[ -d /ceph-host ]]; then
+if [[ -d $REPO_ROOT ]]; then
   if [[ $(ls -A /ceph-host) ]]; then
     mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
-    cp -r /ceph-host/* $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
+    cp -r $REPO_ROOT/* $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
     tar -cjf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE-$CLUSTER.tar.bz2 $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
     sudo rm -rf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
   fi
@@ -70,14 +77,14 @@ if [[ -d $HOME/cepheus ]]; then
     sudo rm -rf $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
   fi
 fi
-sudo chown -R operations:operations $HOME/cepheus-backups/cepheus/
+sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus-backups/cepheus/
 
 # Backup supporting files - These are the same for ALL clusters so no need to rsync
 if [[ -d /ceph-files ]]; then
-  if [[ $(ls -A /ceph-files) ]]; then
+  if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
     mkdir -p $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
-    cp -r /ceph-files/* $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
+    cp -r $REPO_ROOT_FILES/* $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
   fi
 fi
 
-sudo chown -R operations:operations $HOME/cepheus-backups/cepheus-files
+sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus-backups/cepheus-files

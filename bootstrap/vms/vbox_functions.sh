@@ -21,7 +21,7 @@ set -e
 # Set the base directory. This will also get set again later which is ok.
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 
-source $REPO_ROOT/bootstrap/vms/base_environment.sh
+source $REPO_ROOT/bootstrap/common/base_environment.sh
 # source $REPO_ROOT/bootstrap/common/bash_functions.sh
 
 # NOTE: These VirtualBox functions are purpose built for cepheus and not generic vbox functions.

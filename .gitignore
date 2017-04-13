@@ -9,10 +9,18 @@
 /bootstrap/common/cepheus_backup_rsync.sh
 /bootstrap/common/base_environment.sh
 /bootstrap/common/base.sh
-/bootstrap/common/bootstrap_chef.sh
+/bootstrap/common/bootstrap_chef_server.sh
+/bootstrap/common/chef_runlists_update.sh
 /data/build.sh
 /data/data_files.sh
 /data/data_templates.sh
+
+# Cookbook related files that get built by template engine
+/cookbooks/cepheus/metadata.rb
+/cookbooks/cepheus/recipes/cobbler-install.rb
+/cookbooks/cepheus/recipes/cobbler-sync.rb
+/cookbooks/cepheus/templates/cobbler.dhcp.template.erb
+/cookbooks/cepheus/templates/zabbix-userparameter-radosgw.conf.erb
 
 /tmp/
 
