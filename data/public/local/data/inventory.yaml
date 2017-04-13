@@ -10,6 +10,18 @@ inventory:
     # device1_2U: &device1_2U enp0s8
     # device2_2U: &device2_2U enp0s9
 
+    # Use as part of the DNS txt file used by some systems as a way to import your inventory and create A records...
+    dns:
+        type: A
+        ttl: 1200
+
+    ceph:
+        backup:
+            primary:
+                osd: ceph-vm1
+                mon: ceph-vm1
+                rgw: ceph-vm1
+
     nodes:
         # This node's primary role is Bootstrap. Because of that it will not be in the Cobbler system list so *NO* mac addresses needed!
         # It's mainly here for automation and completness.

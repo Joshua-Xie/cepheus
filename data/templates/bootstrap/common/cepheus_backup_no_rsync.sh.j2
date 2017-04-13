@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# Author: Chris Jones <chris.jones@lambdastack.io>
+# Copyright 2017, LambdaStack
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+set -e
+
+DATE=$1
+VERSION=$2
+
+if [[ -z $DATE ]]; then
+  DATE=$(date +%Y-%m-%d_%H:%M:%S)
+fi
+
+if [[ -z $VERSION ]]; then
+  VERSION=$(grep version $HOME/cepheus/cookbooks/cepheus/metadata.rb | awk '{print $2}' | sed "s/'//g")
+fi
+
+CLUSTER=$(hostname | awk -F"-" '{print $1}')
+CEPH_CHEF_BOOTSTRAP=$(hostname)
+
+echo "Backing up Chef Server..."
+
+mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER
+mkdir -p $HOME/cepheus-backups/chef-server/$CLUSTER
+# back up Chef server assets per Chef documentation at
+# https://docs.chef.io/server_backup_restore.html
+
+CHEF_PG_DUMPALL=/opt/opscode/embedded/bin/pg_dumpall
+CHEF_SERVER_BACKUP_PATH=$HOME/cepheus-backups/chef-server/$CLUSTER
+
+PG_BACKUP_TMP=/tmp/chef-pgsql-$VERSION-$DATE.sql.bz2
+sudo -E -u opscode-pgsql $CHEF_PG_DUMPALL -c | bzip2 > $PG_BACKUP_TMP
+mv $PG_BACKUP_TMP $CHEF_SERVER_BACKUP_PATH
+
+sudo tar cjf $CHEF_SERVER_BACKUP_PATH/etc-opscode-$VERSION-$DATE.tar.bz2 /etc/opscode
+sudo tar cjf $CHEF_SERVER_BACKUP_PATH/var-opt-opscode-$VERSION-$DATE.tar.bz2 /var/opt/opscode
+
+logger -t CepheusBackup "Cepheus Chef Server backed up - $VERSION-$DATE"
+
+####################
+
+# Make backup of current "ceph-host" and "cepheus" version
+if [[ -d /ceph-host ]]; then
+  if [[ $(ls -A /ceph-host) ]]; then
+    mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
+    cp -r /ceph-host/* $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
+    tar -cjf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE-$CLUSTER.tar.bz2 $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
+    sudo rm -rf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
+  fi
+fi
+
+if [[ -d $HOME/cepheus ]]; then
+  if [[ $(ls -A $HOME/cepheus) ]]; then
+    mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
+    cp -r $HOME/cepheus/* $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
+    tar -cjf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-cepheus-$VERSION-$DATE-$CLUSTER.tar.bz2 $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
+    sudo rm -rf $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
+  fi
+fi
+sudo chown -R operations:operations $HOME/cepheus-backups/cepheus/
+
+# Backup supporting files - These are the same for ALL clusters so no need to rsync
+if [[ -d /ceph-files ]]; then
+  if [[ $(ls -A /ceph-files) ]]; then
+    mkdir -p $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
+    cp -r /ceph-files/* $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
+  fi
+fi
+
+sudo chown -R operations:operations $HOME/cepheus-backups/cepheus-files

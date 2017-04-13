@@ -1,0 +1,7 @@
+{%- for item in inventory.nodes %}
+{% for interface in item.interfaces %}
+{% if interface.profile == "public" %}
+{{ item.type }},{{ item.name }},{{ interface.ip }},{{ interface.ttl }},{{ data_center }}
+{% endif %}
+{% endfor %}
+{%- endfor %}

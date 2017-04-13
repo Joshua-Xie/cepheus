@@ -83,6 +83,7 @@ git_clone_or_update() {
     touch {{ cache.base }}/${NAME}_downloaded
   fi
 }
+
 {% if method == "pxe" %}
 # Obtain an RHEL 7.2 image to be used for PXE booting in production.
 echo "===> Downloading ISO..."
@@ -102,6 +103,7 @@ if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
 fi
 {% endif %}
+
 echo "===> Downloading Chef..."
 download_file /{{ cache.rpm }}/{{ chef_repo.client.package }} https://packages.chef.io/files/stable/chef/{{ chef_repo.client.version }}/el/7/{{ chef_repo.client.package }}
 download_file /{{ cache.rpm }}/{{ chef_repo.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef_repo.server.version }}/el/7/{{ chef_repo.server.package }}
@@ -112,18 +114,34 @@ ftp_file /{{ cache.rpm }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/
 
 # Most important cookbook
 # If set then it will not download but remove from cache and use the development version that should be set in the cepheus/cookbooks directory.
-if [[ $CHEF_CEPHEUS_DEBUG -eq 0 ]]; then
-  echo "===> Downloading ceph-chef..."
-  download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
-else
-  # Remove it so it's not used.
-  echo "===> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
-  rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
-fi
+# if [[ $CHEF_CEPHEUS_DEBUG -eq 0 ]]; then
+#     echo "===> Downloading ceph-chef..."
+#     download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
+# else
+#   # Remove it so it's not used.
+#   echo "===> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
+#   rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
+# fi
+
+{%- if ceph_chef.debug %}
+
+# Remove it so it's not used.
+echo "===> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
+rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
+# Clone to cookbook area
+rm -rf $REPO_ROOT/cookbooks/ceph-chef
+git clone -b {{ ceph_chef.git.branch }} {{ ceph_chef.git.url }}/{{ ceph_chef.git.repo }} $REPO_ROOT/cookbooks/ceph-chef
+
+{% else %}
+
+echo "===> Downloading ceph-chef..."
+download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
+
+{%- endif %}
 
 if [[ $CEPH_DEV_MODE -ne 0 ]]; then
   echo "===> Cloning Ceph..."
-  git_clone_or_update github/ceph https://github.com/ceph/ceph.git
+  git_clone_or_update git/ceph https://github.com/ceph/ceph.git
 fi
 
 # Python

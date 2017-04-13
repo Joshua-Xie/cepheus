@@ -265,8 +265,8 @@
       
       "os": {
         "type": "centos",
-        "name": "centos-7.3",
-        "version": "7.3",
+        "name": "centos-7.1",
+        "version": "7.1",
         "arch": "x86_64",
         "distro": "centos-7-x86_64-minimal.iso",
         "breed": "redhat"

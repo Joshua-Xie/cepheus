@@ -3,7 +3,13 @@
 # Template built files - these should match the build.yaml files section except with leading '/'
 /bootstrap/common/bootstrap_prereqs.sh
 /bootstrap/common/bootstrap_validate_env.sh
-/bootstrap/vms/base_environment.sh
+/bootstrap/common/cepheus_build_update.sh
+/bootstrap/common/cepheus_bootstrap_init.sh
+/bootstrap/common/cepheus_backup_no_rsync.sh
+/bootstrap/common/cepheus_backup_rsync.sh
+/bootstrap/common/base_environment.sh
+/bootstrap/common/base.sh
+/bootstrap/common/bootstrap_chef.sh
 /data/build.sh
 /data/data_files.sh
 /data/data_templates.sh

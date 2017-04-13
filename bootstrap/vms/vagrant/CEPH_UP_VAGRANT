@@ -51,8 +51,6 @@ export BOOTSTRAP_TYPE=${BOOTSTRAP_TYPE:-"vagrant"}
 # IMPORTANT: *MUST* match environment with 'chef owner' NOTE: This is also the Chef user
 export CHEF_CEPHEUS_OWNER=${CHEF_CEPHEUS_OWNER:-"vagrant"}
 export CHEF_CEPHEUS_GROUP=${CHEF_CEPHEUS_GROUP:-"vagrant"}
-# If set then only build the vms and clone them
-export BUILD_VMS_ONLY=${BUILD_VMS_ONLY:-0}
 # Bootstrap specific variables
 export BOOTSTRAP_SKIP_VMS=${BOOTSTRAP_SKIP_VMS:-0}
 # Vagrant debug flag

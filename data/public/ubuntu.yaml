@@ -25,6 +25,10 @@ vagrant:
     box: ""
 {% endif %}
 
+# NB: Present in all OS data files. RHEL has the full section. CentOS and Ubuntu *must* have only the stub section
+subscription:  # (required for build)
+    enable: false
+
 ceph_repo:
     branch: stable
     arch: x86_64

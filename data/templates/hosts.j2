@@ -1,0 +1,26 @@
+#
+# If unable to modify DNS then a hosts file can be used. However, DNS is always the preferred way.
+#
+
+# Public IPs
+{%- for item in inventory.nodes %}
+{% for interface in item.interfaces %}
+{% if interface.profile == "public" %}
+{{ interface.ip }}  {{ item.name }}  {{ item.name }}.{{ domain }}
+{% endif %}
+{% endfor %}
+{%- endfor %}
+
+# IPMI addresses
+{%- for item in inventory.nodes %}
+{{ item.ipmi.ip  }}  {{ item.ipmi.name }}  {{ item.ipmi.name }}.{{ domain }}
+{%- endfor %}
+
+# Cluster IPs
+{%- for item in inventory.nodes %}
+{% for interface in item.interfaces %}
+{% if interface.profile == "cluster" %}
+{{ interface.ip }}  {{ item.name }}  {{ item.name }}-cluster
+{% endif %}
+{% endfor %}
+{%- endfor %}

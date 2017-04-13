@@ -21,48 +21,21 @@
 # the default of erroring out on anything that comes up such as 'already installed' etc. If nothing is passed in
 # then the default is assumed.
 # Note: This setting is only valid until something downstream (another script) overrides it.
-ERR=${1:-''}
+set -e
 
-export REPO_ROOT=$(git rev-parse --show-toplevel)
+export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
 
-export BOOTSTRAP_CHEF_ENV=${BOOTSTRAP_CHEF_ENV:-"vagrant"}
-
-source $REPO_ROOT/bootstrap/common/base_environment.sh
-
-# IMPORTANT - DO NOT MAKE CHANGES unless to add new functionality that does not already exist. This process will
-# soon change to be like the bare metal build process.
-
-source $REPO_ROOT/bootstrap/vms/ceph_chef_bootstrap.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_dns.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_adapters.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_proxy.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_osd_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_mon_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_rgw_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_mds_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_admin_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_adc_hosts.env
-
-source $REPO_ROOT/bootstrap/vms/vbox_functions.sh
-
-FAILED_ENVVAR_CHECK=0
-REQUIRED_VARS=( BOOTSTRAP_CHEF_ENV BOOTSTRAP_DOMAIN REPO_ROOT CEPH_CHEF_BOOTSTRAP CEPH_CHEF_HOSTS CEPH_OSD_HOSTS CEPH_OSD_DRIVES CEPH_MON_HOSTS CEPH_RGW_HOSTS )
-for ENVVAR in ${REQUIRED_VARS[@]}; do
-  if [[ -z ${!ENVVAR} ]]; then
-    echo "Environment variable $ENVVAR must be set!" >&2
-    FAILED_ENVVAR_CHECK=1
-  fi
-done
-if [[ $FAILED_ENVVAR_CHECK != 0 ]]; then exit 1; fi
-
-# Add 'set -e' check here
-if [[ -z $ERR ]]; then
-  set -e
-else
-  set +e
-fi
-
+set +e
+# It's ok to let this go through because the bootstrap node will not have these generated until AFTER the Chef Server
+# is installed, started and the bootstrap role runs.
+source $REPO_ROOT/environments/ceph_chef_bootstrap.env
+source $REPO_ROOT/environments/ceph_chef_hosts.env
+source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
+source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
+source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
+source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
+source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
+set -e
 # This script does a lot of stuff:
 # - installs Chef Server on the ceph-bootstrap node
 # - installs Chef client on all nodes
@@ -71,21 +44,22 @@ fi
 # doing it this way makes it easy to orchestrate operations between nodes. It will be
 # overhauled at some point to not be Vagrant-specific.
 
+# NOTE: You could check to see if node IP == bootstrap IP and if so then don't ssh or just have the key :)
+
 do_on_node() {
   echo
-  echo "Issuing command: vagrant ssh $1 -c ${2}"
+  echo "Issuing command: ssh $1 ${2}"
   echo "----------------------------------------------------------------------------------------"
   NODE=$1
   shift
   COMMAND="${*}"
-  vagrant ssh $NODE -c "$COMMAND"
+  ssh -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
 }
-
-cd $REPO_ROOT/bootstrap/vms/vagrant
 
 # use Chef Server embedded knife instead of the one in /usr/bin
 KNIFE=/opt/opscode/embedded/bin/knife
 
+# Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
 delete=($CEPH_CHEF_BOOTSTRAP)
 # All of the VMs for Ceph with the bootstrap node removed.
 ceph_vms=("${CEPH_CHEF_HOSTS[@]/$delete}")
@@ -94,8 +68,8 @@ if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
   echo
   echo "##########"
   echo "Root: $REPO_ROOT"
-  echo "cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
-  echo "Ceph VMs: ${ceph_vms[@]}"
+  echo "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
+  echo "Ceph Nodes: ${ceph_vms[@]}"
   echo "##########"
   echo
 fi

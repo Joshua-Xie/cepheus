@@ -33,11 +33,15 @@ vagrant:
     back_end_adapter_ip: 10.121.2.1
 {% endif %}
 
+# NB: Present in all OS data files. RHEL has the full section. CentOS and Ubuntu *must* have only the stub section
+subscription:  # (required for build)
+    enable: false
+
 chef_repo: # (required files for build)
     knife_acl_version: 0.0.12
     client:
-        version: 12.19.36
-        package: chef-12.19.36-1.el7.x86_64.rpm
+        version: 13.0.113
+        package: chef-13.0.113-1.el7.x86_64.rpm
     server:
         version: 12.14.0
         package: chef-server-core-12.14.0-1.el7.x86_64.rpm

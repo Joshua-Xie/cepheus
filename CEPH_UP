@@ -45,6 +45,7 @@ export CEPH_DEV_MODE=0
 export CHEF_CEPHEUS_DEBUG=0
 export BOOTSTRAP_GET_PREREQS_ONLY=0
 export BOOTSTRAP_REMOVE_PREREQS=0
+export BUILD_VMS_ONLY=0
 export BUILD_ENVIRONMENT=vagrant
 export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
@@ -58,7 +59,7 @@ while getopts cbglrsvn:e:d:p:o:t: opt; do
         b)
             # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
             # to help save some time.
-            BUILD_VMS_ONLY=1
+            export BUILD_VMS_ONLY=1
             ;;
         c)
             # (optional) Allows you to see Chef output that only happens when Chef debug flags are set.
@@ -161,18 +162,28 @@ echo "===> Generating $REPO_ROOT/$BUILD_DATA from $REPO_ROOT/data/$BUILD_LOCATIO
 $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
 sudo chmod +x $REPO_ROOT/$BUILD_DATA
 
+
 ## Execution phase of scripts - after being built above!
 # Data portion is executed first to create the required data files.
 # Execute the freshly built `data_files.sh` script that was just built from the template.
 #
 echo "===> Executing $REPO_ROOT/$BUILD_DATA"
 source $REPO_ROOT/$BUILD_DATA
-
+#
 # Execute the freshly built `build.sh` script that was just built from the template.
 echo "===> Executing $REPO_ROOT/$BUILD"
 source $REPO_ROOT/$BUILD
 #
 ## Execution phase end block
+
+
+# Build the init and update scripts
+BUILD_INIT_UPDATE=data/build_init_update.sh
+echo "===> Generating $REPO_ROOT/$BUILD_INIT_UPDATE from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml..."
+$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/$BUILD_INIT_UPDATE.j2 -o $REPO_ROOT/$BUILD_INIT_UPDATE
+sudo chmod +x $REPO_ROOT/$BUILD_INIT_UPDATE
+echo "===> Executing $REPO_ROOT/$BUILD_INIT_UPDATE"
+source $REPO_ROOT/$BUILD_INIT_UPDATE
 
 # Build environments file for Chef
 echo "===> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."

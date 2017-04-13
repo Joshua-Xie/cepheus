@@ -27,11 +27,11 @@ if node['cepheus']['method'] == 'pxe'
       user 'root'
       code <<-EOH
         mount -o loop /tmp/centos-7-x86_64-minimal.iso /mnt
-        cobbler import --name=centos-7.3 --path=/mnt --breed=redhat --arch=x86_64
-        cobbler distro edit --name=centos-7.3-x86_64 --kopts="ksdevice= inst.repo=http://10.0.100.20/cblr/ks_mirror/centos-7.3-x86_64"
+        cobbler import --name=centos-7.1 --path=/mnt --breed=redhat --arch=x86_64
+        cobbler distro edit --name=centos-7.1-x86_64 --kopts="ksdevice= inst.repo=http://10.0.100.20/cblr/ks_mirror/centos-7.1-x86_64"
         umount /mnt
       EOH
-      not_if "cobbler distro list | grep centos-7.3"
+      not_if "cobbler distro list | grep centos-7.1"
       only_if "test -f /tmp/centos-7-x86_64-minimal.iso"
     end
 
@@ -42,11 +42,11 @@ if node['cepheus']['method'] == 'pxe'
     bash 'profile-update-pxe_boot' do
       user 'root'
       code <<-EOH
-            cobbler profile copy --name=centos-7.3-x86_64 --newname=ceph_osd_node
+            cobbler profile copy --name=centos-7.1-x86_64 --newname=ceph_osd_node
             cobbler profile edit --name=ceph_osd_node --kickstart=/var/lib/pxe_boot/kickstarts/ceph_osd_node.ks --kopts="interface=auto"
             cobbler profile edit --name=ceph_osd_node --netboot-enabled=True --comment="OSD type nodes either dedicated OSD or converged with other services like MON and RGW." --name-servers="8.8.8.8" "8.8.4.4"
         
-            cobbler profile copy --name=centos-7.3-x86_64 --newname=ceph_non_osd_node
+            cobbler profile copy --name=centos-7.1-x86_64 --newname=ceph_non_osd_node
             cobbler profile edit --name=ceph_non_osd_node --kickstart=/var/lib/pxe_boot/kickstarts/ceph_non_osd_node.ks --kopts="interface=auto"
             cobbler profile edit --name=ceph_non_osd_node --netboot-enabled=True --comment="NON-OSD type nodes. Services like MON, RGW or MDS." --name-servers="8.8.8.8" "8.8.4.4"
         

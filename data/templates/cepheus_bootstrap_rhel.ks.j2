@@ -173,7 +173,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 # Add a public key here to authorized_keys but make sure to set permission to 0600
 mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
 cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
-{{ user.key }}
+{{ primary_user.key }}
 EOM
 cp /ceph-host/bootstrap/data/environment/{{ environment }}/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
 chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
@@ -191,7 +191,7 @@ echo "%{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ pri
 sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
 echo "{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
 
-{% if subscription.type %}
+{% if subscription.enable %}
 {{ subscription.commands.C1 }}
 {{ subscription.commands.C2 }}
 {{ subscription.commands.C3 }}

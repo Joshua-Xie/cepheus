@@ -62,6 +62,47 @@ cookbooks_files:
     - "cookbooks/cepheus/templates/default/cobbler.dhcp.template.erb"
     - "cookbooks/cepheus/templates/default/zabbix-userparameter-radosgw.conf.erb"
 
+# By default 'ceph-chef' gets downloaded in the 'bootstrap_prereqs.sh' script. However, there are times when you
+# may want a different version. This section will allow for adding environment specific 'staging' like repo endpoints
+# that will override existing versions of specific repos...
+staging_process:
+    -   output: "$WORK_DIR/cepheus-public-staging"
+        comment: "Public Cepheus repo"
+        repo: https://github.com/cepheus-io/cepheus.git
+        branch: master
+        command: ""
+        layer: 1
+    -   output: "$WORK_DIR/cepheus-private-staging"
+        comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
+        repo: https://github.com/cepheus-io/cepheus.git
+        branch: master
+        command: ""
+        layer: 2
+    -   output: "$WORK_DIR/ceph-chef-public-staging"
+        comment: "Public Ceph-Chef Cookbook repo"
+        repo: https://github.com/ceph/ceph-chef.git
+        branch: master
+        command: ""
+        layer: 3
+    -   output: "$WORK_DIR/ceph-chef-private-staging"
+        comment: "Private Ceph-Chef. Here to show that there could be a private version with your company specific items"
+        repo: https://github.com/cepheus-io/ceph-chef
+        branch: master
+        command: ""
+        layer: 4
+    -   output: "$WORK_DIR/cepheus-files-staging"
+        comment: "Cepheus files are basically dependencies. This can be a git repo, object-storage or whatever. Just make sure the data is fed into 'output'"
+        repo: ""
+        branch: ""
+        command: "cp -r $HOME/.cepheus-cache/ $WORK_DIR/cepheus-files-staging"
+        layer: 5
+    -   output: "$WORK_DIR/cepheus-data-staging"
+        comment: "Private data. This one is public but should be private for production envrionments"
+        repo: https://github.com/cepheus-io/cepheus-data
+        branch: master
+        command: ""
+        layer: 6
+
 # Info to setup development environment as well
 development:
     enable: false
