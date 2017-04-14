@@ -43,7 +43,7 @@ export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
 
 # Check to see if Chef Server is installed
 set +e
-{% os.type != "ubuntu" %}
+{% if os.type != "ubuntu" %}
 chef_server=$(rpm -qa | grep chef-server)
 {% else %}
 chef-server="<put ubuntu code here>"

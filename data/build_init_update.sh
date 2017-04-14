@@ -47,3 +47,7 @@ sudo chmod +x $REPO_ROOT/bootstrap/common/cepheus_backup_rsync.sh
 echo "===> Generating bootstrap/common/cepheus_backup_no_rsync.sh..."
 $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/bootstrap/common/cepheus_backup_no_rsync.sh.j2 -o $REPO_ROOT/bootstrap/common/cepheus_backup_no_rsync.sh
 sudo chmod +x $REPO_ROOT/bootstrap/common/cepheus_backup_no_rsync.sh
+
+echo "===> Generating bootstrap/common/bootstrap_chef_server.sh..."
+$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_chef_server.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh
+sudo chmod +x $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh
