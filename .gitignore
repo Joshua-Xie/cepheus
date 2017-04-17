@@ -1,5 +1,8 @@
 # Cepheus Git ignore
 
+# NO KEYS - Keys should be private
+*.key
+
 # Template built files - these should match the build.yaml files section except with leading '/'
 /bootstrap/common/bootstrap_prereqs.sh
 /bootstrap/common/bootstrap_validate_env.sh

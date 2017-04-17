@@ -252,7 +252,6 @@ The following templates are Jinja2 based templates. The `template_engine.py` fou
 * cepheus_node_rhel_nonosd.ks.erb.j2
 * cepheus_node_rhel_osd.ks.erb.j2
 * linux.cfg.j2
-* operations.pub.j2
 
 ## USAGE
 

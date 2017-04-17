@@ -50,7 +50,7 @@ echo "====> Checking for installed Chef Server..."
 {% if os.type != "ubuntu" %}
 chef_server=$(rpm -qa | grep chef-server)
 {% else %}
-chef-server="<put ubuntu code here>"
+chef-server="$(dpkg-query -l 'chef-server*')"
 {% endif %}
 set -e
 

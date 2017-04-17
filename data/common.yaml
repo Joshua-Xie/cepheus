@@ -17,6 +17,10 @@ method: repo
 
 version: 1.1.1
 
+organization:
+    name: LambdaStack
+    url: http://lambdastack.io
+
 # NB: Chef client/server data that is OS specific is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
 # NB: Basic Chef info is found in the envrionment.yaml file.
 

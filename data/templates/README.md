@@ -17,5 +17,3 @@ This is a very important directory. It contains Jinja2 style templates that the 
 * `isolinux.cfg.j2` - This is similar to the previous file except it's for default ISO that gets built on the bootstrap node that is later used as the ISO used for PXE booting.
 
 * `template_engine.py` - Main Python template engine used to take any Jinja2 template and any json/yaml input file to then render a given output file.
-
-* `operations.pub.j2` - Simply ssh public key to be placed in /home/operations/.ssh directory of all servers for a default `operations` user.

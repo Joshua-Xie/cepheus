@@ -247,8 +247,9 @@
         "name": "{{ primary_user.name }}",
         "passwd": "{{ primary_user.passwd }}",
         "passwd_type": "{{ primary_user.passwd_type }}",
-        "key": "{{ primary_user.key }}",
-        "shell": "/bin/bash",
+        "public_key": "{{ primary_user.public_key }}",
+        "private_key": "{{ primary_user.private_key }}",
+        "shell": "{{ primary_user.shell }}",
         "comment": "{{ primary_user.comment }}",
         "groups": "{{ primary_user.group }}",
         "sudo": {%- if primary_user.sudo == True %}true{% else %}false{%- endif %}

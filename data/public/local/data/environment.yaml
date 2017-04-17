@@ -122,8 +122,10 @@ users:
       comment: "Operations user"
       passwd: $6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/
       passwd_type: "--iscrypted"
-      key: "ceph_bootstrap.pub"
-      private_key: operations
+      # NB: If 'public_key' starts with 'ssh-rsa' then it's assumed the key is content and not a file. EXCEPT for PXE_BOOT - must be content
+      public_key: "operations.pub"
+      # All keys *MUST* end with '.key'. Cepheus will named them correctly during the process.
+      private_key: operations.key
       sudo: true
       # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
       # required for ceph commands
@@ -133,9 +135,16 @@ users:
       comment: "Vagrant user"
       passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
       passwd_type: "--iscrypted"
-      key: "ceph_bootstrap.pub"
-      private_key: operations
+      # NB: If 'public_key' starts with 'ssh-rsa' then it's assumed the key is content and not a file. EXCEPT for PXE_BOOT - must be content
+      public_key: "operations.pub"
+      # All keys *MUST* end with '.key'. Cepheus will named them correctly during the process.
+      private_key: operations.key
+      # NB: Key management should be done elsewhere. Cepheus will check for existing file and take it. If one is not found then
+      # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
+      # you change your ssh key but use the same name later if you don't already have one!
+      passphrase: "cepheus"
       sudo: true
+      shell: /bin/bash
       # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
       # required for ceph commands
       ceph_group: true
@@ -148,8 +157,14 @@ primary_user:
     comment: "Vagrant user"
     passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
     passwd_type: "--iscrypted"
-    key: "ceph_bootstrap.pub"
-    private_key: operations
+    # NB: If 'public_key' starts with 'ssh-rsa' then it's assumed the key is content and not a file. EXCEPT for PXE_BOOT - must be content
+    public_key: "operations.pub"
+    # All keys *MUST* end with '.key'. Cepheus will named them correctly during the process.
+    private_key: operations.key
+    # NB: Key management should be done elsewhere. Cepheus will check for existing file and take it. If one is not found then
+    # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
+    # you change your ssh key but use the same name later if you don't already have one!
+    passphrase: "cepheus"
     # Backup is used for Cepheus backups. The default method is 'rsync' and the 'remote' section refers to a remote
     # 'cluster' and/or 'host' that the rsync process will use to sync this given environment (cluster) to.
     backup:

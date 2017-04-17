@@ -184,8 +184,9 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
 # Add a public key here to authorized_keys but make sure to set permission to 0600
 mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
+# NB: public_key must be content for pxe_boot
 cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
-{{ primary_user.key }}
+{{ primary_user.public_key }}
 EOM
 chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
 chown -R {{ primary_user.name }}:{{ primary_user.group }} /home/{{ primary_user.name }}/.ssh
