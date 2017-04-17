@@ -120,7 +120,7 @@ rm -rf $WORK_DIR/cepheus
 rm -rf $WORK_DIR/cepheus-data
 rm -f $WORK_DIR/cepheus-staging/environments/*.json
 
-echo "Clean staging process directories..."
+echo "====> Clean staging process directories..."
 # Clean up staging process directories if they exist
 # NOTE: Important - Do this BEFORE moving data into directories on bootstrap since *all* is used!!
 
@@ -132,7 +132,7 @@ if [[ -d "/opt/opscode/" ]]; then
 fi
 set -e
 
-echo "Building update..."
+echo "====> Building update..."
 # Build new ceph-host environment and replace existing version
 
 # Create dir even though it may already exist
@@ -159,7 +159,7 @@ cp -r $WORK_DIR/cepheus-files/* $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
 
 # Build...
-echo "Building from templates..."
+echo "====> Building from templates..."
 
 # Build from template
 {%- for item in build_update_files %}
@@ -188,7 +188,7 @@ else
   cp -r $REPO_ROOT/* $HOME/cepheus
 
   # Add the dependency cookbooks from the file cache
-  echo "Checking on dependency for cookbooks..."
+  echo "====> Checking on dependency for cookbooks..."
   cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
 
   # Make sure it's operations as owner:group
@@ -255,4 +255,5 @@ fi
 # Remove tmp working directory
 rm -rf $WORK_DIR
 
-echo "Success!"
+echo "====> cepheus_build_update.sh Success!"
+echo

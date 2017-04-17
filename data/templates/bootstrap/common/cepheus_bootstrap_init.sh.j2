@@ -33,6 +33,7 @@ yum install -y ipmitool yum-utils createrepo ntp tmux
 
 found=$(grep {{ user.name }} /etc/passwd)
 if [[ $? -ne 0 ]]; then
+    echo "====> Adding user $user"
     useradd {{ user.name }} -g {{ user.group }} -p {{ user.passwd }}
 fi
 
@@ -40,11 +41,13 @@ fi
 
 found=$(grep "{{ primary_user.name }}:" /etc/group)
 if [[ $? -ne 0 ]]; then
+    echo "====> Adding group for  {{ primary_user.name }}"
     groupadd {{ primary_user.name }}
 fi
 
 found=$(grep wheel /etc/group | grep {{ primary_user.name }})
 if [[ $? -ne 0 ]]; then
+    echo "====> Modifying user {{ primary_user.name }}"
     usermod -a -G wheel,{{ primary_user.name }} {{ primary_user.name }}
 fi
 
@@ -65,6 +68,8 @@ fi
 
 # Setup sudoer
 if [[ ! -f /etc/sudoers.d/{{ primary_user.name }} ]]; then
+    echo "====> Updating sudoer for {{ primary_user.name }}"
+
     echo "%{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
     sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
     echo "{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
@@ -87,4 +92,5 @@ chmod +x /tmp/rhelsub.sh
 
 # May need to do something with NICs here since some require a little extra love before they are happy!
 
-echo "Success!"
+echo "===> cepheus_bootstrap_init.sh Success!"
+echo

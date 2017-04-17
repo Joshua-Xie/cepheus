@@ -24,6 +24,8 @@ REPO_ROOT_FILES=/ceph-files
 
 {% if os.type == "rhel" %}
 # To make this less steps go ahead do a yum update first
+echo "====> Checking subscription-manager..."
+
 status=$(sudo subscription-manager status | awk -F":" '{print $2}' | grep Current)
 if [[ -z $status ]]; then
   sudo /tmp/rhelsub.sh
@@ -43,6 +45,8 @@ export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
 
 # Check to see if Chef Server is installed
 set +e
+echo "====> Checking for installed Chef Server..."
+
 {% if os.type != "ubuntu" %}
 chef_server=$(rpm -qa | grep chef-server)
 {% else %}
@@ -53,28 +57,32 @@ set -e
 #### NOTE: You can check to see if user 'admin' exists and if org 'cepheus' exists but this is usually only called once.
 # If you *have* to run this again then simply just comment one or both of these lines out before running.
 if [[ -z $chef_server ]]; then
-  echo "nginx['non_ssl_port'] = 4000" | sudo tee /etc/opscode/chef-server.rb
-  echo "nginx['enable_non_ssl'] = true" | sudo tee --append /etc/opscode/chef-server.rb
+    echo "====> Creating Chef Server - $chef_server"
 
-  sudo chef-server-ctl reconfigure
+    echo "nginx['non_ssl_port'] = 4000" | sudo tee /etc/opscode/chef-server.rb
+    echo "nginx['enable_non_ssl'] = true" | sudo tee --append /etc/opscode/chef-server.rb
 
-  sudo chef-server-ctl user-create admin admin admin admin@localhost.com welcome --filename /etc/opscode/admin.pem
-  sudo chef-server-ctl org-create cepheus cepheus --association admin --filename /etc/opscode/cepheus-validator.pem
+    sudo chef-server-ctl reconfigure
 
-  sudo chmod 0644 /etc/opscode/admin.pem /etc/opscode/cepheus-validator.pem
+    sudo chef-server-ctl user-create admin admin admin admin@localhost.com welcome --filename /etc/opscode/admin.pem
+    sudo chef-server-ctl org-create cepheus cepheus --association admin --filename /etc/opscode/cepheus-validator.pem
+
+    sudo chmod 0644 /etc/opscode/admin.pem /etc/opscode/cepheus-validator.pem
 fi
 ####
 
+echo "====> Creating $HOME/.chef environment..."
 mkdir -p $HOME/.chef
 echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/$CHEF_CLIENT_RPM'\nchef_server_url 'https://$CEPH_CHEF_BOOTSTRAP/organizations/cepheus'\nvalidation_client_name 'cepheus-validator'\nvalidation_key '/etc/opscode/cepheus-validator.pem'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
 $KNIFE ssl fetch
 
+echo "====> Bootstrapping Chef Server for {{ primary_user.name }}"
 $KNIFE bootstrap $CEPH_CHEF_BOOTSTRAP_IP -x {{ primary_user.name }} $CEPH_CHEF_BOOTSTRAP -P {{ primary_user.name }} --sudo
 
 cd $HOME && rsync -a $REPO_ROOT/* ./cepheus
 
 # Add the dependency cookbooks from the file cache
-echo "Checking on dependency for cookbooks..."
+echo "====> Checking on dependency for cookbooks..."
 sudo cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
 cd $HOME/cepheus/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
 cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
@@ -95,3 +103,6 @@ $KNIFE tag create $CEPH_CHEF_BOOTSTRAP 'ceph-bootstrap' $CHEF_KNIFE_DEBUG
 mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.ssh/id_rsa
 
 sudo chef-client
+
+echo "====> bootstrap_chef_server.sh Success!"
+echo

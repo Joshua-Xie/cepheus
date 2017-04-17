@@ -199,14 +199,18 @@ $REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/
 # 0 then only the other options will be applied. If BUILD_UPDATE is 2 then the vagrant vms will be built and the cepheus
 # environment will automatically get built to make things easier. Or, you can set $BUILD_UPDATE to 1 and then it will only
 # build the vagrant vms and then prepare the bootstrap for building out the other cluster like in a production environment.
-if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -gt 0 ]]; then
+if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -ne 0 ]]; then
     cd $REPO_ROOT/bootstrap/vms/vagrant
     ./CEPH_UP_VAGRANT
     exit 0
 fi
 
 # Build out or update the given environment.
+echo "====> Calling cepheus_bootstrap_init.sh..."
+sudo $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh
 
-source $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh
+echo "====> Calling bootstrap_chef_server.sh..."
 source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh
+
+echo "====> Calling cepheus_build_update.sh..."
 source $REPO_ROOT/bootstrap/common/cepheus_build_update.sh
