@@ -19,8 +19,13 @@
 # This script bootstraps Chef on the bootstrap node.
 # NOTE: This file gets generated in the data center specific folder like dc1 or dc2. That's where it should be launched
 
-REPO_ROOT=/ceph-host
-REPO_ROOT_FILES=/ceph-files
+REPO_ROOT=$1
+REPO_ROOT_FILES={{ cache.base }}
+
+if [[ -z $REPO_ROOT ]]; then
+    echo "MUST specify the REPO_ROOT variable"
+    exit 1
+fi
 
 {% if os.type == "rhel" %}
 # To make this less steps go ahead do a yum update first
@@ -38,10 +43,10 @@ mv $HOME/.ssh/id_rsa $HOME/.ssh/id_rsa.tmp
 
 set -e
 
-source $REPO_ROOT/bootstrap/common/base.sh
-
 export CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
+
+source $REPO_ROOT/bootstrap/common/base.sh
 
 # Check to see if Chef Server is installed
 set +e

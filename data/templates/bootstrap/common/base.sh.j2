@@ -24,18 +24,43 @@
 set -e
 
 export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
+if [[ ! -f $REPO_ROOT ]]; then
+    echo "$REPO_ROOT has not been created yet."
+    exit 0
+fi
 
-set +e
 # It's ok to let this go through because the bootstrap node will not have these generated until AFTER the Chef Server
 # is installed, started and the bootstrap role runs.
-source $REPO_ROOT/environments/ceph_chef_bootstrap.env
-source $REPO_ROOT/environments/ceph_chef_hosts.env
-source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
-source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
-source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
-source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
-source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
-set -e
+# CEPH_CHEF_HOSTS=( ceph-bootstrap )
+
+if [[ -f $REPO_ROOT/environments/ceph_chef_bootstrap.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_bootstrap.env
+fi
+
+if [[ -f $REPO_ROOT/environments/ceph_chef_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_hosts.env
+fi
+
+if [[ -f $REPO_ROOT/environments/ceph_chef_osd_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
+fi
+
+if [[ -f $REPO_ROOT/environments/ceph_chef_mon_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
+fi
+
+if [[ -f $REPO_ROOT/environments/ceph_chef_rgw_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
+fi
+
+if [[ -f $REPO_ROOT/environments/ceph_chef_admin_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
+fi
+
+if [[ -f $REPO_ROOT/environments/ceph_chef_adc_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
+fi
+
 # This script does a lot of stuff:
 # - installs Chef Server on the ceph-bootstrap node
 # - installs Chef client on all nodes
@@ -61,15 +86,14 @@ KNIFE=/opt/opscode/embedded/bin/knife
 
 # Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
 delete=($CEPH_CHEF_BOOTSTRAP)
-# All of the VMs for Ceph with the bootstrap node removed.
-ceph_vms=("${CEPH_CHEF_HOSTS[@]/$delete}")
+ceph_nodes=("${CEPH_CHEF_HOSTS[@]/$delete}")
 
 if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
-  echo
-  echo "##########"
-  echo "Root: $REPO_ROOT"
-  echo "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
-  echo "Ceph Nodes: ${ceph_vms[@]}"
-  echo "##########"
-  echo
+    echo
+    echo "##########"
+    echo "Root: $REPO_ROOT"
+    echo "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
+    echo "Ceph Nodes: ${ceph_nodes[@]}"
+    echo "##########"
+    echo
 fi

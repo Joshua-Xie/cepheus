@@ -55,7 +55,15 @@ ceph_chef: # (required file - cookbook - for build)
 
 # Cache directories in the format of base/{cookbook,gem...}
 cache:
-    base: $HOME/.cepheus-cache
+    # OSX version will sudo
+    base: /ceph-files
+    # NB: If `download` is true then call bootstrap_prereqs.sh else `commands`
+    download: true
+    # NB: If `download` is false then execute whatever is in `commands`. You can load directly into cache.base and set `commands` to ""
+    commands: |
+        echo "test1"
+        echo "test2"
+        echo "test3"
     cookbook: cookbooks
     gem: gems
     rpm: rpms

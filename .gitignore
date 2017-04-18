@@ -2,6 +2,7 @@
 
 # NO KEYS - Keys should be private
 *.key
+*.key.pub
 
 # Template built files - these should match the build.yaml files section except with leading '/'
 /bootstrap/common/bootstrap_prereqs.sh

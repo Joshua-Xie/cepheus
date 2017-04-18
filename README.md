@@ -245,7 +245,7 @@ The following two GEMS will need to be pulled down and loaded onto the productio
 * chef-sugar-3.4.0
 
 ## TEMPLATES
-The following templates are Jinja2 based templates. The `template_engine.py` found in `data/templates` reads the production yaml data files and runs through these files and builds the `production.json`, kickstart, linux grub and operations key files. The `erb` are Chef templates but the `template_engine` script builds and puts those erb files in the `template/default` area of the cookbook as part of the preprocess.
+The following templates are Jinja2 based templates. The `template_engine` found in `data/templates` reads the production yaml data files and runs through these files and builds the `production.json`, kickstart, linux grub and operations key files. The `erb` are Chef templates but the `template_engine` script builds and puts those erb files in the `template/default` area of the cookbook as part of the preprocess.
 
 * base_environment.json.j2
 * cepheus_bootstrap_rhel.ks.j2

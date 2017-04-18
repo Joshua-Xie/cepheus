@@ -22,7 +22,26 @@
 
 # NB: set -e is not set here since '$?' is being checked and taking action.
 
-export REPO_ROOT=$(git rev-parse --show-toplevel)
+# export REPO_ROOT=$(git rev-parse --show-toplevel)
+
+REPO_ROOT=$1
+BUILD_LOCATION=$2
+BUILD_DATA_CENTER=$3
+
+if [[ -z $REPO_ROOT ]]; then
+    echo "MUST specify the REPO_ROOT variable"
+    exit 1
+fi
+
+if [[ -z $BUILD_LOCATION ]]; then
+    echo "MUST specify the BUILD_LOCATION variable"
+    exit 1
+fi
+
+if [[ -z $BUILD_DATA_CENTER ]]; then
+    echo "MUST specify the BUILD_DATA_CENTER variable"
+    exit 1
+fi
 
 {% if os.type != "ubuntu" %}
 for pack in kernel-devel gcc make perl bzip2 epel-release rsync vim git wget curl python2-pip python-jinja2 PyYAML ipmitool yum-utils createrepo ntp tmux; do
@@ -67,12 +86,12 @@ if [[ ! -d /home/{{ primary_user.name }}/.ssh ]]; then
 fi
 
 # Checking for private key from environment.yaml file...
-echo "====> Checking $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.private_key }}"
-if [[ ! -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.private_key }} ]]; then
-    echo "====> Creating $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.private_key }}"
-    ssh-keygen -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.private_key }} -C "{{ primary_user.comment }}" -P "{{ primary_user.passphrase }}" -q
-    chmod 0600 $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.private_key }}
-    chown -R {{ primary_user.name }}:{{ primary_user.group }} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.private_key }}
+echo "====> Checking $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
+if [[ ! -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} ]]; then
+    echo "====> Creating $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
+    ssh-keygen -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} -C "{{ primary_user.comment }}" -P "{{ primary_user.passphrase }}" -q
+    chmod 0600 $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}*
+    chown -R {{ primary_user.name }}:{{ primary_user.group }} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}*
 fi
 
 echo "====> Checking /home/{{ primary_user.name }}/.ssh/authorized_keys"
@@ -83,7 +102,7 @@ cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
 echo "{{ primary_user.public_key }}" >> /home/{{ primary_user.name }}/.ssh/authorized_keys
 EOM
 {% else %}
-    echo $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.public_key }} >> /home/{{ primary_user.name }}/.ssh/authorized_keys
+    echo $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.public_key }} >> /home/{{ primary_user.name }}/.ssh/authorized_keys
 {% endif %}
 fi
 
@@ -91,7 +110,7 @@ echo "====> Checking /home/{{ primary_user.name }}/.ssh/id_rsa"
 if [[ ! -f /home/{{ primary_user.name }}/.ssh/id_rsa ]]; then
     echo "====> Creating /home/{{ primary_user.name }}/.ssh/id_rsa"
 
-    cp $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
+    cp $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
 
     chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
     chmod 0600 /home/{{ primary_user.name }}/.ssh/id_rsa

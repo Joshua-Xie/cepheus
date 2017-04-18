@@ -71,24 +71,24 @@ if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   fi
 fi
 
-# Configure and test any proxies configured.
-if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
-  echo "===> Testing configured proxies..."
-  source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
-fi
+# # Configure and test any proxies configured.
+# if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
+#   echo "===> Testing configured proxies..."
+#   source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
+# fi
+#
+# # Do prerequisite work prior to starting build, downloading files and
+# # creating local directories.
+# echo "===> Downloading necessary files to local cache..."
+# source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
 
-# Do prerequisite work prior to starting build, downloading files and
-# creating local directories.
-echo "===> Downloading necessary files to local cache..."
-source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
-
-# If prerequisites only then end after getting them
-if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then
-    echo
-    echo "Prerequisites have been updated and exiting."
-    echo
-    exit 1
-fi
+# # If prerequisites only then end after getting them
+# if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then
+#     echo
+#     echo "Prerequisites have been updated and exiting."
+#     echo
+#     exit 1
+# fi
 
 # Create VMs in Vagrant and start them.
 # VM only tests inside vagrant_create script
@@ -99,10 +99,11 @@ $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create.sh
 # occurs! This is important because it needes to be done while the VMs are off. Since adding network
 # adpaters also require the VM being off, putting them together saved time.
 
-# Reset shared folders and virtualbox guest addons since addons are required for shared folders.
-$REPO_ROOT/bootstrap/vms/vagrant/vagrant_create_shared_folders_in_vms.sh
-
 if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
+    # Reset shared folders and virtualbox guest addons since addons are required for shared folders.
+    # This is placed here for automatic build in Vagrant option.
+    $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create_shared_folders_in_vms.sh
+
     # Install and configure Chef on all Vagrant hosts.
     echo "===> Installing and configuring Chef on all nodes using the all in one script."
     $REPO_ROOT/bootstrap/vms/vagrant/vagrant_configure_chef_aio.sh

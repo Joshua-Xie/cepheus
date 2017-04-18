@@ -163,7 +163,7 @@ echo "====> Building from templates..."
 
 # Build from template
 {%- for item in build_update_files %}
-$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.input }} -o {{ item.output }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.input }} -o {{ item.output }}
 {% endfor %}
 
 # /ceph-host/bootstrap/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$ENVIRONMENT/$CLUSTER/base-seed.yaml -i /ceph-host/bootstrap/templates/base_environment.json.j2 -o /ceph-host/environments/base_environment.json.j2

@@ -34,7 +34,7 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 {%- for item in build_init_update_files %}
 
 echo "===> Generating {{ item }}..."
-$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {%- endfor %}

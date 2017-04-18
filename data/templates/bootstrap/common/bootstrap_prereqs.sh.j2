@@ -29,14 +29,39 @@ CACHE_LOADER={{ cache.loader }}
 CACHE_COOKBOOK={{ cache.cookbook }}
 CACHE_GEM={{ cache.gem }}
 
+OS_ENV=`uname -a`
+LINUX=`grep ^Linux $OS_ENV`
+USER=`id -un`
+GROUP='id -gn'
+
+if [[ $LINUX -ne 0 ]]; then
+    SUDO=sudo
+else
+    SUDO=""
+fi
+
 # If set then it will remove the cache directories
 if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
-    rm -rf {{ cache.base }}
+    $SUDO rm -rf {{ cache.base }}
 fi
 
 # Create the cache directories...
-mkdir -p {{ cache.base }}/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
-mkdir -p {{ cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
+$SUDO mkdir -p {{ cache.base }}/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
+$SUDO mkdir -p {{ cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
+sudo chown -R $USER:$GROUP {{ cache.base }}
+
+# NB: If your environment can't access the outside world then execute `cache.commands` where you obtain the pre_reqs before
+# calling this...
+{% if !cache.download %}
+# Execute raw `commands` as-is...
+echo "===> Executing raw commands to fill cache..."
+{{ cache.commands }}
+# NB: If this is present then the template_engine allowed the cache directories to be created and then executed the `commands`
+# and exited normally
+echo "===> Success in executing commands!"
+echo
+exit 0
+{% endif %}
 
 # download_file wraps the usual behavior of curling a remote URL to a local file
 # NOTE: PROXY - Make sure your http_proxy and https_proxy envrionment variables are set correctly if behind a proxy.

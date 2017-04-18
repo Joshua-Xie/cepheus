@@ -30,16 +30,16 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # Build the data file from the data templates. This allows for a lot flexibility so that you can run through template engine using
 # the same file so that you will only need to add pieces of data at the top but then have it used every where else below it.
 echo "===> data_templates being processed..."
-$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/environment.yaml.j2 -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/environment.yaml.j2 -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/environment.yaml.j2 -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/environment.yaml.j2 -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml
 
 # Create a working directory to be removed later
 mkdir -p $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/tmp
 
 {%- for item in data_templates %}
 # Use build
-$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/{{ item }}.j2 -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/tmp/{{ item }}.j2
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/{{ item }}.j2 -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/tmp/{{ item }}.j2
 
-$REPO_ROOT/data/templates/template_engine.py -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/tmp/{{ item }}.j2 -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/{{ item }}.j2 -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/tmp/{{ item }}.j2 -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/{{ item }}.j2 -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
 {%- endfor %}
 
 rm -rf $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/templates/tmp

@@ -243,8 +243,9 @@
         "name": "vagrant",
         "passwd": "$6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/",
         "passwd_type": "--iscrypted",
-        "key": "ceph_bootstrap.pub",
-        "shell": "/bin/bash",
+        "public_key": "operations.pub",
+        "private_key": "operations.key",
+        "shell": "",
         "comment": "Vagrant user",
         "groups": "wheel",
         "sudo":true
@@ -252,12 +253,12 @@
       "users": [
             {
             "name": "operations", "group": "wheel", "comment": "Operations user", "passwd": "$6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/",
-            "passwd_type": "--iscrypted", "key": "ceph_bootstrap.pub", "private_key": "operations",
+            "passwd_type": "--iscrypted", "key": "", "private_key": "operations.key",
             "sudo": true, "ceph_group": true
             },
             {
             "name": "vagrant", "group": "wheel", "comment": "Vagrant user", "passwd": "$6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/",
-            "passwd_type": "--iscrypted", "key": "ceph_bootstrap.pub", "private_key": "operations",
+            "passwd_type": "--iscrypted", "key": "", "private_key": "operations.key",
             "sudo": true, "ceph_group": true
             }
       ],
