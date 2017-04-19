@@ -19,12 +19,12 @@
 # This script bootstraps Chef on the bootstrap node.
 # NOTE: This file gets generated in the data center specific folder like dc1 or dc2. That's where it should be launched
 
-REPO_ROOT=$1
+TMP_REPO_ROOT=$1
 REPO_ROOT_FILES={{ cache.base }}
 KNIFE=/opt/opscode/embedded/bin/knife
 
-if [[ -z $REPO_ROOT ]]; then
-    echo "MUST specify the REPO_ROOT variable"
+if [[ -z $TMP_REPO_ROOT ]]; then
+    echo "MUST specify the TMP_REPO_ROOT variable"
     exit 1
 fi
 
@@ -47,7 +47,8 @@ set -e
 # export CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 # export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
 
-source $REPO_ROOT/bootstrap/common/base.sh
+# base.sh sets REPO_ROOT...
+source $TMP_REPO_ROOT/bootstrap/common/base.sh
 
 # Check to see if Chef Server is installed
 set +e
@@ -94,13 +95,11 @@ $KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.n
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.
 mkdir -p /home/{{ primary_user.name }}/cepheus
-# rsync needs to be called like this...
-cd $REPO_ROOT && rsync -a . /home/{{ primary_user.name }}/cepheus
+cp -a $TMP_REPO_ROOT/. /home/{{ primary_user.name }}/cepheus
 
 sudo mkdir -p {{ cache.repo }}
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
-# rsync needs to be called like this...
-cd $REPO_ROOT && rsync -a . {{ cache.repo }}
+cp -a $TMP_REPO_ROOT/. {{ cache.repo }}
 
 # Remove the temp build repo
 rm -rf $HOME/{{ build.cepheus }}
