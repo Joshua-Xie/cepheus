@@ -94,12 +94,20 @@ $KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.n
 
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.
+echo "====> Create working Cepheus home directory and files..."
+if [[ -d /home/{{ primary_user.name }}/cepheus ]]; then
+    rm -rf /home/{{ primary_user.name }}/cepheus
+fi
 mkdir -p /home/{{ primary_user.name }}/cepheus
-cp -a $TMP_REPO_ROOT/. /home/{{ primary_user.name }}/cepheus
+cp -rp $TMP_REPO_ROOT/. /home/{{ primary_user.name }}/cepheus
 
+echo "====> Move files to {{ cache.repo }}..."
+if [[ -d {{ cache.repo }} ]]; then
+    sudo rm -rf {{ cache.repo }}
+fi
 sudo mkdir -p {{ cache.repo }}
+sudo cp -rp $TMP_REPO_ROOT/. {{ cache.repo }}
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
-cp -a $TMP_REPO_ROOT/. {{ cache.repo }}
 
 # Remove the temp build repo
 rm -rf $HOME/{{ build.cepheus }}
@@ -120,13 +128,15 @@ fi
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus
 
 # Add chef info to boostrap node.
+echo "====> Uploading cookbooks..."
 $KNIFE cookbook upload -a
 cd $HOME/cepheus/roles && $KNIFE role from file *.json
 cd $HOME/cepheus/environments && $KNIFE environment from file {{ environment }}.json
 
-$KNIFE node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]' $CHEF_KNIFE_DEBUG
-$KNIFE node environment set {{ bootstrap.name }} {{ environment }} $CHEF_KNIFE_DEBUG
-$KNIFE tag create {{ bootstrap.name }} 'ceph-bootstrap' $CHEF_KNIFE_DEBUG
+echo "====> Running knife commands..."
+$KNIFE node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
+$KNIFE node environment set {{ bootstrap.name }} {{ environment }}
+$KNIFE tag create {{ bootstrap.name }} 'ceph-bootstrap'
 
 mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.ssh/id_rsa
 

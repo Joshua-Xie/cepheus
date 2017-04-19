@@ -231,7 +231,8 @@ echo "====> Calling cepheus_bootstrap_init.sh..."
 sudo $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
 
 echo "====> Calling bootstrap_chef_server.sh..."
+TMP_REPO_ROOT=$REPO_ROOT
 source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
 
 echo "====> Calling cepheus_build_update.sh..."
-source $REPO_ROOT/bootstrap/common/cepheus_build_update.sh
+source $TMP_REPO_ROOT/bootstrap/common/cepheus_build_update.sh
