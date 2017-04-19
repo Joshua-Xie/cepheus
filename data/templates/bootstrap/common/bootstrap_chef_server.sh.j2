@@ -93,7 +93,9 @@ $KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.n
 
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.
+mkdir -p /home/{{ primary_user.name }}/cepheus
 cd $HOME && rsync -a $REPO_ROOT/* ./cepheus
+
 sudo mkdir -p {{ cache.repo }}
 sudo chown -R {{ primary_user.name }}:{{ primary_user.group }}
 rsync -a $REPO_ROOT/* {{ cache.repo }}
