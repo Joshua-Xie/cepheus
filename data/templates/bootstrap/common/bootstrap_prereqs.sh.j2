@@ -29,21 +29,32 @@ CACHE_LOADER={{ cache.loader }}
 CACHE_COOKBOOK={{ cache.cookbook }}
 CACHE_GEM={{ cache.gem }}
 
-OS_ENV=`uname -a`
-LINUX=`grep ^Linux $OS_ENV`
-USER=`id -un`
-GROUP='id -gn'
+echo "===> Checking local environment..."
 
-if [[ $LINUX -ne 0 ]]; then
+# Check variables before use below...
+set +e
+OS_ENV=`uname -a`
+LINUX=`echo $OS_ENV | grep ^Linux`
+USER=`id -un`
+GROUP=`id -gn`
+
+echo "===> Checking for sudo rights..."
+
+if [[ -z $LINUX ]]; then
     SUDO=sudo
 else
-    SUDO=""
+    SUDO=
 fi
+set -e
+
+echo "===> Checking cache: {{ cache.base }}..."
 
 # If set then it will remove the cache directories
 if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
     $SUDO rm -rf {{ cache.base }}
 fi
+
+echo "===> Creating cache directories..."
 
 # Create the cache directories...
 $SUDO mkdir -p {{ cache.base }}/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
@@ -52,7 +63,7 @@ sudo chown -R $USER:$GROUP {{ cache.base }}
 
 # NB: If your environment can't access the outside world then execute `cache.commands` where you obtain the pre_reqs before
 # calling this...
-{% if !cache.download %}
+{% if cache.download != True %}
 # Execute raw `commands` as-is...
 echo "===> Executing raw commands to fill cache..."
 {{ cache.commands }}

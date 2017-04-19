@@ -81,7 +81,7 @@ unless $http_proxy_server.nil? or $http_proxy_server.empty?
   if $lsb_name == 'centos' or $lsb_name == 'rhel'
     $bootstrap_node_name = servers.select { |k| k["roles"] == ["bootstrap"] }[0]["name"]
     $proxy_configuration_script << <<-EOH
-      echo 'Defaults    env_keep += "http_proxy https_proxy no_proxy SSL_CERT_FILE"' | sudo tee -a /etc/sudoers
+      echo 'Defaults env_keep += "http_proxy https_proxy no_proxy SSL_CERT_FILE"' | sudo tee -a /etc/sudoers
       echo 'export http_proxy=#{$http_proxy_server}' | sudo tee -a /etc/profile
       echo 'export https_proxy=#{$https_proxy_server}' | sudo tee -a /etc/profile
       echo 'export no_proxy=127.0.0.1,#{$bootstrap_node_name}.#{$domain},10.0.100.*,10.121.*' | sudo tee -a /etc/profile
@@ -125,12 +125,13 @@ unless $https_proxy_server.nil? or $https_proxy_server.empty?
 end
 
 # After other yum updates you may also need to re-install the kernel-devel-* so it's in the
+# kernel-devel-`uname -r` - old way
 # Only need this for Vagrant
 if $lsb_name == 'centos' or $lsb_name == 'rhel'
   $repos_script = <<-EOH
     sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
     sudo sed -i 's/permissive/disabled/g' /etc/selinux/config /etc/selinux/config
-    sudo yum install -y kernel-devel-`uname -r` gcc make perl bzip2
+    sudo yum install -y kernel-devel gcc make perl bzip2
     sudo yum install -y epel-release rsync
   EOH
 else
@@ -275,8 +276,10 @@ Vagrant.configure("2") do |config|
         machine.vm.provision "file", source: "../network.sh", destination: "network.sh"
         # This file will be used to check and update the vbox guest addition
         machine.vm.provision "file", source: "../vbox_check_guestaddons.sh", destination: "vbox_check_guestaddons.sh"
+
         # This file will be used in the event vagrant chokes on ssh. You can then use vbox-ssh 'vmname'
-        machine.vm.provision "file", source: "../cepheus.pub", destination: ".ssh/cepheus.pub"
+        # machine.vm.provision "file", source: "../cepheus.pub", destination: ".ssh/cepheus.pub"
+
         # This file will be appended to /etc/hosts later...
         machine.vm.provision "file", source: "../ceph_chef_host_file.env", destination: "ceph_chef_host_file"
 
@@ -293,9 +296,9 @@ Vagrant.configure("2") do |config|
         end
 
         # This will add a shared folder but reboot will not recognize it unless it's in fstab
-        machine.vm.synced_folder(ENV['REPO_ROOT'], "/ceph-host") unless ENV['REPO_ROOT'].nil?
-        machine.vm.synced_folder(ENV['BOOTSTRAP_CACHE_DIR'], "/ceph-files") unless ENV['BOOTSTRAP_CACHE_DIR'].nil?
-        machine.vm.synced_folder ".", "/vagrant", disabled: true
+        # machine.vm.synced_folder(ENV['REPO_ROOT'], "/ceph-host") unless ENV['REPO_ROOT'].nil?
+        # machine.vm.synced_folder(ENV['BOOTSTRAP_CACHE_DIR'], "/ceph-files") unless ENV['BOOTSTRAP_CACHE_DIR'].nil?
+        # machine.vm.synced_folder ".", "/vagrant", disabled: true
 
         machine.vm.provision "vboxfs-add-user", type: "shell" do |s|
           s.privileged = true
@@ -307,10 +310,10 @@ Vagrant.configure("2") do |config|
           s.inline = "chmod +x vbox_check_guestaddons.sh"
         end
 
-        machine.vm.provision "add-custom-key", type: "shell" do |s|
-          s.privileged = false
-          s.inline = "cat .ssh/cepheus.pub >> .ssh/authorized_keys"
-        end
+        # machine.vm.provision "add-custom-key", type: "shell" do |s|
+        #   s.privileged = false
+        #   s.inline = "cat .ssh/cepheus.pub >> .ssh/authorized_keys"
+        # end
 
         machine.vm.provision "append-hosts", type: "shell" do |s|
           s.privileged = true

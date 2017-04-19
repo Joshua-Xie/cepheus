@@ -45,6 +45,8 @@ export CEPH_DEV_MODE=0
 export CHEF_CEPHEUS_DEBUG=0
 export BOOTSTRAP_GET_PREREQS_ONLY=0
 export BOOTSTRAP_REMOVE_PREREQS=0
+export BOOTSTRAP_HTTP_PROXY=
+export BOOTSTRAP_HTTPS_PROXY=
 export BUILD_VMS_ONLY=0
 export BUILD_ENVIRONMENT=vagrant
 export BUILD_LOCATION=public
@@ -113,8 +115,8 @@ while getopts cbglrsvu:n:e:d:p:o:t: opt; do
             ;;
         p)
             # (optional) Only used if your environment requires a proxy to access the outside world.
-            BOOTSTRAP_HTTP_PROXY=$OPTARG
-            BOOTSTRAP_HTTPS_PROXY=$OPTARG
+            export BOOTSTRAP_HTTP_PROXY=$OPTARG
+            export BOOTSTRAP_HTTPS_PROXY=$OPTARG
             ;;
         r)
             # (optional) -r to remove the prerequisites. Cleaning up.
