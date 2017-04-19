@@ -119,12 +119,12 @@ fi
 
 # Setup sudoer
 echo "====> Checking sudoer for {{ primary_user.name }}"
-if [[ ! -f /etc/sudoers.d/{{ primary_user.name }} ]]; then
+if sudo bash -c '[[ ! -f "/etc/sudoers.d/{{ primary_user.name }}" ]]'; then
     echo "====> Updating sudoer for {{ primary_user.name }}"
 
-    echo "%{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
-    sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
-    echo "{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
+    sudo echo "%{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
+    sudo sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
+    sudo echo "{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
 fi
 
 {%- if subscription.enable %}
@@ -143,5 +143,5 @@ chmod +x /tmp/rhelsub.sh
 
 # May need to do something with NICs here since some require a little extra love before they are happy!
 
-echo "===> cepheus_bootstrap_init.sh Success!"
+echo "====> cepheus_bootstrap_init.sh Success!"
 echo

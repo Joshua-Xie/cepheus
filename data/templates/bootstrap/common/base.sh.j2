@@ -25,75 +25,76 @@ set -e
 
 export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
 if [[ ! -f $REPO_ROOT ]]; then
-    echo "$REPO_ROOT has not been created yet."
-    exit 0
-fi
-
-# It's ok to let this go through because the bootstrap node will not have these generated until AFTER the Chef Server
-# is installed, started and the bootstrap role runs.
-# CEPH_CHEF_HOSTS=( ceph-bootstrap )
-
-if [[ -f $REPO_ROOT/environments/ceph_chef_bootstrap.env ]]; then
-    source $REPO_ROOT/environments/ceph_chef_bootstrap.env
-fi
-
-if [[ -f $REPO_ROOT/environments/ceph_chef_hosts.env ]]; then
-    source $REPO_ROOT/environments/ceph_chef_hosts.env
-fi
-
-if [[ -f $REPO_ROOT/environments/ceph_chef_osd_hosts.env ]]; then
-    source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
-fi
-
-if [[ -f $REPO_ROOT/environments/ceph_chef_mon_hosts.env ]]; then
-    source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
-fi
-
-if [[ -f $REPO_ROOT/environments/ceph_chef_rgw_hosts.env ]]; then
-    source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
-fi
-
-if [[ -f $REPO_ROOT/environments/ceph_chef_admin_hosts.env ]]; then
-    source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
-fi
-
-if [[ -f $REPO_ROOT/environments/ceph_chef_adc_hosts.env ]]; then
-    source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
-fi
-
-# This script does a lot of stuff:
-# - installs Chef Server on the ceph-bootstrap node
-# - installs Chef client on all nodes
-
-# It would be more efficient as something executed in one shot on each node, but
-# doing it this way makes it easy to orchestrate operations between nodes. It will be
-# overhauled at some point to not be Vagrant-specific.
-
-# NOTE: You could check to see if node IP == bootstrap IP and if so then don't ssh or just have the key :)
-
-do_on_node() {
-  echo
-  echo "Issuing command: ssh $1 ${2}"
-  echo "----------------------------------------------------------------------------------------"
-  NODE=$1
-  shift
-  COMMAND="${*}"
-  ssh -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
-}
-
-# use Chef Server embedded knife instead of the one in /usr/bin
-KNIFE=/opt/opscode/embedded/bin/knife
-
-# Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
-delete=($CEPH_CHEF_BOOTSTRAP)
-ceph_nodes=("${CEPH_CHEF_HOSTS[@]/$delete}")
-
-if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
+    echo "$REPO_ROOT has not been created yet. Success (exit)."
     echo
-    echo "##########"
-    echo "Root: $REPO_ROOT"
-    echo "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
-    echo "Ceph Nodes: ${ceph_nodes[@]}"
-    echo "##########"
-    echo
+else
+
+    # It's ok to let this go through because the bootstrap node will not have these generated until AFTER the Chef Server
+    # is installed, started and the bootstrap role runs.
+    # CEPH_CHEF_HOSTS=( ceph-bootstrap )
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_bootstrap.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_bootstrap.env
+    fi
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_hosts.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_hosts.env
+    fi
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_osd_hosts.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
+    fi
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_mon_hosts.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
+    fi
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_rgw_hosts.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
+    fi
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_admin_hosts.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
+    fi
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_adc_hosts.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
+    fi
+
+    # This script does a lot of stuff:
+    # - installs Chef Server on the ceph-bootstrap node
+    # - installs Chef client on all nodes
+
+    # It would be more efficient as something executed in one shot on each node, but
+    # doing it this way makes it easy to orchestrate operations between nodes. It will be
+    # overhauled at some point to not be Vagrant-specific.
+
+    # NOTE: You could check to see if node IP == bootstrap IP and if so then don't ssh or just have the key :)
+
+    do_on_node() {
+      echo
+      echo "Issuing command: ssh $1 ${2}"
+      echo "----------------------------------------------------------------------------------------"
+      NODE=$1
+      shift
+      COMMAND="${*}"
+      ssh -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
+    }
+
+    # use Chef Server embedded knife instead of the one in /usr/bin
+    KNIFE=/opt/opscode/embedded/bin/knife
+
+    # Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
+    delete=($CEPH_CHEF_BOOTSTRAP)
+    ceph_nodes=("${CEPH_CHEF_HOSTS[@]/$delete}")
+
+    if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
+        echo
+        echo "##########"
+        echo "Root: $REPO_ROOT"
+        echo "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
+        echo "Ceph Nodes: ${ceph_nodes[@]}"
+        echo "##########"
+        echo
+    fi
 fi

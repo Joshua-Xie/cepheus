@@ -62,7 +62,11 @@ set -e
 #### NOTE: You can check to see if user 'admin' exists and if org 'cepheus' exists but this is usually only called once.
 # If you *have* to run this again then simply just comment one or both of these lines out before running.
 if [[ -z $chef_server ]]; then
-    echo "====> Creating Chef Server - $chef_server"
+    echo "====> Creating Chef Server..."
+
+    if sudo bash -c '[[ ! -d "/etc/opscode" ]]'; then
+        sudo rpm -Uvh $(find $REPO_ROOT_FILES/ -name chef-server\*rpm -not -name \*downloaded | tail -1)
+    fi
 
     echo "nginx['non_ssl_port'] = 4000" | sudo tee /etc/opscode/chef-server.rb
     echo "nginx['enable_non_ssl'] = true" | sudo tee --append /etc/opscode/chef-server.rb

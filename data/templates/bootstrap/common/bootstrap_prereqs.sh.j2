@@ -29,47 +29,35 @@ CACHE_LOADER={{ cache.loader }}
 CACHE_COOKBOOK={{ cache.cookbook }}
 CACHE_GEM={{ cache.gem }}
 
-echo "===> Checking local environment..."
+echo "====> Checking local environment..."
 
 # Check variables before use below...
-set +e
-OS_ENV=`uname -a`
-LINUX=`echo $OS_ENV | grep ^Linux`
 USER=`id -un`
 GROUP=`id -gn`
 
-echo "===> Checking for sudo rights..."
-
-if [[ -z $LINUX ]]; then
-    SUDO=sudo
-else
-    SUDO=
-fi
-set -e
-
-echo "===> Checking cache: {{ cache.base }}..."
+echo "====> Checking cache: {{ cache.base }}..."
 
 # If set then it will remove the cache directories
 if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
-    $SUDO rm -rf {{ cache.base }}
+    sudo rm -rf {{ cache.base }}
 fi
 
-echo "===> Creating cache directories..."
+echo "====> Creating cache directories..."
 
 # Create the cache directories...
-$SUDO mkdir -p {{ cache.base }}/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
-$SUDO mkdir -p {{ cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
+sudo mkdir -p {{ cache.base }}/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
+sudo mkdir -p {{ cache.base }}/{$CACHE_PYTHON,$CACHE_RPM,$CACHE_DEB,$CACHE_COOKBOOK,$CACHE_GEM}
 sudo chown -R $USER:$GROUP {{ cache.base }}
 
 # NB: If your environment can't access the outside world then execute `cache.commands` where you obtain the pre_reqs before
 # calling this...
 {% if cache.download != True %}
 # Execute raw `commands` as-is...
-echo "===> Executing raw commands to fill cache..."
+echo "====> Executing raw commands to fill cache..."
 {{ cache.commands }}
 # NB: If this is present then the template_engine allowed the cache directories to be created and then executed the `commands`
 # and exited normally
-echo "===> Success in executing commands!"
+echo "====> Success in executing commands!"
 echo
 exit 0
 {% endif %}
@@ -109,7 +97,7 @@ git_clone_or_update() {
   local NAME=$1
   local URL=$2
 
-  echo "===> Git clone or update..."
+  echo "====> Git clone or update..."
   if [[ ! -f {{ cache.base }}/${NAME}_downloaded ]]; then
     if [[ ! -d {{ cache.base }}/$NAME ]]; then
       git clone $URL {{ cache.base }}/$NAME || true
@@ -122,7 +110,7 @@ git_clone_or_update() {
 
 {% if method == "pxe" %}
 # Obtain an RHEL 7.2 image to be used for PXE booting in production.
-echo "===> Downloading ISO..."
+echo "====> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
     # NOTE: the +e is because the hardware  We can change it later...
@@ -140,12 +128,12 @@ if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
 fi
 {% endif %}
 
-echo "===> Downloading Chef..."
+echo "====> Downloading Chef..."
 download_file /{{ cache.rpm }}/{{ chef_repo.client.package }} https://packages.chef.io/files/stable/chef/{{ chef_repo.client.version }}/el/7/{{ chef_repo.client.package }}
 download_file /{{ cache.rpm }}/{{ chef_repo.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef_repo.server.version }}/el/7/{{ chef_repo.server.package }}
 
 # BIRD is a little different
-echo "===> Downloading Bird..."
+echo "====> Downloading Bird..."
 ftp_file /{{ cache.rpm }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/pub/bird/redhat/{{ adc_repo.bgp.bird.package }}
 
 # Most important cookbook
@@ -162,7 +150,7 @@ ftp_file /{{ cache.rpm }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/
 {%- if ceph_chef.debug %}
 
 # Remove it so it's not used.
-echo "===> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
+echo "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
 rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
 # Clone to cookbook area
 rm -rf $REPO_ROOT/cookbooks/ceph-chef
@@ -170,13 +158,13 @@ git clone -b {{ ceph_chef.git.branch }} {{ ceph_chef.git.url }}/{{ ceph_chef.git
 
 {% else %}
 
-echo "===> Downloading ceph-chef..."
+echo "====> Downloading ceph-chef..."
 download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
 
 {%- endif %}
 
 if [[ $CEPH_DEV_MODE -ne 0 ]]; then
-  echo "===> Cloning Ceph..."
+  echo "====> Cloning Ceph..."
   git_clone_or_update git/ceph https://github.com/ceph/ceph.git
 fi
 
