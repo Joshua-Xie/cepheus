@@ -89,7 +89,7 @@ echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ 
 $KNIFE ssl fetch
 
 echo "====> Bootstrapping Chef Server for {{ primary_user.name }}"
-$KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} {{ bootstrap.name }} -P {{ primary_user.name }} --sudo
+$KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.name }} -P {{ primary_user.name }} --sudo
 
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.

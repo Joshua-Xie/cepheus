@@ -26,6 +26,9 @@
 /cookbooks/cepheus/templates/cobbler.dhcp.template.erb
 /cookbooks/cepheus/templates/zabbix-userparameter-radosgw.conf.erb
 
+# Everything is template driven
+/environments/*.json
+
 /tmp/
 
 # Private data
