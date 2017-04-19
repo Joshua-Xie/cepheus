@@ -21,6 +21,7 @@
 
 REPO_ROOT=$1
 REPO_ROOT_FILES={{ cache.base }}
+KNIFE=/opt/opscode/embedded/bin/knife
 
 if [[ -z $REPO_ROOT ]]; then
     echo "MUST specify the REPO_ROOT variable"
@@ -43,8 +44,8 @@ mv $HOME/.ssh/id_rsa $HOME/.ssh/id_rsa.tmp
 
 set -e
 
-export CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
-export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
+# export CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
+# export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
 
 source $REPO_ROOT/bootstrap/common/base.sh
 
@@ -83,11 +84,11 @@ fi
 
 echo "====> Creating $HOME/.chef environment..."
 mkdir -p $HOME/.chef
-echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://$CEPH_CHEF_BOOTSTRAP/organizations/{{ chef.org }}'\nvalidation_client_name '{{ chef.validator }}'\nvalidation_key '/etc/opscode/{{ chef.validator }}.pem'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
-$KNIFE ssl fetch
+echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}.{{ domain }}/organizations/{{ chef.org }}'\nvalidation_client_name '{{ chef.validator }}'\nvalidation_key '/etc/opscode/{{ chef.validator }}.pem'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
+ ssl fetch
 
 echo "====> Bootstrapping Chef Server for {{ primary_user.name }}"
-$KNIFE bootstrap $CEPH_CHEF_BOOTSTRAP_IP -x {{ primary_user.name }} $CEPH_CHEF_BOOTSTRAP -P {{ primary_user.name }} --sudo
+$KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} {{ bootstrap.name }} -P {{ primary_user.name }} --sudo
 
 cd $HOME && rsync -a $REPO_ROOT/* ./cepheus
 
@@ -106,9 +107,9 @@ $KNIFE cookbook upload -a
 cd $HOME/cepheus/roles && $KNIFE role from file *.json
 cd $HOME/cepheus/environments && $KNIFE environment from file {{ environment }}.json
 
-$KNIFE node run_list set $CEPH_CHEF_BOOTSTRAP 'role[ceph-bootstrap]' $CHEF_KNIFE_DEBUG
-$KNIFE node environment set $CEPH_CHEF_BOOTSTRAP {{ environment }} $CHEF_KNIFE_DEBUG
-$KNIFE tag create $CEPH_CHEF_BOOTSTRAP 'ceph-bootstrap' $CHEF_KNIFE_DEBUG
+$KNIFE node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]' $CHEF_KNIFE_DEBUG
+$KNIFE node environment set {{ bootstrap.name }} {{ environment }} $CHEF_KNIFE_DEBUG
+$KNIFE tag create {{ bootstrap.name }} 'ceph-bootstrap' $CHEF_KNIFE_DEBUG
 
 mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.ssh/id_rsa
 

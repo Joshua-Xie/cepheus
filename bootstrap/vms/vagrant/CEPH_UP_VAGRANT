@@ -60,26 +60,26 @@ export BOOTSTRAP_VAGRANT_DEBUG=${BOOTSTRAP_VAGRANT_DEBUG:-0}
 export DONT_SHOW_BANNER=0
 
 # Perform preflight checks to validate environment sanity as much as possible.
-echo "===> Performing preflight environment validation..."
+echo "====> Performing preflight environment validation..."
 source $REPO_ROOT/bootstrap/common/bootstrap_validate_env.sh
 
 if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   # Test that Vagrant is really installed and of an appropriate version.
   if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
-    echo "===> Checking VirtualBox and Vagrant..."
+    echo "====> Checking VirtualBox and Vagrant..."
     source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_test.sh
   fi
 fi
 
 # # Configure and test any proxies configured.
 # if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
-#   echo "===> Testing configured proxies..."
+#   echo "====> Testing configured proxies..."
 #   source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
 # fi
 #
 # # Do prerequisite work prior to starting build, downloading files and
 # # creating local directories.
-# echo "===> Downloading necessary files to local cache..."
+# echo "====> Downloading necessary files to local cache..."
 # source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
 
 # # If prerequisites only then end after getting them
@@ -92,7 +92,7 @@ fi
 
 # Create VMs in Vagrant and start them.
 # VM only tests inside vagrant_create script
-echo "===> Clean up old VMs and Starting new local Vagrant cluster..."
+echo "====> Clean up old VMs and Starting new local Vagrant cluster..."
 $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create.sh
 
 # IMPORTANT: Inside vagrant_create.sh in the configure_network function the ADDING of OSD drives
@@ -105,7 +105,7 @@ if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
     $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create_shared_folders_in_vms.sh
 
     # Install and configure Chef on all Vagrant hosts.
-    echo "===> Installing and configuring Chef on all nodes using the all in one script."
+    echo "====> Installing and configuring Chef on all nodes using the all in one script."
     $REPO_ROOT/bootstrap/vms/vagrant/vagrant_configure_chef_aio.sh
 else
     echo

@@ -33,7 +33,7 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # Build from template
 {%- for item in build_init_update_files %}
 
-echo "===> Generating {{ item }}..."
+echo "====> Generating {{ item }}..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 

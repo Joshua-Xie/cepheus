@@ -155,12 +155,12 @@ sudo chmod +x $REPO_ROOT/$BUILD
 ## WIP Section
 # Pass data templates through template enginge first
 # BUILD_DATA_TEMPLATES=data/data_templates.sh
-# echo "===> Generating $REPO_ROOT/$BUILD_DATA_TEMPLATES from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data_templates.yaml..."
+# echo "====> Generating $REPO_ROOT/$BUILD_DATA_TEMPLATES from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data_templates.yaml..."
 # $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data_templates.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA_TEMPLATES.j2 -o $REPO_ROOT/$BUILD_DATA_TEMPLATES
 # sudo chmod +x $REPO_ROOT/$BUILD_DATA_TEMPLATES
 #
 # # This must now be ran to generate environment.yaml for the given environment.
-# echo "===> Executing $REPO_ROOT/$BUILD_DATA_TEMPLATES"
+# echo "====> Executing $REPO_ROOT/$BUILD_DATA_TEMPLATES"
 # source $REPO_ROOT/$BUILD_DATA_TEMPLATES
 ##
 

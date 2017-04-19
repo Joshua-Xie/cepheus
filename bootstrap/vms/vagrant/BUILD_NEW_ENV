@@ -214,29 +214,29 @@ mkdir -p $BOOTSTRAP_CACHE_DIR/build/iso/{in,out}
 
 # Configure and test any proxies configured.
 if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
-  echo "===> Testing configured proxies..."
+  echo "====> Testing configured proxies..."
   source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
 fi
 
 export BOOTSTRAP_TYPE=${BOOTSTRAP_TYPE:-"vagrant"}
 
 # Perform preflight checks to validate environment sanity as much as possible.
-echo "===> Performing preflight environment validation..."
+echo "====> Performing preflight environment validation..."
 source $REPO_ROOT/bootstrap/common/bootstrap_validate_env.sh
 
-echo "===> Checking VirtualBox and Vagrant..."
+echo "====> Checking VirtualBox and Vagrant..."
 source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_test.sh
 
 # Do prerequisite work prior to starting build, downloading files and
 # creating local directories.
-echo "===> Downloading necessary files to local cache..."
+echo "====> Downloading necessary files to local cache..."
 source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
 
 # Just remove pxe_boot iso to make sure it's clean
 rm -f $BOOTSTRAP_CACHE_DIR/pxe_boot/isos/*
 
 # Copy over RHEL
-echo "===> Copying ISO to cache..."
+echo "====> Copying ISO to cache..."
 if [[ ! -f $BOOTSTRAP_CACHE_DIR/build/iso/in/$COBBLER_BOOTSTRAP_ISO ]]; then
   cp $COBBLER_REMOTE_URL_ISO $BOOTSTRAP_CACHE_DIR/build/iso/in/$COBBLER_BOOTSTRAP_ISO
 fi
@@ -254,7 +254,7 @@ set -e
 # No need to reset the GITHUB metadata here
 git clone $GITHUB_PUBLIC_REPO $BOOTSTRAP_CACHE_DIR/build/github/public/$GITHUB_PUBLIC_LAYER_REPO
 
-echo "===> Git (Internal): $GITHUB_PRIVATE_REPO"
+echo "====> Git (Internal): $GITHUB_PRIVATE_REPO"
 
 # May be there so ignore fail if not there.
 set +e
@@ -311,21 +311,21 @@ vagrant destroy -f
 vagrant up
 
 echo
-echo "===> Vagrant build complete..."
+echo "====> Vagrant build complete..."
 echo
 
 if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
-  echo "===> Copying ISO to /tmp..."
+  echo "====> Copying ISO to /tmp..."
   echo
   # Move the ISO because we rsync later
   do_on_node $vm "mv /ceph-files/build/iso/in/rhel*.iso /tmp"
 
-  echo "===> Creating directories and mounting base ISO..."
+  echo "====> Creating directories and mounting base ISO..."
   echo
   do_on_node $vm "mkdir -p /tmp/build/{iso,mnt,packages,keys}"
   do_on_node $vm "sudo mount -o loop /tmp/$COBBLER_BOOTSTRAP_ISO /tmp/build/mnt"
 
-  echo "===> Moving ISO data to /tmp/build/iso..."
+  echo "====> Moving ISO data to /tmp/build/iso..."
   echo
   do_on_node $vm "rsync -av /tmp/build/mnt/ /tmp/build/iso/"
   do_on_node $vm "sudo mkdir -p /tmp/build/iso/postinstall/ceph-files/keys"
@@ -339,7 +339,7 @@ if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
   do_on_node $vm "sudo find /tmp/build/iso -name TRANS.TBL -exec rm -f {} \;"
 
   # Copy over ceph-files and to postinstall
-  echo "===> Copying $CEPH_CHEF_FILES to ISO..."
+  echo "====> Copying $CEPH_CHEF_FILES to ISO..."
   echo
   # No ceph-host in this part of build cycle. The ceph-host will be made on actual bootstrap node during
   # kickstart post install cycle.
@@ -383,17 +383,17 @@ if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
   do_on_node $vm "sudo rm -f /tmp/build/iso/postinstall/ceph-host/environments/$env.json.j2"
 
   # Build ISO with custom kickstart
-  echo "===> Generating new ISO..."
+  echo "====> Generating new ISO..."
   echo
   # This commented line is for possible future reference - ls -1 | sed -e 's/\.rpm$//' | grep 'x86_64' | xargs yum install --downloadonly --downloaddir=/tmp/repos
   # mkisofs
   do_on_node $vm "TODAY=\$(date +'%Y-%m-%d'); sudo genisoimage -r -J -N -d -hide-rr-moved -R -T -no-emul-boot -boot-load-size 4 -boot-info-table -V \"$ISOVOLUMEID\" -p \"$PACKAGER\" -A \"$ISOVOLUMEID - \$TODAY\" -b isolinux/isolinux.bin -c isolinux/boot.cat -x \"lost+found\" -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -o /tmp/$CHEF_CEPHEUS_ENV-$COBBLER_BOOTSTRAP_ISO /tmp/build/iso"
-  echo "===> Generating MD5 in ISO..."
+  echo "====> Generating MD5 in ISO..."
   echo
 
   do_on_node $vm "sudo implantisomd5 /tmp/$CHEF_CEPHEUS_ENV-$COBBLER_BOOTSTRAP_ISO"
 
-  echo "===> Copying $CHEF_CEPHEUS_ENV-$COBBLER_BOOTSTRAP_ISO to $BOOTSTRAP_CACHE_DIR/build/iso/out"
+  echo "====> Copying $CHEF_CEPHEUS_ENV-$COBBLER_BOOTSTRAP_ISO to $BOOTSTRAP_CACHE_DIR/build/iso/out"
   echo
   do_on_node $vm "cp /tmp/$CHEF_CEPHEUS_ENV-$COBBLER_BOOTSTRAP_ISO /ceph-files/build/iso/out/."
 fi

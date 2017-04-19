@@ -138,11 +138,11 @@ ftp_file /{{ cache.packages }}/{{ adc_repo.bgp.bird.package }} ftp://bird.networ
 # Most important cookbook
 # If set then it will not download but remove from cache and use the development version that should be set in the cepheus/cookbooks directory.
 # if [[ $CHEF_CEPHEUS_DEBUG -eq 0 ]]; then
-#     echo "===> Downloading ceph-chef..."
+#     echo "====> Downloading ceph-chef..."
 #     download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
 # else
 #   # Remove it so it's not used.
-#   echo "===> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
+#   echo "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
 #   rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
 # fi
 
