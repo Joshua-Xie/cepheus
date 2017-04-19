@@ -214,6 +214,12 @@ ipmi:
 
 chef:
     owner: vagrant
+    org: cepheus
+    validator: cepheus-validator.pem
+    admin:
+        user: admin
+        email: admin@localhost.com
+        pem: admin.pem
     # May want the group part of the default group of the owner above.
     group: vagrant
     server: http://10.0.100.20:4000

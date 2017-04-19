@@ -66,8 +66,9 @@ cache:
         echo "test3"
     cookbook: cookbooks
     gem: gems
-    rpm: rpms
-    deb: debs
+    # rpm: rpms
+    # deb: debs
+    packages: packages
     python: python
     pxe_boot: pxe_boot
     iso: isos
