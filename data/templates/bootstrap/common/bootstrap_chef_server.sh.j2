@@ -94,11 +94,13 @@ $KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.n
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.
 mkdir -p /home/{{ primary_user.name }}/cepheus
-/bin/cp -rf $REPO_ROOT/* /home/{{ primary_user.name }}/cepheus
+# rsync needs to be called like this...
+cd $REPO_ROOT && rsync -a . /home/{{ primary_user.name }}/cepheus
 
 sudo mkdir -p {{ cache.repo }}
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
-/bin/cp -rf $REPO_ROOT/* {{ cache.repo }}
+# rsync needs to be called like this...
+cd $REPO_ROOT && rsync -a . {{ cache.repo }}
 
 # Remove the temp build repo
 rm -rf $HOME/{{ build.cepheus }}
@@ -109,8 +111,11 @@ sudo cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
 cd $HOME/cepheus/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
 cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
 
+{%- if pxe_boot.enable %}
 # NOTE: *HAVE* to load the files into files/ before cookbook upload
 sudo cp $REPO_ROOT_FILES/cobbler/loaders/* $HOME/cepheus/cookbooks/cepheus/files/loaders
+{% endif %}
+
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus
 
 # Add chef info to boostrap node.
