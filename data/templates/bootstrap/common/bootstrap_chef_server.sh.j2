@@ -85,7 +85,7 @@ fi
 echo "====> Creating $HOME/.chef environment..."
 mkdir -p $HOME/.chef
 echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}.{{ domain }}/organizations/{{ chef.org }}'\nvalidation_client_name '{{ chef.validator }}'\nvalidation_key '/etc/opscode/{{ chef.validator }}.pem'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
- ssl fetch
+$KNIFE ssl fetch
 
 echo "====> Bootstrapping Chef Server for {{ primary_user.name }}"
 $KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} {{ bootstrap.name }} -P {{ primary_user.name }} --sudo

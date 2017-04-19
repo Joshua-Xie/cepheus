@@ -215,7 +215,7 @@ ipmi:
 chef:
     owner: vagrant
     org: cepheus
-    validator: cepheus-validator.pem
+    validator: cepheus-validator
     admin:
         user: admin
         email: admin@localhost.com
