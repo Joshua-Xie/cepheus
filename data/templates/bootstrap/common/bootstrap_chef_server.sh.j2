@@ -89,7 +89,7 @@ echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ 
 $KNIFE ssl fetch
 
 echo "====> Bootstrapping Chef Server for {{ primary_user.name }}"
-$KNIFE bootstrap {{ bootstrap.ip }} -y -x {{ primary_user.name }} -N {{ bootstrap.name }} -P {{ primary_user.name }} --sudo
+$KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.name }} -P {{ primary_user.name }} --sudo --yes
 
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.
@@ -97,7 +97,7 @@ mkdir -p /home/{{ primary_user.name }}/cepheus
 cp -r $REPO_ROOT/* /home/{{ primary_user.name }}/cepheus
 
 sudo mkdir -p {{ cache.repo }}
-sudo chown -R {{ primary_user.name }}:{{ primary_user.group }}
+sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
 cp -r $REPO_ROOT/* {{ cache.repo }}
 
 # Remove the temp build repo
