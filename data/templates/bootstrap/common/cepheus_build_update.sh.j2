@@ -22,8 +22,8 @@
 set -e
 
 # Force a new clone
-REPO_ROOT=/ceph-host
-REPO_ROOT_FILES=/ceph-files
+REPO_ROOT={{ cache.repo }}
+REPO_ROOT_FILES={{ cache.base }}
 
 WORK_DIR=/tmp/cepheus-tmp
 DATE=$(date +%Y-%m-%d_%H%M%S)
@@ -36,21 +36,21 @@ CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 OWNER={{ primary_user.name }}
 GROUP={{ primary_user.group }}
 
-ENVIRONMENT=$1
-
-if [[ -z $ENVIRONMENT ]]; then
-  echo "MUST pass in an environment: production, staging, lab"
-  exit 1
-fi
-
-if [[ "production" == $ENVIRONMENT || "staging" == $ENVIRONMENT || "lab" == $ENVIRONMENT ]]; then
-  echo
-  echo "Using environment: $ENVIRONMENT"
-  echo
-else
-  echo "MUST pass in an environment: production, staging, lab, dev or whatever you wish to call it."
-  exit 1
-fi
+# ENVIRONMENT=$1
+#
+# if [[ -z $ENVIRONMENT ]]; then
+#   echo "MUST pass in an environment: production, staging, lab"
+#   exit 1
+# fi
+#
+# if [[ "production" == $ENVIRONMENT || "staging" == $ENVIRONMENT || "lab" == $ENVIRONMENT ]]; then
+#   echo
+#   echo "Using environment: $ENVIRONMENT"
+#   echo
+# else
+#   echo "MUST pass in an environment: production, staging, lab, dev or whatever you wish to call it."
+#   exit 1
+# fi
 
 if [[ -d $WORK_DIR ]]; then
   rm -rf $WORK_DIR
@@ -93,13 +93,13 @@ git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
 {% if primary_user.backup.enable %}
 if [[ -d "/opt/opscode/" ]]; then
-  {% if primary_user.backup.remote.enable %}
-  # Call the backup and rsync script
-  ./cepheus_backup_rsync.sh $DATE $VERSION
-  {% else %}
-  # Call the backup
-  ./cepheus_backup_no_rsync.sh $DATE $VERSION
-  {% endif %}
+    {% if primary_user.backup.remote.enable %}
+    # Call the backup and rsync script
+    ./cepheus_backup_rsync.sh $DATE $VERSION
+    {% else %}
+    # Call the backup
+    ./cepheus_backup_no_rsync.sh $DATE $VERSION
+    {% endif %}
 fi
 {% endif %}
 
@@ -127,8 +127,8 @@ echo "====> Clean staging process directories..."
 set +e
 # Only if Chef has been installed which means ansible is loaded and host files exist
 if [[ -d "/opt/opscode/" ]]; then
- ansible all -m shell -a "sudo rm -rf $REPO_ROOT"
- ansible all -m shell -a "sudo rm -rf $REPO_ROOT_FILES"
+    ansible all -m shell -a "sudo rm -rf $REPO_ROOT"
+    ansible all -m shell -a "sudo rm -rf $REPO_ROOT_FILES"
 fi
 set -e
 
@@ -139,8 +139,8 @@ echo "====> Building update..."
 sudo mkdir -p $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
 
-if [[ $(ls -A /ceph-host) ]]; then
-  sudo rm -rf $REPO_ROOT/*
+if [[ $(ls -A {{ cache.repo }}) ]]; then
+    sudo rm -rf $REPO_ROOT/*
 fi
 
 cp -r $WORK_DIR/cepheus-staging/* $REPO_ROOT
@@ -152,7 +152,7 @@ sudo mkdir -p $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
 
 if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
-  sudo rm -rf $REPO_ROOT_FILES/*
+    sudo rm -rf $REPO_ROOT_FILES/*
 fi
 
 cp -r $WORK_DIR/cepheus-files/* $REPO_ROOT_FILES
@@ -174,10 +174,10 @@ $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BU
 
 # Install Chef if not installed. Parts of the below code will be duplicated but will be removed later...
 if [[ ! -d "/opt/opscode/" ]]; then
-  mkdir -p $HOME/cepheus
-  source $REPO_ROOT/bootstrap/common/bootstrap_chef.sh
+    mkdir -p $HOME/cepheus
+    source $REPO_ROOT/bootstrap/common/bootstrap_chef.sh
 
-  # NOTE: The chef server *MUST* install and the bootstrap server chef-client must complete with no issues first!
+    # NOTE: The chef server *MUST* install and the bootstrap server chef-client must complete with no issues first!
 else
   # NOTE: This update should not be executed until *ALL* nodes have been bootstrapped via cobbler kickstart!
   # If this section runs before all nodes have been bootstrapped then it will error out during the set of commands
@@ -207,12 +207,12 @@ else
   # Update chef info
   knife cookbook upload -a
   cd $HOME/cepheus/roles && knife role from file *.json
-  cd $HOME/cepheus/environments && knife environment from file $ENVIRONMENT.json
+  cd $HOME/cepheus/environments && knife environment from file {{ environment }}.json
 
   # Add Chef tags
   # NOTE: run_list *set* replaces any run_list that may have already been there before
   knife node run_list set $CEPH_CHEF_BOOTSTRAP 'role[ceph-bootstrap]'
-  knife node environment set $CEPH_CHEF_BOOTSTRAP $ENVIRONMENT
+  knife node environment set $CEPH_CHEF_BOOTSTRAP {{ environment }}
   knife tag create $CEPH_CHEF_BOOTSTRAP 'ceph-bootstrap'
 
   sudo chef-client -o 'recipe[cepheus::build-env]'
@@ -222,7 +222,7 @@ else
   /ceph-host/bootstrap/data/environment/common/scripts/chef_tags_create.sh
 
   # Make sure the production environment is always set
-  /ceph-host/bootstrap/data/environment/common/scripts/chef_environment_nodes.sh $ENVIRONMENT
+  /ceph-host/bootstrap/data/environment/common/scripts/chef_environment_nodes.sh {{ environment }}
 
   # Update run_lists
   /ceph-host/bootstrap/data/environment/common/scripts/chef_runlists_update.sh
