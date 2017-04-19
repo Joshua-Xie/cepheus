@@ -107,7 +107,7 @@ git_clone_or_update() {
   fi
 }
 
-{% if method == "pxe" %}
+{% if pxe_boot.enable %}
 # Obtain an RHEL 7.2 image to be used for PXE booting in production.
 echo "====> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
@@ -119,12 +119,12 @@ if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   fi
 fi
 
-if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
+# if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   download_file {{ cache.pxe_boot }}/{{ cache.loader }}/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
   download_file {{ cache.pxe_boot }}/{{ cache.loader }}/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
   download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
   download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
-fi
+# fi
 {% endif %}
 
 echo "====> Downloading Chef..."

@@ -9,7 +9,7 @@ ISO:
 # This data will not show up in the final Chef environment.json file unless `method` is set to 'pxe'
 pxe_boot:
     # This enable flag is present for those installations that are pxe_booting but want to turn it off
-    enable: true
+    enable: false
     web_user: cobbler
     environment: vagrant
     interface: enp0s3

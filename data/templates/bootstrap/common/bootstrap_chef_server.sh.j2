@@ -110,9 +110,11 @@ sudo cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
 cd $HOME/cepheus/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
 cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
 
-{%- if pxe_boot.enable %}
+{% if pxe_boot.enable %}
 # NOTE: *HAVE* to load the files into files/ before cookbook upload
-sudo cp $REPO_ROOT_FILES/cobbler/loaders/* $HOME/cepheus/cookbooks/cepheus/files/loaders
+if [[ -d $REPO_ROOT_FILES/cobbler ]]; then
+    sudo cp $REPO_ROOT_FILES/cobbler/loaders/* $HOME/cepheus/cookbooks/cepheus/files/loaders
+fi
 {% endif %}
 
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus

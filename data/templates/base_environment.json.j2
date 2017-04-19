@@ -266,7 +266,7 @@
           {%- endfor %}
       ],
 
-      {% if method == "pxe" %}
+      {% if pxe_boot.enable %}
       "pxe_boot": {
         "enable": {%- if pxe_boot.enable == True %}true,{% else %}false,{%- endif %}
         "web_user": "{{ pxe_boot.web_user }}",

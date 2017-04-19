@@ -33,7 +33,7 @@ export BOOTSTRAP_HTTPS_PROXY=${BOOTSTRAP_HTTPS_PROXY:-}
 
 export BOOTSTRAP_CACHE_DIR=${BOOTSTRAP_CACHE_DIR:-{{ cache.base }}}
 
-{%- if method == "pxe" %}
+{%- if pxe_boot.enable %}
 # NB: The name of the cobbler distro that must match node['cepheus']['pxe_boot']['os']['distro']
 # NB: These are still used in places and only for PXE booting method
 
