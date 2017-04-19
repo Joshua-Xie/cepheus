@@ -21,6 +21,10 @@ organization:
     name: LambdaStack
     url: http://lambdastack.io
 
+build:
+    # Where the clone of https://github.com/cepheus-io/cepheus-build is located
+    cepheus: cepheus-build
+
 # NB: Chef client/server data that is OS specific is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
 # NB: Basic Chef info is found in the envrionment.yaml file.
 
@@ -55,7 +59,7 @@ ceph_chef: # (required file - cookbook - for build)
 
 # Cache directories in the format of base/{cookbook,gem...}
 cache:
-    # OSX version will sudo
+    repo: /ceph-host
     base: /ceph-files
     # NB: If `download` is true then call bootstrap_prereqs.sh else `commands`
     download: true
