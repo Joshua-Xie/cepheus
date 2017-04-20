@@ -101,13 +101,14 @@ fi
 mkdir -p /home/{{ primary_user.name }}/cepheus
 cp -rp $TMP_REPO_ROOT/. /home/{{ primary_user.name }}/cepheus
 
-echo "====> Move files to {{ cache.repo }}..."
-if [[ -d {{ cache.repo }} ]]; then
-    sudo rm -rf {{ cache.repo }}
-fi
-sudo mkdir -p {{ cache.repo }}
-sudo cp -rp $TMP_REPO_ROOT/. {{ cache.repo }}
-sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
+# IMPORTANT - Remove this after testing cepheus_build_update.sh...
+# echo "====> Move files to {{ cache.repo }}..."
+# if [[ -d {{ cache.repo }} ]]; then
+#     sudo rm -rf {{ cache.repo }}
+# fi
+# sudo mkdir -p {{ cache.repo }}
+# sudo cp -rp $TMP_REPO_ROOT/. {{ cache.repo }}
+# sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
 
 # Remove the temp build repo
 rm -rf $HOME/{{ build.cepheus }}

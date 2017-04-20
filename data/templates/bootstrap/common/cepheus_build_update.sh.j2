@@ -36,22 +36,6 @@ CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 OWNER={{ primary_user.name }}
 GROUP={{ primary_user.group }}
 
-# ENVIRONMENT=$1
-#
-# if [[ -z $ENVIRONMENT ]]; then
-#   echo "MUST pass in an environment: production, staging, lab"
-#   exit 1
-# fi
-#
-# if [[ "production" == $ENVIRONMENT || "staging" == $ENVIRONMENT || "lab" == $ENVIRONMENT ]]; then
-#   echo
-#   echo "Using environment: $ENVIRONMENT"
-#   echo
-# else
-#   echo "MUST pass in an environment: production, staging, lab, dev or whatever you wish to call it."
-#   exit 1
-# fi
-
 if [[ -d $WORK_DIR ]]; then
   rm -rf $WORK_DIR
 fi
@@ -67,7 +51,7 @@ git config --global credential.helper 'cache --timeout=25'
 # IMPORTANT: NEVER push ONLY pull/clone
 # Pull down (public) cepheus (cepheus-public-staging)
 
-{% for item in staging_process %}
+{% for item in staging.process %}
 # {{ item.comment }}
 {%- if item.command %}
 {{ item.command }}
@@ -77,29 +61,18 @@ git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}
 
 {%- endfor %}
 
-# Pull down (public) ceph-chef (ceph-chef-public-staging)
-# git clone https://github.com/ceph/ceph-chef.git $WORK_DIR/ceph-chef-public-staging
-
-# Pull down (private) cepheus (cepheus-private-staging)
-# git clone https://github.com/cepheus-io/cepheus.git $WORK_DIR/cepheus-private-staging
-
-# Pull down (private) data (cepheus-data-staging)
-# git clone https://github.com/cepheus-io/cepheus-data.git $WORK_DIR/cepheus-data-staging
-
-# Pull down (private) files (cepheus-files-staging)
-# This can be pulled from anywhere (git, object-storage, artifactory or anything holding your dependencies)
-# git clone https://github.com/cepheus-io/cepheus-files.git $WORK_DIR/cepheus-files-staging
-
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
 {% if primary_user.backup.enable %}
 if [[ -d "/opt/opscode/" ]]; then
-    {% if primary_user.backup.remote.enable %}
-    # Call the backup and rsync script
-    ./cepheus_backup_rsync.sh $DATE $VERSION
-    {% else %}
-    # Call the backup
-    ./cepheus_backup_no_rsync.sh $DATE $VERSION
-    {% endif %}
+    if [[ -d $REPO_ROOT ]]; then
+        {% if primary_user.backup.remote.enable %}
+        # Call the backup and rsync script
+        source $REPO_ROOT/cepheus_backup_rsync.sh $DATE $VERSION
+        {% else %}
+        # Call the backup
+        source $REPO_ROOT/cepheus_backup_no_rsync.sh $DATE $VERSION
+        {% endif %}
+    fi
 fi
 {% endif %}
 
@@ -107,10 +80,10 @@ fi
 cp -r $WORK_DIR/cepheus/* $WORK_DIR/cepheus-staging/
 
 # Update the scripts themselves
-cp -p $WORK_DIR/cepheus-data/*.sh $HOME/.
+# cp -p $WORK_DIR/cepheus-data/*.sh $HOME/.
 
 # Remove script from data area since it was copied to $OWNER/$GROUP home above
-rm -f $WORK_DIR/cepheus-data/cepheus_*.sh
+# rm -f $WORK_DIR/cepheus-data/cepheus_*.sh
 
 # Copy data over staging
 cp -r $WORK_DIR/cepheus-data/* $WORK_DIR/cepheus-staging/
@@ -118,7 +91,7 @@ cp -r $WORK_DIR/cepheus-data/* $WORK_DIR/cepheus-staging/
 # Remove unneeded directories and files
 rm -rf $WORK_DIR/cepheus
 rm -rf $WORK_DIR/cepheus-data
-rm -f $WORK_DIR/cepheus-staging/environments/*.json
+# rm -f $WORK_DIR/cepheus-staging/environments/*.json
 
 echo "====> Clean staging process directories..."
 # Clean up staging process directories if they exist
@@ -127,6 +100,7 @@ echo "====> Clean staging process directories..."
 set +e
 # Only if Chef has been installed which means ansible is loaded and host files exist
 if [[ -d "/opt/opscode/" ]]; then
+    # Nodes may not exist during initial build so it's ok to fail...
     ansible all -m shell -a "sudo rm -rf $REPO_ROOT"
     ansible all -m shell -a "sudo rm -rf $REPO_ROOT_FILES"
 fi
@@ -146,17 +120,24 @@ fi
 cp -r $WORK_DIR/cepheus-staging/* $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
 
-# Update /ceph-files/ (supporting files - dependencies)
-# Create dir even though it may already exist
+
+####
+# NB: This process may seem a little odd at first depending on the environment. For Vagrant the commands above 'cp'
+# to the cepheus-staging because it pulls in the dependencies via the bootstrap_prereqs.sh. However, other environments
+# may pull in from internal github or artifactory or something else. So, this makes sure it gets filled. May change later.
+# Update {{ cache.base }}/ (supporting files - dependencies)
 sudo mkdir -p $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
-
+#
 if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
     sudo rm -rf $REPO_ROOT_FILES/*
 fi
-
+#
 cp -r $WORK_DIR/cepheus-files/* $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
+#
+####
+
 
 # Build...
 echo "====> Building from templates..."
@@ -164,93 +145,79 @@ echo "====> Building from templates..."
 # Build from template
 {%- for item in build_update_files %}
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.input }} -o {{ item.output }}
+# NB: Pass through template_engine twice
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.output }} -o {{ item.output }}
 {% endfor %}
 
-# /ceph-host/bootstrap/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$ENVIRONMENT/$CLUSTER/base-seed.yaml -i /ceph-host/bootstrap/templates/base_environment.json.j2 -o /ceph-host/environments/base_environment.json.j2
-# /ceph-host/bootstrap/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$ENVIRONMENT/$CLUSTER/base-seed.yaml -i /ceph-host/bootstrap/templates/operations.pub.j2 -o /ceph-host/cookbooks/cepheus/files/default/operations.pub
-# /ceph-host/bootstrap/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$ENVIRONMENT/$CLUSTER/base-seed.yaml -i /ceph-host/bootstrap/templates/cepheus_node_rhel_nonosd.ks.erb.j2 -o /ceph-host/cookbooks/cepheus/templates/default/cepheus_node_rhel_nonosd.ks.erb
-# /ceph-host/bootstrap/templates/jinja_render.py -d /ceph-host/bootstrap/data/environment/$ENVIRONMENT/$CLUSTER/base-seed.yaml -i /ceph-host/bootstrap/templates/cepheus_node_rhel_osd.ks.erb.j2 -o /ceph-host/cookbooks/cepheus/templates/default/cepheus_node_rhel_osd.ks.erb
+# Sync $HOME/cepheus with {{ cache.repo }}
+sudo rm -rf $HOME/cepheus/*
+cp -rp $REPO_ROOT/* $HOME/cepheus
 
+# Add the dependency cookbooks from the file cache
+echo "====> Checking on dependency for cookbooks..."
+cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
 
-# Install Chef if not installed. Parts of the below code will be duplicated but will be removed later...
-if [[ ! -d "/opt/opscode/" ]]; then
-    mkdir -p $HOME/cepheus
-    source $REPO_ROOT/bootstrap/common/bootstrap_chef.sh
+# Make sure it's {{ primary_user.name }} as owner:group
+sudo chown -R $OWNER:$GROUP $HOME/cepheus
 
-    # NOTE: The chef server *MUST* install and the bootstrap server chef-client must complete with no issues first!
-else
-  # NOTE: This update should not be executed until *ALL* nodes have been bootstrapped via cobbler kickstart!
-  # If this section runs before all nodes have been bootstrapped then it will error out during the set of commands
-  # after the chef build-env recipe is ran!!
+cd $HOME/cepheus/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
+cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
 
-  # Sync $HOME/cepheus with /ceph-host
-  sudo rm -rf $HOME/cepheus/*
-  cp -r $REPO_ROOT/* $HOME/cepheus
+# Make sure it's {{ primary_user.name }} as owner:group
+sudo chown -R $OWNER:$GROUP $HOME/cepheus
 
-  # Add the dependency cookbooks from the file cache
-  echo "====> Checking on dependency for cookbooks..."
-  cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
+# Override ceph-chef with ceph-chef-staging. This will override an existing 'ceph-chef' package that may already exist.
+mkdir -p $HOME/cepheus/cookbooks/ceph-chef
+cp -r $WORK_DIR/ceph-chef-staging/* $HOME/cepheus/cookbooks/ceph-chef
 
-  # Make sure it's operations as owner:group
-  sudo chown -R $OWNER:$GROUP $HOME/cepheus
+# Update chef info
+knife cookbook upload -a
+cd $HOME/cepheus/roles && knife role from file *.json
+cd $HOME/cepheus/environments && knife environment from file {{ environment }}.json
 
-  cd $HOME/cepheus/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
-  cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
+# Add Chef tags
+# NOTE: run_list *set* replaces any run_list that may have already been there before
+knife node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
+knife node environment set {{ bootstrap.name }} {{ environment }}
+knife tag create {{ bootstrap.name }} 'ceph-bootstrap'
 
-  # Make sure it's operations as owner:group
-  sudo chown -R $OWNER:$GROUP $HOME/cepheus
+sudo chef-client -o 'recipe[cepheus::build-env]'
 
-  # Override ceph-chef with ceph-chef-staging
-  mkdir -p $HOME/cepheus/cookbooks/ceph-chef
-  cp -r $WORK_DIR/ceph-chef-staging/* $HOME/cepheus/cookbooks/ceph-chef
+# Update Chef tags
+/ceph-host/bootstrap/data/environment/common/scripts/chef_tags_delete.sh
+/ceph-host/bootstrap/data/environment/common/scripts/chef_tags_create.sh
 
-  # Update chef info
-  knife cookbook upload -a
-  cd $HOME/cepheus/roles && knife role from file *.json
-  cd $HOME/cepheus/environments && knife environment from file {{ environment }}.json
+# Make sure the production environment is always set
+/ceph-host/bootstrap/data/environment/common/scripts/chef_environment_nodes.sh {{ environment }}
 
-  # Add Chef tags
-  # NOTE: run_list *set* replaces any run_list that may have already been there before
-  knife node run_list set $CEPH_CHEF_BOOTSTRAP 'role[ceph-bootstrap]'
-  knife node environment set $CEPH_CHEF_BOOTSTRAP {{ environment }}
-  knife tag create $CEPH_CHEF_BOOTSTRAP 'ceph-bootstrap'
+# Update run_lists
+/ceph-host/bootstrap/data/environment/common/scripts/chef_runlists_update.sh
 
-  sudo chef-client -o 'recipe[cepheus::build-env]'
+# Update bootstrap node
+##################
+# Tmp comment out for testing...
+sudo chef-client
 
-  # Update Chef tags
-  /ceph-host/bootstrap/data/environment/common/scripts/chef_tags_delete.sh
-  /ceph-host/bootstrap/data/environment/common/scripts/chef_tags_create.sh
+logger -t CepheusBackup "Cepheus Chef Server updated to latest packages - $VERSION-$DATE"
 
-  # Make sure the production environment is always set
-  /ceph-host/bootstrap/data/environment/common/scripts/chef_environment_nodes.sh {{ environment }}
+# Make sure tmp files are present for cookbooks
+# Hack around gem issue - one of Chef's bad things...
+# NB: Fix in future - Should only run these ansible runs *IF* nodes exists but for now it's ok if they fail on intial run...
+set +e
+{% for item in ceph_chef.gems %}
+ansible all -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item.name }}-{{ item.version }}.gem dest=/tmp/{{ item.name }}-{{ item.version }}.gem owner=$OWNER"
+{% endfor %}
 
-  # Update run_lists
-  /ceph-host/bootstrap/data/environment/common/scripts/chef_runlists_update.sh
+# Backup ALL important configs, keys etc
+# I have seen this sometimes hang - maybe due to doing a number of crush map gets which means it needs to be
+# optimized to only get configs for each of the node groups since the configs are the same for all in that group and
+# then maybe store the backup on the boostrap as well as the primary node in the given group. Until then, it's OK to ctrl-c out of it.
 
-  # Update bootstrap node
-  ##################
-  # Tmp comment out for testing...
-  sudo chef-client
+ansible {{ inventory.ceph.backup.primary.mon }},{{ inventory.ceph.backup.primary.osd }},{{ inventory.ceph.backup.primary.rgw }} -m shell -a "sudo /etc/ceph/scripts/ceph_backup_files.sh $VERSION $DATE"
+set -e
+##################
 
-  logger -t CepheusBackup "Cepheus Chef Server updated to latest packages - $VERSION-$DATE"
-
-  # Make sure tmp files are present for cookbooks
-  # Hack around gem issue - one of Chef's bad things...
-  {% for item in ceph_chef.gems %}
-  ansible all -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item.name }}-{{ item.version }}.gem dest=/tmp/{{ item.name }}-{{ item.version }}.gem owner=$OWNER"
-  {% endfor %}
-
-  # Backup ALL important configs, keys etc
-  # I have seen this sometimes hang - maybe due to doing a number of crush map gets which means it needs to be
-  # optimized to only get configs for each of the node groups since the configs are the same for all in that group and
-  # then maybe store the backup on the boostrap as well as the primary node in the given group. Until then, it's OK to ctrl-c out of it.
-
-  ansible {{ inventory.ceph.backup.primary.mon }},{{ inventory.ceph.backup.primary.osd }},{{ inventory.ceph.backup.primary.rgw }} -m shell -a "sudo /etc/ceph/scripts/ceph_backup_files.sh $VERSION $DATE"
-
-  ##################
-
-  # Now you can run chef-client on the nodes
-fi
+# Now you can run chef-client on the nodes
 
 # Remove tmp working directory
 rm -rf $WORK_DIR
