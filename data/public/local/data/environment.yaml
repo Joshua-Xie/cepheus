@@ -95,7 +95,8 @@ staging_process:
         comment: "Cepheus files are basically dependencies. This can be a git repo, object-storage or whatever. Just make sure the data is fed into 'output'"
         repo: ""
         branch: ""
-        command: "cp -r $HOME/.cepheus-cache/ $WORK_DIR/cepheus-files-staging"
+        # NB: When you embed template code the output must pass through template_engine two times.
+        command: "cp -rp {{ cache.base }}/ $WORK_DIR/cepheus-files-staging"
         layer: 5
     -   output: "$WORK_DIR/cepheus-data-staging"
         comment: "Private data. This one is public but should be private for production envrionments"

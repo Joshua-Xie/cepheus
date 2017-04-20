@@ -25,7 +25,7 @@ set -e
 REPO_ROOT={{ cache.repo }}
 REPO_ROOT_FILES={{ cache.base }}
 
-WORK_DIR=/tmp/cepheus-tmp
+WORK_DIR={{ build.work_dir }}
 DATE=$(date +%Y-%m-%d_%H%M%S)
 VERSION={{ version }}
 
@@ -69,13 +69,13 @@ git config --global credential.helper 'cache --timeout=25'
 
 {% for item in staging_process %}
 # {{ item.comment }}
-{% if item.command %}
-source {{ item.command }}
+{%- if item.command %}
+{{ item.command }}
 {% else %}
 git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}
-{% endif %}
+{%- endif %}
 
-{% endfor %}
+{%- endfor %}
 
 # Pull down (public) ceph-chef (ceph-chef-public-staging)
 # git clone https://github.com/ceph/ceph-chef.git $WORK_DIR/ceph-chef-public-staging

@@ -35,6 +35,8 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 
 echo "====> Generating {{ item }}..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+# NB: Passes through template_engine twice
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {%- endfor %}

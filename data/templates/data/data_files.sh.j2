@@ -34,6 +34,9 @@ sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment
 # Pass the data files through the template engine first.
 echo "====> Data_files being processed..."
 
+# NOTE: Take a look at running these through the template_engine twice!!!!!!
+# TODO: Check files...
+
 {%- for item in data_files %}
 # Check data center folder first else use location specific version...
 if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} ]]; then
@@ -75,6 +78,8 @@ echo "====> Environment_files being processed..."
 
 echo "====> Generating {{ item }}..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+# NB: Run through template_engine twice
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {%- endfor %}
@@ -85,6 +90,8 @@ echo "====> Cookbooks_files being processed..."
 
 echo "====> Generating {{ item }}..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+# NB: Run through template_engine twice
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {%- endfor %}

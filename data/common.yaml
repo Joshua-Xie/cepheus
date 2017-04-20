@@ -15,7 +15,7 @@
 # 'method' can only be `repo` or `pxe`. If `pxe` then the 'pxe_boot' section of the given OS yaml is used.
 method: repo
 
-version: 1.1.1
+version: 1.1.2
 
 organization:
     name: LambdaStack
@@ -24,6 +24,8 @@ organization:
 build:
     # Where the clone of https://github.com/cepheus-io/cepheus-build is located
     cepheus: cepheus-build
+    # Working directory where layering occurs.
+    work_dir: /tmp/cepheus
 
 # NB: Chef client/server data that is OS specific is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
 # NB: Basic Chef info is found in the envrionment.yaml file.
