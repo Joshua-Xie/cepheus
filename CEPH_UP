@@ -53,11 +53,12 @@ export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
 export BUILD_OS=centos
 export BUILD_UPDATE=1
+export BUILD_TEMPLATES_ONLY=0
 
 # NB: May want to add an option for 'build' or 'update' so only the template_engine runs and the files can then be
 # uploaded to Chef for management.
 
-while getopts cbglrsvu:n:e:d:p:o:t: opt; do
+while getopts cbglrsvzu:n:e:d:p:o:t: opt; do
     case $opt in
         b)
             # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
@@ -140,6 +141,10 @@ while getopts cbglrsvu:n:e:d:p:o:t: opt; do
             # (optional) Verbose of `bash` commands - not Chef output
             set -x
             ;;
+        z)
+            # Only run everything through the template_engine
+            export BUILD_TEMPLATES_ONLY=1
+            ;;
     esac
 done
 
@@ -196,6 +201,11 @@ source $REPO_ROOT/$BUILD_INIT_UPDATE
 # Build environments file for Chef
 echo "====> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
+
+if [[ $BUILD_TEMPLATES_ONLY -ne 0 ]]; then
+    echo "====> Built templates only..."
+    exit 0
+fi
 
 # Configure and test any proxies configured.
 if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then

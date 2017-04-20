@@ -73,7 +73,9 @@ staging:
             comment: "Public Cepheus repo"
             repo: https://github.com/cepheus-io/cepheus.git
             branch: master
-            command: ""
+            command: |
+                # This will only build the templates (scripts)
+                $WORK_DIR/cepheus-public-staging/CEPH_UP -z
             layer: 1
         -   output: "$WORK_DIR/cepheus-private-staging"
             comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
@@ -97,9 +99,10 @@ staging:
             comment: "Cepheus files are basically dependencies. This can be a git repo, object-storage or whatever. Just make sure the data is fed into 'output'"
             repo: ""
             branch: ""
+            # NB: The below $ variables are present in the script this will go in so keep that in mind. Need to create global vars.
             command: |
                 echo "====> Downloading necessary files to local cache..."
-                source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
+                source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh
                 cp -rp {{ cache.base }}/ $WORK_DIR/cepheus-files-staging
             layer: 5
         -   output: "$WORK_DIR/cepheus-data-staging"

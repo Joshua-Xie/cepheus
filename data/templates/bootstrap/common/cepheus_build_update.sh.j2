@@ -50,13 +50,15 @@ git config --global credential.helper 'cache --timeout=25'
 
 # IMPORTANT: NEVER push ONLY pull/clone
 # Pull down (public) cepheus (cepheus-public-staging)
+# If the repo exists it will processed first and then the commands if they exists.
 
 {% for item in staging.process %}
 # {{ item.comment }}
-{%- if item.command %}
-{{ item.command }}
-{% else %}
+{%- if item.repo %}
 git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}
+{% endif %}
+{% if item.command %}
+{{ item.command }}
 {%- endif %}
 
 {%- endfor %}
