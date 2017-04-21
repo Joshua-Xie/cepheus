@@ -84,18 +84,18 @@ if [[ -z $chef_server ]]; then
 
     sudo chef-server-ctl reconfigure
 
-    set +e
-    sudo chef-server-ctl user-show {{ chef.admin.user }} 2>/dev/null
-    set -e
-    if [[ $? -ne 0 ]]; then
+    # set +e
+    # sudo chef-server-ctl user-show {{ chef.admin.user }} 2>/dev/null
+    # set -e
+    # if [[ $? -ne 0 ]]; then
         sudo chef-server-ctl user-create {{ chef.admin.user }} {{ chef.admin.user }} {{ chef.admin.user }} {{ chef.admin.email }} welcome --filename /etc/opscode/{{ chef.admin.pem }}
-    fi
-    set +e
-    sudo chef-server-ctl org-show {{ chef.org }} 2>/dev/null
-    set -e
-    if [[ $? -ne 0 ]]; then
+    # fi
+    # set +e
+    # sudo chef-server-ctl org-show {{ chef.org }} 2>/dev/null
+    # set -e
+    # if [[ $? -ne 0 ]]; then
         sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association admin # {# --filename /etc/opscode/{{ chef.validator }}.pem #}
-    fi
+    # fi
 
     # sudo chmod 0644 /etc/opscode/{{ chef.admin.pem }} /etc/opscode/{{ chef.validator }}.pem
 fi
