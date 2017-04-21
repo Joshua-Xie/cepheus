@@ -175,17 +175,20 @@ if [[ $CEPH_DEV_MODE -ne 0 ]]; then
 fi
 
 # Python
+echo "====> Downloading Python based dependencies..."
 # NB: If this section is empty it means that no python 'pip like' dependency was asked for so the template_engine skipped it.
 {%- for item in python %}
 download_file /python/{{ item.name }}-{{ item.verion }}.tar.gz {{ item.url }}{%- if item.inline %}{{ item.name }}-{{ item.version }}.tar.gz{%- endif %}
 {%- endfor %}
 
 # Cookbooks
+echo "====> Downloading Cookbook dependencies..."
 {%- for item in cookbooks %}
 download_file {{ cache.cookbook }}/{{ item.name }}-{{ item.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/{{ item.name }}/versions/{{ item.version }}/download
 {%- endfor %}
 
 # Gems
+echo "====> Downloading GEM dependencies..."
 # REQUIRED for ceph-chef cookbook - must be installed before doing 'sudo chef-client' on any node
 {%- for item in ceph_chef.gems %}
 download_file {{ cache.gem }}/{{ item.name }}-{{ item.version }}.gem https://rubygems.org/downloads/{{ item.name }}-{{ item.version }}.gem
@@ -200,3 +203,6 @@ done
 
 # Pull knife-acl gem. This is ONLY needed if using data bags where the data bag is created with a recipe!
 download_file {{ cache.gem }}/knife-acl-{{ chef_repo.knife_acl_version }}.gem https://rubygems.global.ssl.fastly.net/gems/knife-acl-{{ chef_repo.knife_acl_version }}.gem
+
+echo "====> Completed bootstrap_prereqs.sh. Success!"
+echo
