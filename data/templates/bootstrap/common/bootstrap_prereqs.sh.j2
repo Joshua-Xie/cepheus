@@ -151,13 +151,16 @@ set -e
 
 {%- if ceph_chef.debug %}
 
-# Remove it so it's not used.
+# Remove it so it's not used - ONLY if the directories exists else skip it because that means it will be handled differently later.
 echo "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
-rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
+if [[ -d {{ cache.base }}/{{ cache.cookbook }} ]]; then
+    rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
+fi
 # Clone to cookbook area
-rm -rf $REPO_ROOT/cookbooks/ceph-chef
-git clone -b {{ ceph_chef.git.branch }} {{ ceph_chef.git.url }}/{{ ceph_chef.git.repo }} $REPO_ROOT/cookbooks/ceph-chef
-
+if [[ -d $REPO_ROOT/cookbooks/ceph-chef ]]; then
+    rm -rf $REPO_ROOT/cookbooks/ceph-chef
+    git clone -b {{ ceph_chef.git.branch }} {{ ceph_chef.git.url }}/{{ ceph_chef.git.repo }} $REPO_ROOT/cookbooks/ceph-chef
+fi
 {% else %}
 
 echo "====> Downloading ceph-chef..."
