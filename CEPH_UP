@@ -58,7 +58,7 @@ export BUILD_TEMPLATES_ONLY=0
 # NB: May want to add an option for 'build' or 'update' so only the template_engine runs and the files can then be
 # uploaded to Chef for management.
 
-while getopts cbglrsvzu:n:e:d:p:o:t: opt; do
+while getopts cbglrsvu:n:e:d:p:o:t:z: opt; do
     case $opt in
         b)
             # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
@@ -144,6 +144,10 @@ while getopts cbglrsvzu:n:e:d:p:o:t: opt; do
         z)
             # Only run everything through the template_engine
             export BUILD_TEMPLATES_ONLY=1
+            # If no argument then keep the existing one
+            if [[ ! -z $OPTARG ]]; then
+                export REPO_ROOT=$OPTARG
+            fi
             ;;
     esac
 done
