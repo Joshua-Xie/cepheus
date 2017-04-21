@@ -29,7 +29,8 @@ if [[ -z $TMP_REPO_ROOT ]]; then
 fi
 
 # Check for running Chef Server. Could do update of server here.
-if [[ which chef-server-ctl >/dev/null ]]; then
+sudo which chef-server-ctl 2>/dev/null
+if [[ $? -eq 0 ]]; then
     # Now check for everything running to make sure
     sudo chef-server-ctl status
     if [[ $? -eq 0 ]]; then
