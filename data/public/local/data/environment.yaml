@@ -75,8 +75,8 @@ staging:
             branch: master
             command: |
                 # This will only build the templates (scripts)
-                echo "====> Calling CEPH_UP -z"
-                $HOME/cepheus/CEPH_UP -z
+                echo "====> Calling CEPH_UP -z $HOME/cepheus"
+                $HOME/cepheus/CEPH_UP -z $HOME/cepheus
             layer: 1
         -   output: "$WORK_DIR/cepheus-private-staging"
             comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
