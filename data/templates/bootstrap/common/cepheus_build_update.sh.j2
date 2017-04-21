@@ -122,9 +122,9 @@ if [[ $(ls -A {{ cache.repo }}) ]]; then
     sudo rm -rf $REPO_ROOT/*
 fi
 
+echo "====> Copying data to $REPO_ROOT..."
 cp -rp $WORK_DIR/cepheus-public-staging/* $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
-
 
 ####
 # NB: This process may seem a little odd at first depending on the environment. For Vagrant the commands above 'cp'
@@ -138,6 +138,7 @@ if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
     sudo rm -rf $REPO_ROOT_FILES/*
 fi
 #
+echo "====> Copying files to $REPO_ROOT_FILES..."
 cp -r $WORK_DIR/cepheus-files-staging/* $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
 #
@@ -148,12 +149,19 @@ echo "====> Building from templates..."
 
 # Build from template
 {%- for item in build_update_files %}
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.input }} -o {{ item.output }}
+{% if item.sudo %}
+SUDO=sudo
+{% else %}
+SUDO=
+{% endif %}
+echo {{ item.echo }}
+$SUDO $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.input }} -o {{ item.output }}
 # NB: Pass through template_engine twice
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.output }} -o {{ item.output }}
+$SUDO $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.output }} -o {{ item.output }}
 {% endfor %}
 
 # Sync $HOME/cepheus with {{ cache.repo }}
+echo "====> Syncing $REPO_ROOT and $HOME/cepheus..."
 sudo rm -rf $HOME/cepheus/*
 cp -rp $REPO_ROOT/* $HOME/cepheus
 

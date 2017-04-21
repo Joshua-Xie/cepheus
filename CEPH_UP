@@ -208,6 +208,7 @@ $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BU
 
 if [[ $BUILD_TEMPLATES_ONLY -ne 0 ]]; then
     echo "====> Built templates only..."
+    echo
     exit 0
 fi
 
@@ -250,3 +251,6 @@ source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
 
 echo "====> Calling cepheus_build_update.sh..."
 source $TMP_REPO_ROOT/bootstrap/common/cepheus_build_update.sh
+
+echo "====> Complete!"
+echo
