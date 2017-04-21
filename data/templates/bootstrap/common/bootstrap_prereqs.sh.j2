@@ -149,6 +149,7 @@ set -e
 #   rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
 # fi
 
+{# Don't want debug enabled on initial build out or ceph-chef may not get uploaded!! #}
 {%- if ceph_chef.debug %}
 
 # Remove it so it's not used - ONLY if the directories exists else skip it because that means it will be handled differently later.

@@ -36,7 +36,8 @@ build:
 ceph_chef: # (required file - cookbook - for build)
     version: 1.1.15
     # If debug is false then use the supermarket version of ceph-chef else use github version
-    debug: true
+    # NB: For the initial build out *make* sure debug is 'false'
+    debug: false
     git:
         github: true
         url: https://github.com/
