@@ -47,6 +47,7 @@ export BOOTSTRAP_GET_PREREQS_ONLY=0
 export BOOTSTRAP_REMOVE_PREREQS=0
 export BOOTSTRAP_HTTP_PROXY=
 export BOOTSTRAP_HTTPS_PROXY=
+export BOOTSTRAP_INIT=0
 export BUILD_VMS_ONLY=0
 export BUILD_ENVIRONMENT=vagrant
 export BUILD_LOCATION=public
@@ -61,9 +62,8 @@ export BUILD_TEMPLATES_ONLY=0
 while getopts cbglrsvu:n:e:d:p:o:t:z: opt; do
     case $opt in
         b)
-            # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
-            # to help save some time.
-            export BUILD_VMS_ONLY=1
+            # (required) MUST call this first. It will bootstrap Chef Server and support items
+            export BOOTSTRAP_INIT=1
             ;;
         c)
             # (optional) Allows you to see Chef output that only happens when Chef debug flags are set.
@@ -138,8 +138,9 @@ while getopts cbglrsvu:n:e:d:p:o:t:z: opt; do
             export BUILD_UPDATE=$OPTARG
             ;;
         v)
-            # (optional) Verbose of `bash` commands - not Chef output
-            set -x
+            # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
+            # to help save some time.
+            export BUILD_VMS_ONLY=1
             ;;
         z)
             # Only run everything through the template_engine
@@ -235,22 +236,24 @@ fi
 # 0 then only the other options will be applied. If BUILD_UPDATE is 2 then the vagrant vms will be built and the cepheus
 # environment will automatically get built to make things easier. Or, you can set $BUILD_UPDATE to 1 and then it will only
 # build the vagrant vms and then prepare the bootstrap for building out the other cluster like in a production environment.
-if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -ne 0 ]]; then
-    cd $REPO_ROOT/bootstrap/vms/vagrant
-    ./CEPH_UP_VAGRANT
-    exit 0
+if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
+    if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -ne 0 ]]; then
+        cd $REPO_ROOT/bootstrap/vms/vagrant
+        ./CEPH_UP_VAGRANT
+        exit 0
+    fi
+else
+    # Build out or update the given environment.
+    echo "====> Calling cepheus_bootstrap_init.sh..."
+    sudo $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
+
+    echo "====> Calling bootstrap_chef_server.sh..."
+    TMP_REPO_ROOT=$REPO_ROOT
+    # Just a safe check because this part can fail and be fine.
+    set +e
+    source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
+    set -e
 fi
-
-# Build out or update the given environment.
-echo "====> Calling cepheus_bootstrap_init.sh..."
-sudo $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
-
-echo "====> Calling bootstrap_chef_server.sh..."
-TMP_REPO_ROOT=$REPO_ROOT
-# Just a safe check because this part can fail and be fine.
-set +e
-source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
-set -e
 
 echo "====> Calling cepheus_build_update.sh..."
 source $TMP_REPO_ROOT/bootstrap/common/cepheus_build_update.sh
