@@ -103,7 +103,7 @@ staging:
             # NB: The below $ variables are present in the script this will go in so keep that in mind. Need to create global vars.
             command: |
                 echo "====> Downloading necessary files to local cache..."
-                source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh
+                source $HOME/cepheus/bootstrap/common/bootstrap_prereqs.sh
                 cp -rp {{ cache.base }}/ $WORK_DIR/cepheus-files-staging
             layer: 5
         -   output: "$WORK_DIR/cepheus-data-staging"
