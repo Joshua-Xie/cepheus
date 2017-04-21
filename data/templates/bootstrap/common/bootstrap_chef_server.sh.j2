@@ -28,6 +28,17 @@ if [[ -z $TMP_REPO_ROOT ]]; then
     exit 1
 fi
 
+# Check for running Chef Server. Could do update of server here.
+if [[ which chef-server-ctl >/dev/null ]]; then
+    # Now check for everything running to make sure
+    sudo chef-server-ctl status
+    if [[ $? -eq 0 ]]; then
+        echo "====> Found running Chef Server so no bootstrapping..."
+        echo
+        exit 0
+    fi
+fi
+
 {% if os.type == "rhel" %}
 # To make this less steps go ahead do a yum update first
 echo "====> Checking subscription-manager..."
@@ -43,9 +54,6 @@ fi
 mv $HOME/.ssh/id_rsa $HOME/.ssh/id_rsa.tmp
 
 set -e
-
-# export CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
-# export CEPH_CHEF_BOOTSTRAP_IP={{ bootstrap.ip }}
 
 # base.sh sets REPO_ROOT...
 source $TMP_REPO_ROOT/bootstrap/common/base.sh
@@ -75,12 +83,22 @@ if [[ -z $chef_server ]]; then
 
     sudo chef-server-ctl reconfigure
 
-    # May want to add check for user and org before attempting to create them since if they exist already it will trigger an exit from this script.
-    sudo chef-server-ctl user-create {{ chef.admin.user }} {{ chef.admin.user }} {{ chef.admin.user }} {{ chef.admin.email }} welcome --filename /etc/opscode/{{ chef.admin.pem }}
-    sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association admin # {# --filename /etc/opscode/{{ chef.validator }}.pem #}
+    set +e
+    sudo chef-server-ctl user-show {{ chef.admin.user }} 2>/dev/null
+    set -e
+    if [[ $? -ne 0 ]]; then
+        sudo chef-server-ctl user-create {{ chef.admin.user }} {{ chef.admin.user }} {{ chef.admin.user }} {{ chef.admin.email }} welcome --filename /etc/opscode/{{ chef.admin.pem }}
+    fi
+    set +e
+    sudo chef-server-ctl org-show {{ chef.org }} 2>/dev/null
+    set -e
+    if [[ $? -ne 0 ]]; then
+        sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association admin # {# --filename /etc/opscode/{{ chef.validator }}.pem #}
+    fi
 
     # sudo chmod 0644 /etc/opscode/{{ chef.admin.pem }} /etc/opscode/{{ chef.validator }}.pem
 fi
+# NB: May want to think of updating Chef Server here...
 ####
 
 echo "====> Creating $HOME/.chef environment..."

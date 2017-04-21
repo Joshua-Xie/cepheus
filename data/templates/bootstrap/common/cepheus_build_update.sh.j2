@@ -172,6 +172,7 @@ cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
 # Make sure it's {{ primary_user.name }} as owner:group
 sudo chown -R $OWNER:$GROUP $HOME/cepheus
 
+echo "====> Extracting cookbooks..."
 cd $HOME/cepheus/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
 cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
 
@@ -179,35 +180,47 @@ cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
 sudo chown -R $OWNER:$GROUP $HOME/cepheus
 
 # Override ceph-chef with ceph-chef-staging. This will override an existing 'ceph-chef' package that may already exist.
+echo "====> Overridding Ceph-Chef cookbook..."
 mkdir -p $HOME/cepheus/cookbooks/ceph-chef
 cp -r $WORK_DIR/ceph-chef-public-staging/* $HOME/cepheus/cookbooks/ceph-chef
 
 # Update chef info
+echo "====> Uploading Chef cookbooks..."
 knife cookbook upload -a
+echo "====> Setting Chef Roles..."
 cd $HOME/cepheus/roles && knife role from file *.json
+echo "====> Setting Chef Environment..."
 cd $HOME/cepheus/environments && knife environment from file {{ environment }}.json
 
 # Add Chef tags
 # NOTE: run_list *set* replaces any run_list that may have already been there before
+echo "====> Setting Chef Bootstrap Run-list..."
 knife node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
+echo "====> Setting Chef Bootstrap Environment..."
 knife node environment set {{ bootstrap.name }} {{ environment }}
+echo "====> Setting Chef Bootstrap Tag..."
 knife tag create {{ bootstrap.name }} 'ceph-bootstrap'
 
+echo "====> Building Chef ENV..."
 sudo chef-client -o 'recipe[cepheus::build-env]'
 
 # Update Chef tags
+echo "====> Calling Chef tags..."
 {{ cache.repo }}/bootstrap/common/chef_tags_delete.sh
 {{ cache.repo }}/bootstrap/common/chef_tags_create.sh
 
 # Make sure the production environment is always set
+echo "====> Calling Chef environments..."
 {{ cache.repo }}/bootstrap/common/chef_environment_nodes.sh {{ environment }}
 
 # Update run_lists
+echo "====> Calling Chef run-lists..."
 {{ cache.repo }}/bootstrap/common/chef_runlists_update.sh
 
 # Update bootstrap node
 ##################
 # Tmp comment out for testing...
+echo "====> Running Chef-Client..."
 sudo chef-client
 
 logger -t CepheusBackup "Cepheus Chef Server updated to latest packages - $VERSION-$DATE"
