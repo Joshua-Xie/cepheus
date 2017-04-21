@@ -104,6 +104,7 @@ staging:
             command: |
                 echo "====> Downloading necessary files to local cache..."
                 source $HOME/cepheus/bootstrap/common/bootstrap_prereqs.sh
+                echo "====> Copying dependencies to staging area..."
                 cp -rp {{ cache.base }}/ $WORK_DIR/cepheus-files-staging
             layer: 5
         -   output: "$WORK_DIR/cepheus-data-staging"

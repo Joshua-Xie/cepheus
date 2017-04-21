@@ -18,9 +18,7 @@
 
 # Deletes the tags on all nodes. BE CAREFUL!
 
-REPO_ROOT=/ceph-host
-
-source $REPO_ROOT/bootstrap/common/base.sh
+source {{ cache.root }}/bootstrap/common/base.sh
 
 echo "Updating run_list..."
 

@@ -76,24 +76,22 @@ if [[ -d "/opt/opscode/" ]]; then
         {% endif %}
     fi
 fi
-{% endif %}
+{%- endif %}
 
-# Copy internal cepheus over staging
-cp -r $WORK_DIR/cepheus/* $WORK_DIR/cepheus-staging/
 
+# Old section...
 # Update the scripts themselves
 # cp -p $WORK_DIR/cepheus-data/*.sh $HOME/.
 
 # Remove script from data area since it was copied to $OWNER/$GROUP home above
 # rm -f $WORK_DIR/cepheus-data/cepheus_*.sh
 
-# Copy data over staging
-cp -r $WORK_DIR/cepheus-data/* $WORK_DIR/cepheus-staging/
-
-# Remove unneeded directories and files
-rm -rf $WORK_DIR/cepheus
-rm -rf $WORK_DIR/cepheus-data
-# rm -f $WORK_DIR/cepheus-staging/environments/*.json
+# Copy data over staging in order...
+echo "====> Layering data..."
+cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
+cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
+cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/
+cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
 echo "====> Clean staging process directories..."
 # Clean up staging process directories if they exist
@@ -119,7 +117,7 @@ if [[ $(ls -A {{ cache.repo }}) ]]; then
     sudo rm -rf $REPO_ROOT/*
 fi
 
-cp -r $WORK_DIR/cepheus-staging/* $REPO_ROOT
+cp -rp $WORK_DIR/cepheus-public-staging/* $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
 
 
@@ -135,11 +133,10 @@ if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
     sudo rm -rf $REPO_ROOT_FILES/*
 fi
 #
-cp -r $WORK_DIR/cepheus-files/* $REPO_ROOT_FILES
+cp -r $WORK_DIR/cepheus-files-staging/* $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
 #
 ####
-
 
 # Build...
 echo "====> Building from templates..."
@@ -170,7 +167,7 @@ sudo chown -R $OWNER:$GROUP $HOME/cepheus
 
 # Override ceph-chef with ceph-chef-staging. This will override an existing 'ceph-chef' package that may already exist.
 mkdir -p $HOME/cepheus/cookbooks/ceph-chef
-cp -r $WORK_DIR/ceph-chef-staging/* $HOME/cepheus/cookbooks/ceph-chef
+cp -r $WORK_DIR/ceph-chef-public-staging/* $HOME/cepheus/cookbooks/ceph-chef
 
 # Update chef info
 knife cookbook upload -a
@@ -186,14 +183,14 @@ knife tag create {{ bootstrap.name }} 'ceph-bootstrap'
 sudo chef-client -o 'recipe[cepheus::build-env]'
 
 # Update Chef tags
-/ceph-host/bootstrap/data/environment/common/scripts/chef_tags_delete.sh
-/ceph-host/bootstrap/data/environment/common/scripts/chef_tags_create.sh
+{{ cache.repo }}/bootstrap/common/chef_tags_delete.sh
+{{ cache.repo }}/bootstrap/common/chef_tags_create.sh
 
 # Make sure the production environment is always set
-/ceph-host/bootstrap/data/environment/common/scripts/chef_environment_nodes.sh {{ environment }}
+{{ cache.repo }}/bootstrap/common/chef_environment_nodes.sh {{ environment }}
 
 # Update run_lists
-/ceph-host/bootstrap/data/environment/common/scripts/chef_runlists_update.sh
+{{ cache.repo }}/bootstrap/common/chef_runlists_update.sh
 
 # Update bootstrap node
 ##################

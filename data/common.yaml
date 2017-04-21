@@ -153,6 +153,8 @@ files:
     -   "bootstrap/common/chef_runlists_update.sh"
     -   "bootstrap/common/bootstrap_validate_env.sh"
     -   "bootstrap/common/bootstrap_prereqs.sh"
+    -   "bootstrap/common/chef_tags_create.sh"
+    -   "bootstrap/common/chef_environment_nodes.sh"
 
 # These files represent the build init and update files.
 build_init_update_files:

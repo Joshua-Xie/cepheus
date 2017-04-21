@@ -86,14 +86,14 @@ else
 
     # Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
     delete=($CEPH_CHEF_BOOTSTRAP)
-    ceph_nodes=("${CEPH_CHEF_HOSTS[@]/$delete}")
+    export CEPH_NODES=("${CEPH_CHEF_HOSTS[@]/$delete}")
 
     if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
         echo
         echo "##########"
         echo "Root: $REPO_ROOT"
         echo "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
-        echo "Ceph Nodes: ${ceph_nodes[@]}"
+        echo "Ceph Nodes: ${CEPH_NODES[@]}"
         echo "##########"
         echo
     fi
