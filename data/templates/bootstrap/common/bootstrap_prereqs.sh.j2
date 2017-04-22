@@ -20,7 +20,8 @@
 # Exit immediately if anything goes wrong!
 set -eu
 
-REPO_ROOT_FILES=${1:-"{{ cache.base }}"}
+REPO_ROOT_FILES=$1
+REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}
 
 # Create directory for download cache.
 CACHE_ISO={{ cache.iso }}
