@@ -36,6 +36,8 @@ CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 OWNER={{ primary_user.name }}
 GROUP={{ primary_user.group }}
 
+KNIFE=/opt/opscode/embedded/bin/knife
+
 # NB: Clear if exists
 if [[ -d $WORK_DIR ]]; then
   rm -rf $WORK_DIR
@@ -52,7 +54,6 @@ git config --global credential.helper 'cache --timeout=25'
 # IMPORTANT: NEVER push ONLY pull/clone
 # Pull down (public) cepheus (cepheus-public-staging)
 # If the repo exists it will processed first and then the commands if they exists.
-
 {% for item in staging.process %}
 # {{ item.comment }}
 {%- if item.repo %}
@@ -88,6 +89,7 @@ cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/
 cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
 # Create template files for staging before moving...
+echo "====> Creating files from templates for 'cepheus-public-staging'..."
 cd $WORK_DIR/cepheus-public-staging
 ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
 
@@ -106,7 +108,7 @@ echo "====> Clean staging process directories..."
 # set -e
 
 echo "====> Building update..."
-# Build new ceph-host environment and replace existing version
+# Build new {{ cache.repo }} environment and replace existing version
 
 # Create dir even though it may already exist
 sudo mkdir -p $REPO_ROOT
@@ -147,12 +149,12 @@ echo "====> Building from templates..."
 SUDO=sudo
 {% else %}
 SUDO=
-{% endif %}
+{%- endif %}
 echo {{ item.echo }}
 $SUDO $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.input }} -o {{ item.output }}
 # NB: Pass through template_engine twice
 $SUDO $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i {{ item.output }} -o {{ item.output }}
-{% endfor %}
+{%- endfor %}
 
 # Sync $HOME/cepheus with {{ cache.repo }}
 echo "====> Syncing $REPO_ROOT and $HOME/cepheus..."
@@ -178,22 +180,26 @@ echo "====> Overridding Ceph-Chef cookbook..."
 mkdir -p $HOME/cepheus/cookbooks/ceph-chef
 cp -r $WORK_DIR/ceph-chef-public-staging/* $HOME/cepheus/cookbooks/ceph-chef
 
-# Update chef info
-echo "====> Uploading Chef cookbooks..."
-knife cookbook upload -a
-echo "====> Setting Chef Roles..."
-cd $HOME/cepheus/roles && knife role from file *.json
-echo "====> Setting Chef Environment..."
-cd $HOME/cepheus/environments && knife environment from file {{ environment }}.json
+# Make sure it's {{ primary_user.name }} as owner:group
+sudo chown -R $OWNER:$GROUP $HOME/cepheus
 
+# Update chef info
+echo "====> Setting Chef Environment..."
+cd $HOME/cepheus/environments && $KNIFE environment from file {{ environment }}.json
+echo "====> Setting Chef Roles..."
+cd $HOME/cepheus/roles && $KNIFE role from file *.json
+echo "====> Uploading Chef cookbooks..."
+$KNIFE cookbook upload -a
+
+# Bootstrap node will never change or should never change...
 # Add Chef tags
 # NOTE: run_list *set* replaces any run_list that may have already been there before
-echo "====> Setting Chef Bootstrap Run-list..."
-knife node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
-echo "====> Setting Chef Bootstrap Environment..."
-knife node environment set {{ bootstrap.name }} {{ environment }}
-echo "====> Setting Chef Bootstrap Tag..."
-knife tag create {{ bootstrap.name }} 'ceph-bootstrap'
+# echo "====> Setting Chef Bootstrap Run-list..."
+# knife node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
+# echo "====> Setting Chef Bootstrap Environment..."
+# knife node environment set {{ bootstrap.name }} {{ environment }}
+# echo "====> Setting Chef Bootstrap Tag..."
+# knife tag create {{ bootstrap.name }} 'ceph-bootstrap'
 
 echo "====> Building Chef ENV..."
 sudo chef-client -o 'recipe[cepheus::build-env]'

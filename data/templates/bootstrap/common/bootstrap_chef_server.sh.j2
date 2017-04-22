@@ -162,5 +162,9 @@ mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.
 
 sudo chef-client
 
+# NB: TODO: Need to move required chef data and bootstrap all of the other nodes IF NOT pxe_boot enabled. This
+# must assume that the ssh-key represented in the yaml data files are already in place on each node so ansible can
+# move the data and bootstrap the chef-client on each of the nodes.
+
 echo "====> bootstrap_chef_server.sh Success!"
 echo

@@ -15,6 +15,9 @@
 /bootstrap/common/base.sh
 /bootstrap/common/bootstrap_chef_server.sh
 /bootstrap/common/chef_runlists_update.sh
+/bootstrap/common/chef_tags_create.sh
+/bootstrap/common/chef_tags_delete.sh
+/bootstrap/common/chef_environment_nodes.sh
 /data/build.sh
 /data/data_files.sh
 /data/data_templates.sh
