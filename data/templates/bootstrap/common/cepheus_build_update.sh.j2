@@ -85,7 +85,7 @@ echo "====> Layering data..."
 cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
 cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
 
-cp $WORK_DIR/ceph-chef-private-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
+cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
 
 cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
 cd $WORK_DIR/cepheus-public-staging/cookbooks && sudo rm -f *.tar.gz
