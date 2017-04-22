@@ -225,9 +225,9 @@ primary_user:
     # Backup is used for Cepheus backups. The default method is 'rsync' and the 'remote' section refers to a remote
     # 'cluster' and/or 'host' that the rsync process will use to sync this given environment (cluster) to.
     backup:
-        enable: true
+        enable: false
         remote:
-            enable: true
+            enable: false
             method: rsync
             # This is usually the bootstrap node on a remote cluster that you are pushing the backup to for HA
             host: ceph-vm3

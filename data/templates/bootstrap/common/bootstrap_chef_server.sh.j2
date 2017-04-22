@@ -152,7 +152,9 @@ fi
 
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus
 
-
+if [[ -d /tmp/cepheus ]]; then
+    rm -rf /tmp/cepheus
+fi
 
 # Test............................................
 # Add chef info to boostrap node.
