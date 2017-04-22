@@ -129,6 +129,7 @@ staging:
                 echo
                 echo "====> Generating bootstrap_prereqs.sh..."
                 source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging
+                ll $WORK_DIR/cepheus-files-staging
             layer: 6
         -   output: ""
             comment: "Layer cookbooks specifically for this environment or generically..."

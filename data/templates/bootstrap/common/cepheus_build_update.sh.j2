@@ -126,6 +126,7 @@ if [[ $(ls -A {{ cache.repo }}) ]]; then
 fi
 
 echo "====> Copying data to $REPO_ROOT..."
+ls $WORK_DIR/cepheus-public-staging
 cp -rp $WORK_DIR/cepheus-public-staging/* $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
 
@@ -137,6 +138,12 @@ sudo chown -R $OWNER:$GROUP $REPO_ROOT
 sudo mkdir -p $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
 #
+
+echo "$REPO_ROOT_FILES"
+ls $REPO_ROOT_FILES
+echo "-----------------"
+ls $WORK_DIR/cepheus-files-staging
+
 if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
     sudo rm -rf $REPO_ROOT_FILES/*
 fi

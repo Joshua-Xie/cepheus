@@ -53,12 +53,6 @@ if [[ -z $status ]]; then
 fi
 {% endif %}
 
-# NOTE: Because the operations key *may* contain a security phrase, we will temporarily move it so that Chef uses the
-# password instead. After the run the key will be moved back.
-if [[ -f $HOME/.ssh/id_rsa ]]; then
-    mv $HOME/.ssh/id_rsa $HOME/.ssh/id_rsa.tmp
-fi
-
 set -e
 
 # base.sh sets REPO_ROOT...
@@ -74,6 +68,12 @@ chef_server=$(rpm -qa | grep chef-server)
 chef-server="$(dpkg-query -l 'chef-server*')"
 {% endif %}
 set -e
+
+# NOTE: Because the operations key *may* contain a security phrase, we will temporarily move it so that Chef uses the
+# password instead. After the run the key will be moved back.
+if [[ -f $HOME/.ssh/id_rsa ]]; then
+    mv $HOME/.ssh/id_rsa $HOME/.ssh/id_rsa.tmp
+fi
 
 #### NOTE: You can check to see if user 'admin' exists and if org 'cepheus' exists but this is usually only called once.
 # If you *have* to run this again then simply just comment one or both of these lines out before running.
