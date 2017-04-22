@@ -106,13 +106,15 @@ staging:
             # NB: This example is for vagrant so the commands below would be different for production such as calling bootstrap_prereqs.sh
             # may not be called in a production environment if it had no access to the outside world. Instead it may pull from a
             # private git repo or something like artifactory. Below it's redundant...
+            # NB: When using '|' even embedded '#' are not treated as comments in yaml but pass through as desired.
+            # Empty lines also pass through.
             command: |
                 echo
                 echo "====> Downloading necessary files to local cache..."
                 source $HOME/cepheus/bootstrap/common/bootstrap_prereqs.sh
 
                 echo "====> Copying dependencies to staging area..."
-                \# NB: Since this is vagrant the 'cp' command is redundant but it's here to show flexibility...
+                # NB: Since this is vagrant the 'cp' command is redundant but it's here to show flexibility...
                 cp -rp {{ cache.base }}/ $WORK_DIR/cepheus-files-staging
             layer: 5
         -   output: "$WORK_DIR/cepheus-data-staging"
