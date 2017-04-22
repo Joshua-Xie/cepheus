@@ -1,4 +1,4 @@
-$REPO_ROOT_FILES#!/bin/bash
+#!/bin/bash
 #
 # Copyright 2017, LambdaStack
 #
@@ -20,8 +20,7 @@ $REPO_ROOT_FILES#!/bin/bash
 # Exit immediately if anything goes wrong!
 set -eu
 
-REPO_ROOT_FILES=$1
-REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}
+REPO_ROOT_FILES=${1:-"{{ cache.base }}"}
 
 # Create directory for download cache.
 CACHE_ISO={{ cache.iso }}
