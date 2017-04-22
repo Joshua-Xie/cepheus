@@ -80,12 +80,11 @@ if [[ -d "/opt/opscode/" ]]; then
 fi
 {%- endif %}
 
-
 # Copy data over staging in order...
 echo "====> Layering data..."
 cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
 cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
-cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/
+cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
 cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
 # Create template files for staging before moving...

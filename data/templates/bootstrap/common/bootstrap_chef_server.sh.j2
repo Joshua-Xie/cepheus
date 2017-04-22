@@ -36,6 +36,8 @@ if [[ $? -eq 0 ]]; then
     if [[ $? -eq 0 ]]; then
         echo "====> Found running Chef Server so no bootstrapping..."
         echo
+        # Remove the cepheus-build repo
+        rm -rf $HOME/{{ build.cepheus }}
         exit 0
     fi
 fi
@@ -115,6 +117,7 @@ $KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.n
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.
 echo "====> Create working Cepheus home directory and files..."
 if [[ -d /home/{{ primary_user.name }}/cepheus ]]; then
+    # Force a cleanup...
     rm -rf /home/{{ primary_user.name }}/cepheus
 fi
 mkdir -p /home/{{ primary_user.name }}/cepheus
@@ -129,7 +132,7 @@ cp -rp $TMP_REPO_ROOT/. /home/{{ primary_user.name }}/cepheus
 # sudo cp -rp $TMP_REPO_ROOT/. {{ cache.repo }}
 # sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
 
-# Remove the temp build repo
+# Remove the cepheus-build repo
 rm -rf $HOME/{{ build.cepheus }}
 
 # Add the dependency cookbooks from the file cache
@@ -138,7 +141,7 @@ sudo cp $REPO_ROOT_FILES/cookbooks/*.tar.gz $HOME/cepheus/cookbooks
 cd $HOME/cepheus/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
 cd $HOME/cepheus/cookbooks && sudo rm -f *.tar.gz
 
-{% if pxe_boot.enable %}
+{%- if pxe_boot.enable %}
 # NOTE: *HAVE* to load the files into files/ before cookbook upload
 if [[ -d $REPO_ROOT_FILES/cobbler ]]; then
     sudo cp $REPO_ROOT_FILES/cobbler/loaders/* $HOME/cepheus/cookbooks/cepheus/files/loaders
