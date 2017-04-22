@@ -110,7 +110,8 @@ git_clone_or_update() {
   fi
 }
 
-{% if pxe_boot.enable %}
+{# Using method gate instead of pxe_boot.enable since we only want common.yaml to be used as data input #}
+{% if method == "pxe" %}
 # Obtain an RHEL 7.2 image to be used for PXE booting in production.
 echo "====> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
