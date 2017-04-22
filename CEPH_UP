@@ -134,7 +134,7 @@ while getopts cbglrsvu:n:e:d:p:o:t:z: opt; do
             BOOTSTRAP_TYPE=$OPTARG
             ;;
         u)
-            # Update the cluster. If nothing exists to update then it will build/create it for the first time.
+            # Update the cluster.
             export BUILD_UPDATE=$OPTARG
             ;;
         v)
@@ -253,6 +253,10 @@ else
     set +e
     source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
     set -e
+
+    echo "====> Completed Bootstrapping!"
+    echo
+    exit 0
 fi
 
 echo "====> Calling cepheus_build_update.sh..."
