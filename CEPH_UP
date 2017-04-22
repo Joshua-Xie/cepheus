@@ -24,8 +24,15 @@
 # Exit immediately if anything goes wrong, instead of making things worse.
 set -eu
 
+# Colors
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
 clear
 
+echo -e "${RED}"
 echo "             __     "
 echo "             \ \    "
 echo "              > \   "
@@ -36,6 +43,7 @@ echo "            Cepheus Vagrant Build"
 echo "-----------------------------------------------------"
 echo "Bootstrapping local CEPH environment using Vagrant..."
 echo
+echo -e "${NC}"
 
 # Creates the REPO_ROOT env var for everything else to use...
 export REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -158,9 +166,12 @@ cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTE
 
 # Build bootstrapping environment based on yaml data
 BUILD=data/build.sh
+
+echo -e "${YELLOW}"
 echo "====> Generating $REPO_ROOT/$BUILD from $REPO_ROOT/data/common.yaml..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
 sudo chmod +x $REPO_ROOT/$BUILD
+echo -e "${NC}"
 
 ## WIP Section
 # Pass data templates through template enginge first
@@ -176,9 +187,11 @@ sudo chmod +x $REPO_ROOT/$BUILD
 
 # Add all other data files to the final build.yaml
 BUILD_DATA=data/data_files.sh
+echo -e "${YELLOW}"
 echo "====> Generating $REPO_ROOT/$BUILD_DATA from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
 sudo chmod +x $REPO_ROOT/$BUILD_DATA
+echo -e "${NC}"
 
 
 ## Execution phase of scripts - after being built above!
@@ -200,6 +213,7 @@ BUILD_INIT_UPDATE=data/build_init_update.sh
 echo "====> Generating $REPO_ROOT/$BUILD_INIT_UPDATE from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/$BUILD_INIT_UPDATE.j2 -o $REPO_ROOT/$BUILD_INIT_UPDATE
 sudo chmod +x $REPO_ROOT/$BUILD_INIT_UPDATE
+
 echo "====> Executing $REPO_ROOT/$BUILD_INIT_UPDATE"
 source $REPO_ROOT/$BUILD_INIT_UPDATE
 
@@ -227,15 +241,16 @@ source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
 # If prerequisites only then end after getting them
 if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then
     echo
+    echo -e "${GREEN}"
     echo "====> Prerequisites have been updated and exiting."
+    echo -e "${NC}"
     echo
     exit 1
 fi
 
-# If the environment is for vagrant and BUILD_UPDATE is > 0 then execute the vagrant build environment. If BUILD_UPDATE is
-# 0 then only the other options will be applied. If BUILD_UPDATE is 2 then the vagrant vms will be built and the cepheus
-# environment will automatically get built to make things easier. Or, you can set $BUILD_UPDATE to 1 and then it will only
-# build the vagrant vms and then prepare the bootstrap for building out the other cluster like in a production environment.
+# Save the REPO_ROOT value...
+TMP_REPO_ROOT=$REPO_ROOT
+
 if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
     if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -ne 0 ]]; then
         cd $REPO_ROOT/bootstrap/vms/vagrant
@@ -248,13 +263,14 @@ else
     sudo $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
 
     echo "====> Calling bootstrap_chef_server.sh..."
-    TMP_REPO_ROOT=$REPO_ROOT
     # Just a safe check because this part can fail and be fine.
     set +e
     source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
     set -e
 
+    echo -e "${GREEN}"
     echo "====> Completed Bootstrapping!"
+    echo -e "${NC}"
     echo
     exit 0
 fi
@@ -262,5 +278,7 @@ fi
 echo "====> Calling cepheus_build_update.sh..."
 source $TMP_REPO_ROOT/bootstrap/common/cepheus_build_update.sh
 
+echo -e "${GREEN}"
 echo "====> Complete!"
+echo -e "${NC}"
 echo
