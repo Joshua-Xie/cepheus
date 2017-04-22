@@ -36,6 +36,7 @@ CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 OWNER={{ primary_user.name }}
 GROUP={{ primary_user.group }}
 
+# NB: Clear if exists
 if [[ -d $WORK_DIR ]]; then
   rm -rf $WORK_DIR
 fi
@@ -57,7 +58,7 @@ git config --global credential.helper 'cache --timeout=25'
 {%- if item.repo %}
 git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}
 {% endif %}
-{% if item.command %}
+{%- if item.command %}
 {{ item.command }}
 {%- endif %}
 
@@ -79,13 +80,6 @@ fi
 {%- endif %}
 
 
-# Old section...
-# Update the scripts themselves
-# cp -p $WORK_DIR/cepheus-data/*.sh $HOME/.
-
-# Remove script from data area since it was copied to $OWNER/$GROUP home above
-# rm -f $WORK_DIR/cepheus-data/cepheus_*.sh
-
 # Copy data over staging in order...
 echo "====> Layering data..."
 cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
@@ -95,7 +89,7 @@ cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
 # Create template files for staging before moving...
 cd $WORK_DIR/cepheus-public-staging
-./CEPH_UP -z $WORK_DIR/cepheus-public-staging
+./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
 
 echo "====> Clean staging process directories..."
 # Clean up staging process directories if they exist

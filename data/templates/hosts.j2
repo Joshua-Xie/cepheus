@@ -4,11 +4,11 @@
 
 # Public IPs
 {%- for item in inventory.nodes %}
-{% for interface in item.interfaces %}
-{% if interface.profile == "public" %}
+{%- for interface in item.interfaces %}
+{%- if interface.profile == "public" %}
 {{ interface.ip }}  {{ item.name }}  {{ item.name }}.{{ domain }}
-{% endif %}
-{% endfor %}
+{%- endif %}
+{%- endfor %}
 {%- endfor %}
 
 # IPMI addresses
@@ -18,9 +18,9 @@
 
 # Cluster IPs
 {%- for item in inventory.nodes %}
-{% for interface in item.interfaces %}
-{% if interface.profile == "cluster" %}
+{%- for interface in item.interfaces %}
+{%- if interface.profile == "cluster" %}
 {{ interface.ip }}  {{ item.name }}  {{ item.name }}-cluster
-{% endif %}
-{% endfor %}
+{%- endif %}
+{%- endfor %}
 {%- endfor %}

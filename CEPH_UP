@@ -21,6 +21,9 @@
 # VirtualBox UI application, stop and remove the 'ceph-*' VMs that should be shown and then start this script again.
 ##########
 
+# Creates the REPO_ROOT env var for everything else to use...
+export REPO_ROOT=$(git rev-parse --show-toplevel)
+
 # Exit immediately if anything goes wrong, instead of making things worse.
 set -eu
 
@@ -30,24 +33,6 @@ YELLOW='\033[0;33m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-clear
-
-echo -e "${RED}"
-echo "             __     "
-echo "             \ \    "
-echo "              > \   "
-echo "             / ^ \  "
-echo "            /_/ \_\ "
-echo
-echo "            Cepheus Vagrant Build"
-echo "-----------------------------------------------------"
-echo "Bootstrapping local CEPH environment using Vagrant..."
-echo
-echo -e "${NC}"
-
-# Creates the REPO_ROOT env var for everything else to use...
-export REPO_ROOT=$(git rev-parse --show-toplevel)
-
 # Default values...
 export CEPH_DEV_MODE=0
 export CHEF_CEPHEUS_DEBUG=0
@@ -56,6 +41,7 @@ export BOOTSTRAP_REMOVE_PREREQS=0
 export BOOTSTRAP_HTTP_PROXY=
 export BOOTSTRAP_HTTPS_PROXY=
 export BOOTSTRAP_INIT=0
+export BUILD_SHOW_LOGO=1
 export BUILD_VMS_ONLY=0
 export BUILD_ENVIRONMENT=vagrant
 export BUILD_LOCATION=public
@@ -67,7 +53,7 @@ export BUILD_TEMPLATES_ONLY=0
 # NB: May want to add an option for 'build' or 'update' so only the template_engine runs and the files can then be
 # uploaded to Chef for management.
 
-while getopts cbglrsvu:n:e:d:p:o:t:z: opt; do
+while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
     case $opt in
         b)
             # (required) MUST call this first. It will bootstrap Chef Server and support items
@@ -150,6 +136,10 @@ while getopts cbglrsvu:n:e:d:p:o:t:z: opt; do
             # to help save some time.
             export BUILD_VMS_ONLY=1
             ;;
+        x)
+            # (optional) Causes the logo portion *NOT* to show
+            export BUILD_SHOW_LOGO=0
+            ;;
         z)
             # Only run everything through the template_engine
             export BUILD_TEMPLATES_ONLY=1
@@ -160,6 +150,22 @@ while getopts cbglrsvu:n:e:d:p:o:t:z: opt; do
             ;;
     esac
 done
+
+if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
+    clear
+    echo -e "${RED}"
+    echo "                    __     "
+    echo "                    \ \    "
+    echo "                     > \   "
+    echo "                    / ^ \  "
+    echo "                   /_/ \_\ "
+    echo
+    echo "            Cepheus Vagrant Build"
+    echo "-----------------------------------------------------"
+    echo "Bootstrapping local CEPH environment using Vagrant..."
+    echo
+    echo -e "${NC}"
+fi
 
 # Create *initial* build.yaml from common.yaml
 cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
@@ -222,7 +228,9 @@ echo "====> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
 
 if [[ $BUILD_TEMPLATES_ONLY -ne 0 ]]; then
+    echo -e "${GREEN}"
     echo "====> Built templates only..."
+    echo -e "${NC}"
     echo
     exit 0
 fi
