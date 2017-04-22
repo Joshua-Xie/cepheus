@@ -1,4 +1,4 @@
-#!/bin/bash
+$REPO_ROOT_FILES#!/bin/bash
 #
 # Copyright 2017, LambdaStack
 #
@@ -20,6 +20,9 @@
 # Exit immediately if anything goes wrong!
 set -eu
 
+REPO_ROOT_FILES=$1
+REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}
+
 # Create directory for download cache.
 CACHE_ISO={{ cache.iso }}
 CACHE_PACKAGES={{ cache.packages }}
@@ -34,19 +37,19 @@ echo "====> Checking local environment..."
 USER=`id -un`
 GROUP=`id -gn`
 
-echo "====> Checking cache: {{ cache.base }}..."
+echo "====> Checking cache: $REPO_ROOT_FILES..."
 
 # If set then it will remove the cache directories
 if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
-    sudo rm -rf {{ cache.base }}
+    sudo rm -rf $REPO_ROOT_FILES
 fi
 
 echo "====> Creating cache directories..."
 
 # Create the cache directories...
-sudo mkdir -p {{ cache.base }}/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
-sudo mkdir -p {{ cache.base }}/{$CACHE_PYTHON,$CACHE_PACKAGES,$CACHE_COOKBOOK,$CACHE_GEM}
-sudo chown -R $USER:$GROUP {{ cache.base }}
+sudo mkdir -p $REPO_ROOT_FILES/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
+sudo mkdir -p $REPO_ROOT_FILES/{$CACHE_PYTHON,$CACHE_PACKAGES,$CACHE_COOKBOOK,$CACHE_GEM}
+sudo chown -R $USER:$GROUP $REPO_ROOT_FILES
 
 # NB: If your environment can't access the outside world then execute `cache.commands` where you obtain the pre_reqs before
 # calling this...
@@ -67,13 +70,13 @@ download_file() {
   FILE=$1
   URL=$2
 
-  if [[ ! -f {{ cache.base }}/$FILE && ! -f {{ cache.base }}/${FILE}_downloaded ]]; then
+  if [[ ! -f $REPO_ROOT_FILES/$FILE && ! -f $REPO_ROOT_FILES/${FILE}_downloaded ]]; then
     echo $FILE
     echo $URL
 
-    rm -f {{ cache.base }}/$FILE
-    curl -L --progress-bar -o {{ cache.base }}/$FILE $URL
-    touch {{ cache.base }}/${FILE}_downloaded
+    rm -f $REPO_ROOT_FILES/$FILE
+    curl -L --progress-bar -o $REPO_ROOT_FILES/$FILE $URL
+    touch $REPO_ROOT_FILES/${FILE}_downloaded
   fi
 }
 
@@ -82,13 +85,13 @@ ftp_file() {
   FILE=$1
   URL=$2
 
-  if [[ ! -f {{ cache.base }}/$FILE && ! -f {{ cache.base }}/${FILE}_downloaded ]]; then
+  if [[ ! -f $REPO_ROOT_FILES/$FILE && ! -f $REPO_ROOT_FILES/${FILE}_downloaded ]]; then
     echo $FILE
     echo $URL
 
-    rm -f {{ cache.base }}/$FILE
-    wget $URL -O {{ cache.base }}/$FILE
-    touch {{ cache.base }}/${FILE}_downloaded
+    rm -f $REPO_ROOT_FILES/$FILE
+    wget $URL -O $REPO_ROOT_FILES/$FILE
+    touch $REPO_ROOT_FILES/${FILE}_downloaded
   fi
 }
 
@@ -97,13 +100,13 @@ git_clone_or_update() {
   local URL=$2
 
   echo "====> Git clone or update..."
-  if [[ ! -f {{ cache.base }}/${NAME}_downloaded ]]; then
-    if [[ ! -d {{ cache.base }}/$NAME ]]; then
-      git clone $URL {{ cache.base }}/$NAME || true
+  if [[ ! -f $REPO_ROOT_FILES/${NAME}_downloaded ]]; then
+    if [[ ! -d $REPO_ROOT_FILES/$NAME ]]; then
+      git clone $URL $REPO_ROOT_FILES/$NAME || true
     else
-      ( cd {{ cache.base }}/$NAME && git pull --ff-only $URL )
+      ( cd $REPO_ROOT_FILES/$NAME && git pull --ff-only $URL )
     fi
-    touch {{ cache.base }}/${NAME}_downloaded
+    touch $REPO_ROOT_FILES/${NAME}_downloaded
   fi
 }
 
@@ -146,7 +149,7 @@ set -e
 # else
 #   # Remove it so it's not used.
 #   echo "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
-#   rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
+#   rm -f $REPO_ROOT_FILES/{{ cache.cookbook }}/ceph-chef-*
 # fi
 
 {# Don't want debug enabled on initial build out or ceph-chef may not get uploaded!! #}
@@ -154,8 +157,8 @@ set -e
 
 # Remove it so it's not used - ONLY if the directories exists else skip it because that means it will be handled differently later.
 echo "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
-if [[ -d {{ cache.base }}/{{ cache.cookbook }} ]]; then
-    rm -f {{ cache.base }}/{{ cache.cookbook }}/ceph-chef-*
+if [[ -d $REPO_ROOT_FILES/{{ cache.cookbook }} ]]; then
+    rm -f $REPO_ROOT_FILES/{{ cache.cookbook }}/ceph-chef-*
 fi
 # Clone to cookbook area
 if [[ -d $REPO_ROOT/cookbooks/ceph-chef ]]; then
@@ -196,7 +199,7 @@ download_file {{ cache.gem }}/{{ item.name }}-{{ item.version }}.gem https://rub
 
 # Pull needed gems for fpm
 GEMS=( {{ gems|join(' ') }} )
-# mkdir -p {{ cache.base }}/gems
+# mkdir -p $REPO_ROOT_FILES/gems
 for GEM in ${GEMS[@]}; do
   download_file {{ cache.gem }}/$GEM.gem https://rubygems.global.ssl.fastly.net/gems/$GEM.gem
 done

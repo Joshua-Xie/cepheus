@@ -32,9 +32,9 @@ VERSION={{ version }}
 CLUSTER={{ data_center }}
 CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 
-# Change to whatever owner/group you like
+# Change to whatever owner/group you like - NB: group was primary_user.group
 OWNER={{ primary_user.name }}
-GROUP={{ primary_user.group }}
+GROUP={{ primary_user.name }}
 
 KNIFE=/opt/opscode/embedded/bin/knife
 
@@ -51,20 +51,6 @@ fi
 git config --global credential.helper cache
 git config --global credential.helper 'cache --timeout=25'
 
-# IMPORTANT: NEVER push ONLY pull/clone
-# Pull down (public) cepheus (cepheus-public-staging)
-# If the repo exists it will processed first and then the commands if they exists.
-{% for item in staging.process %}
-# {{ item.comment }}
-{%- if item.repo %}
-git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}
-{% endif %}
-{%- if item.command %}
-{{ item.command }}
-{%- endif %}
-
-{%- endfor %}
-
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
 {% if primary_user.backup.enable %}
 if [[ -d "/opt/opscode/" ]]; then
@@ -80,25 +66,40 @@ if [[ -d "/opt/opscode/" ]]; then
 fi
 {%- endif %}
 
+# IMPORTANT: NEVER push ONLY pull/clone
+# Pull down (public) cepheus (cepheus-public-staging)
+# If the repo exists it will processed first and then the commands if they exists.
+{% for item in staging.process %}
+# {{ item.comment }}
+{%- if item.repo %}
+git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}
+{% endif %}
+{%- if item.command %}
+{{ item.command }}
+{%- endif %}
+
+{%- endfor %}
+
 # Copy data over staging in order...
-echo "====> Layering data..."
-cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
-cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
-
-cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
-
-cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% tar xvzf %
-cd $WORK_DIR/cepheus-public-staging/cookbooks && rm -f *.tar.gz
-sudo chown -R $OWNER:$GROUP $WORK_DIR/cepheus-public-staging
-
-cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
-cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
+# echo "====> Layering data..."
+# cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
+# cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
+#
+# cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
+#
+# cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% tar xvzf %
+# cd $WORK_DIR/cepheus-public-staging/cookbooks && rm -f *.tar.gz
+# sudo chown -R $OWNER:$GROUP $WORK_DIR/cepheus-public-staging
+#
+# cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
+# cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
 # Create template files for staging before moving...
-echo "====> Creating files from templates for 'cepheus-public-staging'..."
-cd $WORK_DIR/cepheus-public-staging
-./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
+# echo "====> Creating files from templates for 'cepheus-public-staging'..."
+# cd $WORK_DIR/cepheus-public-staging
+# ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
 
+echo
 echo "====> Clean staging process directories..."
 # Clean up staging process directories if they exist
 # NOTE: Important - Do this BEFORE moving data into directories on bootstrap since *all* is used!!

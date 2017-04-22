@@ -73,12 +73,13 @@ staging:
             comment: "Public Cepheus repo"
             repo: https://github.com/cepheus-io/cepheus.git
             branch: master
-            command: |
-                # This will only build the templates (scripts)
-                echo
-                echo "====> Calling CEPH_UP -x -z $HOME/cepheus..."
-                echo
-                cd $HOME/cepheus && ./CEPH_UP -x -z $HOME/cepheus
+            command: ""
+            # command: |
+            #     # This will only build the templates (scripts)
+            #     echo
+            #     echo "====> Calling CEPH_UP -x -z $HOME/cepheus..."
+            #     echo
+            #     cd $HOME/cepheus && ./CEPH_UP -x -z $HOME/cepheus
             layer: 1
         -   output: "$WORK_DIR/cepheus-private-staging"
             comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
@@ -98,6 +99,12 @@ staging:
             branch: master
             command: ""
             layer: 4
+        -   output: "$WORK_DIR/cepheus-data-staging"
+            comment: "Private data. This one is public but should be private for production envrionments"
+            repo: https://github.com/cepheus-io/cepheus-data
+            branch: master
+            command: ""
+            layer: 5
         -   output: "$WORK_DIR/cepheus-files-staging"
             comment: "Cepheus files are basically dependencies. This can be a git repo, object-storage or whatever. Just make sure the data is fed into 'output'"
             repo: ""
@@ -110,19 +117,49 @@ staging:
             # Empty lines also pass through.
             command: |
                 echo
-                echo "====> Downloading necessary files to local cache..."
-                source $HOME/cepheus/bootstrap/common/bootstrap_prereqs.sh
+                echo "====> Generating bootstrap_prereqs.sh..."
 
-                echo "====> Copying dependencies to staging area..."
-                # NB: Since this is vagrant the 'cp' command is redundant but it's here to show flexibility...
-                cp -rp {{ cache.base }}/ $WORK_DIR/cepheus-files-staging
-            layer: 5
-        -   output: "$WORK_DIR/cepheus-data-staging"
-            comment: "Private data. This one is public but should be private for production envrionments"
-            repo: https://github.com/cepheus-io/cepheus-data
-            branch: master
-            command: ""
+                # Generating bootstrap_prereqs.sh by calling the template_engine directly. If held in git repo this would not be needed.
+                # Common.yaml is all that is needed for bootstrap_prereqs.sh to be generated.
+
+                $WORK_DIR/cepheus-public-staging/data/templates/template_engine -d $WORK_DIR/cepheus-public-staging/data/common.yaml -i $WORK_DIR/cepheus-public-staging/data/templates/bootstrap/common/bootstrap_prereqs.sh.j2 -o $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh
+                # NB: Passes through template_engine twice
+                $WORK_DIR/cepheus-public-staging/data/templates/template_engine -d $WORK_DIR/cepheus-public-staging/data/common.yaml -i $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh -o $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh
+                sudo chmod +x $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh
+
+                echo "====> Downloading necessary files to local cache..."
+                source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging
             layer: 6
+        -   output: "$WORK_DIR/cepheus-public-staging"
+            comment: "Layer data specifically for this environment or generically..."
+            repo: ""
+            branch: ""
+            command: |
+                echo
+                echo "====> Layering data..."
+                cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
+                cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
+
+                cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
+
+                cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% tar xvzf %
+                cd $WORK_DIR/cepheus-public-staging/cookbooks && rm -f *.tar.gz
+                sudo chown -R $OWNER:$GROUP $WORK_DIR/cepheus-public-staging
+
+                cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
+                cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
+            layer: 7
+        -   output: "$WORK_DIR/cepheus-public-staging"
+            comment: "Generate scripts from data..."
+            repo: ""
+            branch: ""
+            command: |
+                # This will only build the templates (scripts)
+                echo
+                echo "====> Calling CEPH_UP -x -z $WORK_DIR/cepheus-public-staging..."
+                echo
+                cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
+            layer: 8
 
 # Info to setup development environment as well
 development:
