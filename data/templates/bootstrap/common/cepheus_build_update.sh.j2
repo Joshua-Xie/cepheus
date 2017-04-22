@@ -87,8 +87,9 @@ cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
 
 cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
 
-cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% sudo tar xvzf %
-cd $WORK_DIR/cepheus-public-staging/cookbooks && sudo rm -f *.tar.gz
+cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% tar xvzf %
+cd $WORK_DIR/cepheus-public-staging/cookbooks && rm -f *.tar.gz
+sudo chown -R $OWNER:$GROUP $WORK_DIR/cepheus-public-staging
 
 cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
 cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
