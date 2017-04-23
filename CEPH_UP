@@ -159,6 +159,7 @@ while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
     esac
 done
 
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/base_colors.sh.j2 -o $REPO_ROOT/bootstrap/common/base_colors.sh
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
