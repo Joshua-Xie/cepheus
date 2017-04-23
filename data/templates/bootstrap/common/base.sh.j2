@@ -49,6 +49,10 @@ else
         source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
     fi
 
+    if [[ -f $REPO_ROOT/environments/ceph_chef_mds_hosts.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_mds_hosts.env
+    fi
+
     if [[ -f $REPO_ROOT/environments/ceph_chef_rgw_hosts.env ]]; then
         source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
     fi
@@ -59,6 +63,10 @@ else
 
     if [[ -f $REPO_ROOT/environments/ceph_chef_adc_hosts.env ]]; then
         source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
+    fi
+
+    if [[ -f $REPO_ROOT/environments/ceph_chef_proxy.env ]]; then
+        source $REPO_ROOT/environments/ceph_chef_proxy.env
     fi
 
     # This script does a lot of stuff:

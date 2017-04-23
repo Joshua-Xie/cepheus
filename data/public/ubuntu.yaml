@@ -12,7 +12,18 @@ os:
     # pxe_boot file extension - This will get used when creating the OS specific kickstart file using the profile name and this extension
     kickstart_ext: ks
     iso:
-        url:
+        url: ""
+    device: "/dev/"
+    devices:
+        # Change the device name on OS/Platforms that enumerate devices differently.
+        # Size is in GB
+        # NB: Take a look at raid levels later...
+        -   device: sda
+            type: sdd
+            size: 400
+        -   device: sdb
+            type: sdd
+            size: 400
 
 # Unique ISO data for OS
 ISO:

@@ -18,6 +18,17 @@ os:
     kickstart_ext: ks
     iso:
         url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+    device: "/dev/"
+    devices:
+        # Change the device name on OS/Platforms that enumerate devices differently.
+        # Size is in GB
+        # NB: Take a look at raid levels later...
+        -   device: sda
+            type: sdd
+            size: 400
+        -   device: sdb
+            type: sdd
+            size: 400
 
 # Unique ISO data for OS
 ISO:

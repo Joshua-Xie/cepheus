@@ -76,6 +76,7 @@ inventory:
               ip: 10.123.85.131
           roles:
               - mon
+              - mgr
               - osd
               - rgw
               - adc
@@ -124,6 +125,7 @@ inventory:
               ip: 10.123.85.132
           roles:
               - mon
+              - mgr
               - osd
               - rgw
               - adc
@@ -172,6 +174,7 @@ inventory:
               ip: 10.123.85.133
           roles:
               - mon
+              - mgr
               - osd
               - rgw
               - adc

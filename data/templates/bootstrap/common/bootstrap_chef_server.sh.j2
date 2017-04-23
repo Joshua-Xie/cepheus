@@ -101,15 +101,12 @@ if [[ -z $chef_server ]]; then
     # if [[ $? -ne 0 ]]; then
         sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association {{ chef.admin.user }} # {# --filename /etc/opscode/{{ chef.validator }}.pem #}
     # fi
-
-    # sudo chmod 0644 /etc/opscode/{{ chef.admin.pem }} /etc/opscode/{{ chef.validator }}.pem
 fi
 # NB: May want to think of updating Chef Server here...
 ####
 
 echo "====> Creating $HOME/.chef environment..."
 mkdir -p $HOME/.chef
-# {# echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}.{{ domain }}/organizations/{{ chef.org }}'\nvalidation_client_name '{{ chef.validator }}'\nvalidation_key '/etc/opscode/{{ chef.validator }}.pem'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb #}
 echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}.{{ domain }}/organizations/{{ chef.org }}'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
 $KNIFE ssl fetch
 
@@ -135,7 +132,9 @@ sudo cp -rp $TMP_REPO_ROOT/. {{ cache.repo }}
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.repo }}
 
 # Remove the cepheus-build repo
-rm -rf $HOME/{{ build.cepheus }}
+if [[ -d $HOME/{{ build.cepheus }} ]]; then
+    rm -rf $HOME/{{ build.cepheus }}
+fi
 
 # Add the dependency cookbooks from the file cache
 echo "====> Checking on dependency for cookbooks..."
@@ -156,23 +155,9 @@ if [[ -d /tmp/cepheus ]]; then
     rm -rf /tmp/cepheus
 fi
 
-# Test............................................
-# Add chef info to bootstrap node.
-# echo "====> Uploading cookbooks..."
-# $KNIFE cookbook upload -a
-# cd $HOME/cepheus/roles && $KNIFE role from file *.json
-# cd $HOME/cepheus/environments && $KNIFE environment from file {{ environment }}.json
-#
-# echo "====> Running knife commands..."
-# $KNIFE node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
-# $KNIFE node environment set {{ bootstrap.name }} {{ environment }}
-# $KNIFE tag create {{ bootstrap.name }} 'ceph-bootstrap'
-#
-# mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.ssh/id_rsa
-#
-# sudo chef-client
-
-
+if [[ -f /home/{{ primary_user.name }}/.ssh/id_rsa.tmp ]]; then
+    mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.ssh/id_rsa
+fi
 
 # NB: TODO: Need to move required chef data and bootstrap all of the other nodes IF NOT pxe_boot enabled. This
 # must assume that the ssh-key represented in the yaml data files are already in place on each node so ansible can

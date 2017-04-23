@@ -41,6 +41,11 @@ device2_2U: &device2_2U enp0s9
 #
 ## End of device variable naming
 
+# Set the proxies for the given environment if there are any.
+proxy:
+    http: ""
+    https: ""
+
 # These can be any data files you want. A normal example is putting your rack data into a separate yaml for each rack
 # and then add them here to be included in the final build of `build.yaml` which everything will eventually derive from.
 data_files:
@@ -52,16 +57,27 @@ data_files:
     - "inventory.yaml"
 
 # Environment specific files that need to run through the template engine
+# *.env files contain host names for given roles which comes from inventory.yaml.
 environment_files:
-    - "bootstrap/vms/environment_config.yaml"
+    -   "bootstrap/vms/environment_config.yaml"
+    -   "environments/ceph_chef_adc_hosts.env"
+    -   "environments/ceph_chef_admin_hosts.env"
+    -   "environments/ceph_chef_bootstrap.env"
+    -   "environments/ceph_chef_hosts.env"
+    -   "environments/ceph_chef_mds_hosts.env"
+    -   "environments/ceph_chef_mgr_hosts.env"
+    -   "environments/ceph_chef_mon_hosts.env"
+    -   "environments/ceph_chef_osd_hosts.env"
+    -   "environments/ceph_chef_proxy.env"
+    -   "environments/ceph_chef_rgw_hosts.env"
 
 # Place all files that fall under the `cookbooks` directory normally such as recipes, recipe templates, etc
 cookbooks_files:
-    - "cookbooks/cepheus/recipes/cobbler-install.rb"
-    - "cookbooks/cepheus/recipes/cobbler-sync.rb"
-    - "cookbooks/cepheus/templates/default/cobbler.dhcp.template.erb"
-    - "cookbooks/cepheus/templates/default/zabbix-userparameter-radosgw.conf.erb"
-    - "cookbooks/cepheus/metadata.rb"
+    -   "cookbooks/cepheus/recipes/cobbler-install.rb"
+    -   "cookbooks/cepheus/recipes/cobbler-sync.rb"
+    -   "cookbooks/cepheus/templates/default/cobbler.dhcp.template.erb"
+    -   "cookbooks/cepheus/templates/default/zabbix-userparameter-radosgw.conf.erb"
+    -   "cookbooks/cepheus/metadata.rb"
 
 # By default 'ceph-chef' gets downloaded in the 'bootstrap_prereqs.sh' script. However, there are times when you
 # may want a different version. This section will allow for adding environment specific 'staging' like repo endpoints
@@ -148,17 +164,6 @@ staging:
                 # Override ceph-chef - Useful if debugging or custom version
                 cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
             layer: 7
-        # -   output: ""
-        #     comment: "Generate scripts from data..."
-        #     repo: ""
-        #     branch: ""
-        #     command: |
-        #         # This will only build the templates (scripts)
-        #         echo
-        #         echo "====> Calling CEPH_UP -x -z $WORK_DIR/cepheus-public-staging..."
-        #         echo
-        #         cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
-        #     layer: 8
 
 # Info to setup development environment as well
 development:

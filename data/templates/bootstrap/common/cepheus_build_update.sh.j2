@@ -185,18 +185,18 @@ cd $HOME/cepheus/roles && $KNIFE role from file *.json
 echo "====> Uploading Chef cookbooks..."
 $KNIFE cookbook upload -a
 
-# Bootstrap node will never change or should never change...
 # Add Chef tags
 # NOTE: run_list *set* replaces any run_list that may have already been there before
-# echo "====> Setting Chef Bootstrap Run-list..."
-# knife node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
-# echo "====> Setting Chef Bootstrap Environment..."
-# knife node environment set {{ bootstrap.name }} {{ environment }}
-# echo "====> Setting Chef Bootstrap Tag..."
-# knife tag create {{ bootstrap.name }} 'ceph-bootstrap'
+echo "====> Setting Chef Bootstrap Run-list..."
+knife node run_list set {{ bootstrap.name }} 'role[ceph-bootstrap]'
+echo "====> Setting Chef Bootstrap Environment..."
+knife node environment set {{ bootstrap.name }} {{ environment }}
+echo "====> Setting Chef Bootstrap Tag..."
+knife tag create {{ bootstrap.name }} 'ceph-bootstrap'
 
-echo "====> Building Chef ENV..."
-sudo chef-client -o 'recipe[cepheus::build-env]'
+# Remove this block after env templates are tested...
+# echo "====> Building Chef ENV..."
+# sudo chef-client -o 'recipe[cepheus::build-env]'
 
 # Update Chef tags
 echo "====> Calling Chef tags..."
