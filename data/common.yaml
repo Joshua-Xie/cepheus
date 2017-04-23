@@ -150,7 +150,7 @@ shell:
 files:
     -   "bootstrap/common/base_environment.sh"
     -   "bootstrap/common/base.sh"
-    -   "bootstrap/common.base_colors.sh"
+    -   "bootstrap/common/base_colors.sh"
     -   "bootstrap/common/chef_runlists_update.sh"
     -   "bootstrap/common/bootstrap_validate_env.sh"
     -   "bootstrap/common/bootstrap_prereqs.sh"
