@@ -142,7 +142,7 @@ download_file /{{ cache.packages }}/{{ chef_repo.client.package }} https://packa
 download_file /{{ cache.packages }}/{{ chef_repo.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef_repo.server.version }}/el/7/{{ chef_repo.server.package }}
 
 # BIRD is a little different
-echo_light_purple "====> Downloading Bird..."
+echo_orange "====> Downloading Bird..."
 # Bird ftp site sometimes has connection issues so...
 set +e
 ftp_file /{{ cache.packages }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/pub/bird/redhat/{{ adc_repo.bgp.bird.package }}
