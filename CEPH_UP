@@ -279,7 +279,9 @@ else
 
     echo_yellow "====> Calling bootstrap_chef_server.sh..."
     # Just a safe check because this part can fail and be fine.
+    set +e
     source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
+    set -e
 
     echo_green "====> Bootstrapping phase - Complete <===="
     echo
