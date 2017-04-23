@@ -24,7 +24,10 @@ set -e
 # Force a new clone
 REPO_ROOT={{ cache.repo }}
 REPO_ROOT_FILES={{ cache.base }}
+
+# Hold onto the original data
 TMP_REPO_ROOT_FILES=$REPO_ROOT_FILES
+TMP_REPO_ROOT=$REPO_ROOT
 
 WORK_DIR={{ build.work_dir }}
 DATE=$(date +%Y-%m-%d_%H%M%S)
@@ -101,6 +104,10 @@ echo_yellow "====> Clean staging process directories..."
 echo_yellow "====> Building update..."
 # Build new {{ cache.repo }} environment and replace existing version
 
+# Force this to be original value
+REPO_ROOT_FILES=$TMP_REPO_ROOT_FILES
+REPO_ROOT=$TMP_REPO_ROOT
+
 # Create dir even though it may already exist
 sudo mkdir -p $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
@@ -109,11 +116,7 @@ if [[ $(ls -A {{ cache.repo }}) ]]; then
     sudo rm -rf $REPO_ROOT/*
 fi
 
-# Force this to be original value
-REPO_ROOT_FILES=$TMP_REPO_ROOT_FILES
-
 echo_yellow "====> Copying data to $REPO_ROOT..."
-ls $WORK_DIR/cepheus-public-staging
 cp -rp $WORK_DIR/cepheus-public-staging/* $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
 
