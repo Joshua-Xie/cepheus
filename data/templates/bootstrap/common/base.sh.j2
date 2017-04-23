@@ -15,101 +15,96 @@
 # limitations under the License.
 #
 
-# This is for situations where you have a partial setup on something and you want to override the default
-# 'set -e' option. Put here so it's easy to see but the condition is further down after basic tests are performed.
-# This allows you to pass anything in after the script in question which means you're making a decision to override
-# the default of erroring out on anything that comes up such as 'already installed' etc. If nothing is passed in
-# then the default is assumed.
-# Note: This setting is only valid until something downstream (another script) overrides it.
-set -e
-
 export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
 
 if [[ -f $REPO_ROOT/bootstrap/common/base_colors.sh ]]; then
     source $REPO_ROOT/bootstrap/common/base_colors.sh
 elif [[ -f `pwd`/bootstrap/common/base_colors.sh ]]; then
     source `pwd`/bootstrap/common/base_colors.sh
+    REPO_ROOT=`pwd`
 fi
 
-if [[ ! -f $REPO_ROOT ]]; then
+if [[ ! -d $REPO_ROOT ]]; then
     echo_red "$REPO_ROOT has not been created yet. Success (exit)."
     echo
-else
+    exit 1
+fi
 
-    # It's ok to let this go through because the bootstrap node will not have these generated until AFTER the Chef Server
-    # is installed, started and the bootstrap role runs.
-    # CEPH_CHEF_HOSTS=( ceph-bootstrap )
+set -e
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_bootstrap.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_bootstrap.env
-    fi
+# It's ok to let this go through because the bootstrap node will not have these generated until AFTER the Chef Server
+# is installed, started and the bootstrap role runs.
+# CEPH_CHEF_HOSTS=( ceph-bootstrap )
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_hosts.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_hosts.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_bootstrap.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_bootstrap.env
+fi
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_osd_hosts.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_hosts.env
+fi
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_mon_hosts.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_osd_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
+fi
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_mds_hosts.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_mds_hosts.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_mon_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
+fi
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_rgw_hosts.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_mds_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_mds_hosts.env
+fi
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_admin_hosts.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_rgw_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
+fi
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_adc_hosts.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_admin_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
+fi
 
-    if [[ -f $REPO_ROOT/environments/ceph_chef_proxy.env ]]; then
-        source $REPO_ROOT/environments/ceph_chef_proxy.env
-    fi
+if [[ -f $REPO_ROOT/environments/ceph_chef_adc_hosts.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
+fi
 
-    # This script does a lot of stuff:
-    # - installs Chef Server on the ceph-bootstrap node
-    # - installs Chef client on all nodes
+if [[ -f $REPO_ROOT/environments/ceph_chef_proxy.env ]]; then
+    source $REPO_ROOT/environments/ceph_chef_proxy.env
+fi
 
-    # It would be more efficient as something executed in one shot on each node, but
-    # doing it this way makes it easy to orchestrate operations between nodes. It will be
-    # overhauled at some point to not be Vagrant-specific.
+# This script does a lot of stuff:
+# - installs Chef Server on the ceph-bootstrap node
+# - installs Chef client on all nodes
 
-    # NOTE: You could check to see if node IP == bootstrap IP and if so then don't ssh or just have the key :)
+# It would be more efficient as something executed in one shot on each node, but
+# doing it this way makes it easy to orchestrate operations between nodes. It will be
+# overhauled at some point to not be Vagrant-specific.
 
-    do_on_node() {
-      echo
-      echo_green "Issuing command: ssh $1 ${2}"
-      echo_green "----------------------------------------------------------------------------------------"
-      NODE=$1
-      shift
-      COMMAND="${*}"
-      ssh -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
-    }
+# NOTE: You could check to see if node IP == bootstrap IP and if so then don't ssh or just have the key :)
 
-    # use Chef Server embedded knife instead of the one in /usr/bin
-    KNIFE=/opt/opscode/embedded/bin/knife
+do_on_node() {
+  echo
+  echo_green "Issuing command: ssh $1 ${2}"
+  echo_green "----------------------------------------------------------------------------------------"
+  NODE=$1
+  shift
+  COMMAND="${*}"
+  ssh -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
+}
 
-    # Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
-    delete=($CEPH_CHEF_BOOTSTRAP)
-    export CEPH_NODES=("${CEPH_CHEF_HOSTS[@]/$delete}")
+# use Chef Server embedded knife instead of the one in /usr/bin
+KNIFE=/opt/opscode/embedded/bin/knife
 
-    if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
-        echo
-        echo_yellow "##########"
-        echo_yellow "Root: $REPO_ROOT"
-        echo_yellow "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
-        echo_yellow "Ceph Nodes: ${CEPH_NODES[@]}"
-        echo_yellow "##########"
-        echo
-    fi
+# Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
+delete=($CEPH_CHEF_BOOTSTRAP)
+export CEPH_NODES=("${CEPH_CHEF_HOSTS[@]/$delete}")
+
+if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
+    echo
+    echo_yellow "##########"
+    echo_yellow "Root: $REPO_ROOT"
+    echo_yellow "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
+    echo_yellow "Ceph Nodes: ${CEPH_NODES[@]}"
+    echo_yellow "##########"
+    echo
 fi
