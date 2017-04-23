@@ -28,7 +28,7 @@ REPO_ROOT=$1
 BUILD_LOCATION=$2
 BUILD_DATA_CENTER=$3
 
-source base_colors.sh
+source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 if [[ -z $REPO_ROOT ]]; then
     echo_red "====> MUST specify the REPO_ROOT variable <===="

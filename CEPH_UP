@@ -253,7 +253,7 @@ fi
 # creating local directories. It can do one of two things - download or execute commands. The end result is a filled cache.
 echo_yellow "====> Downloading necessary files to local cache..."
 # The /ceph-files parameter will need to be addressed!
-source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh /ceph-files
+source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh /ceph-files `pwd`
 
 # If prerequisites only then end after getting them
 if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then

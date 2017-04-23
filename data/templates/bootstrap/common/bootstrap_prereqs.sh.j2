@@ -20,11 +20,13 @@
 # Exit immediately if anything goes wrong!
 set -eu
 
-# Same directory as this script
-source base_colors.sh
-
 REPO_ROOT_FILES=$1
 REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}
+
+REPO_ROOT=$2
+REPO_ROOT=${REPO_ROOT:-"{{ cache.root }}"}
+
+source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 # Create directory for download cache.
 CACHE_ISO={{ cache.iso }}
