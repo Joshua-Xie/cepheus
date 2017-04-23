@@ -17,6 +17,9 @@
 
 export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
 
+# If DONT_SHOW_BANNER is not set then default it to 0
+DONT_SHOW_BANNER=${DONT_SHOW_BANNER:-1}
+
 if [[ -f $REPO_ROOT/bootstrap/common/base_colors.sh ]]; then
     source $REPO_ROOT/bootstrap/common/base_colors.sh
 elif [[ -f `pwd`/bootstrap/common/base_colors.sh ]]; then
