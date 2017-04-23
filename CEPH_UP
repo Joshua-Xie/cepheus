@@ -161,7 +161,7 @@ done
 
 if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
     clear
-    echo -e "${RED}"
+    echo -e "${GREEN}"
     echo "                    __     "
     echo "                    \ \    "
     echo "                     > \   "
@@ -173,7 +173,7 @@ if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
     echo -e "Bootstrapping local CEPH environment using Vagrant...${NC}"
     echo
 else
-    echo -e "${RED}"
+    echo -e "${GREEN}"
     echo "====> CEPH_UP being called..."
     echo -e "${NC}"
 fi
