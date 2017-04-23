@@ -13,6 +13,7 @@
 /bootstrap/common/cepheus_backup_rsync.sh
 /bootstrap/common/base_environment.sh
 /bootstrap/common/base.sh
+/bootstrap/common/base_colors.sh
 /bootstrap/common/bootstrap_chef_server.sh
 /bootstrap/common/chef_runlists_update.sh
 /bootstrap/common/chef_tags_create.sh

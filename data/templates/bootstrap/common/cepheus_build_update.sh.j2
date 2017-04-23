@@ -25,23 +25,12 @@ set -e
 REPO_ROOT={{ cache.repo }}
 REPO_ROOT_FILES={{ cache.base }}
 
-# Fall back to current directory root
-if [[ ! -d $REPO_ROOT ]]; then
-    REPO_ROOT=`pwd`
-fi
-
-# Hold onto the original data
-# TMP_REPO_ROOT_FILES=$REPO_ROOT_FILES
-# TMP_REPO_ROOT=$REPO_ROOT
-
 WORK_DIR={{ build.work_dir }}
 DATE=$(date +%Y-%m-%d_%H%M%S)
 VERSION={{ version }}
 
 CLUSTER={{ data_center }}
 CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
-
-source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 # Change to whatever owner/group you like - NB: group was primary_user.group
 OWNER={{ primary_user.name }}
@@ -61,6 +50,13 @@ fi
 # This is OK since only cloning/pulling. It only caches the credentials long enough to pull in all of the repos.
 git config --global credential.helper cache
 git config --global credential.helper 'cache --timeout=25'
+
+## Colors data is injected here for self-maintenance so it's not depending on anything else.
+## Begin colors section
+
+{{ common.colors }}
+
+## End colors section
 
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
 {% if primary_user.backup.enable %}
