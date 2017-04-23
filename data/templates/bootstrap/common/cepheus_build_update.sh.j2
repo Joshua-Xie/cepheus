@@ -24,6 +24,7 @@ set -e
 # Force a new clone
 REPO_ROOT={{ cache.repo }}
 REPO_ROOT_FILES={{ cache.base }}
+TMP_REPO_ROOT_FILES=$REPO_ROOT_FILES
 
 WORK_DIR={{ build.work_dir }}
 DATE=$(date +%Y-%m-%d_%H%M%S)
@@ -124,6 +125,9 @@ sudo chown -R $OWNER:$GROUP $REPO_ROOT
 if [[ $(ls -A {{ cache.repo }}) ]]; then
     sudo rm -rf $REPO_ROOT/*
 fi
+
+# Force this to be original value
+REPO_ROOT_FILES=$TMP_REPO_ROOT_FILES
 
 echo "====> Copying data to $REPO_ROOT..."
 ls $WORK_DIR/cepheus-public-staging
