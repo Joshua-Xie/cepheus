@@ -109,6 +109,14 @@ echo_yellow "====> Building update..."
 REPO_ROOT_FILES={{ cache.base }}
 REPO_ROOT={{ cache.repo }}
 
+# Remove '.git' and other dot files for clean up
+set +e
+cd $WORK_DIR/cepheus-public-staging
+rm -rf .git
+rm .*
+cd -
+set -e
+
 # Create dir even though it may already exist
 sudo mkdir -p $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
@@ -118,7 +126,7 @@ if [[ $(ls -A {{ cache.repo }}) ]]; then
 fi
 
 echo_yellow "====> Copying data to $REPO_ROOT..."
-cp -rp $WORK_DIR/cepheus-public-staging/* $REPO_ROOT
+cp -r $WORK_DIR/cepheus-public-staging/* $REPO_ROOT
 sudo chown -R $OWNER:$GROUP $REPO_ROOT
 
 ####
@@ -159,7 +167,7 @@ $SUDO $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATI
 # Sync $HOME/cepheus with {{ cache.repo }}
 echo_yellow "====> Syncing $REPO_ROOT and $HOME/cepheus..."
 sudo rm -rf $HOME/cepheus/*
-cp -rp $REPO_ROOT/* $HOME/cepheus
+cp -r $REPO_ROOT/* $HOME/cepheus
 
 # Make sure it's {{ primary_user.name }} as owner:group
 sudo chown -R $OWNER:$GROUP $HOME/cepheus
