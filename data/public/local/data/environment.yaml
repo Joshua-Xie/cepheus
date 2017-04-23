@@ -144,7 +144,7 @@ staging:
                 cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
                 echo
                 echo "====> Generating bootstrap_prereqs.sh..."
-                source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging
+                source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging $WORK_DIR/cepheus-public-staging
                 ls $WORK_DIR/cepheus-files-staging
             layer: 6
         -   output: ""
