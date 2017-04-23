@@ -25,6 +25,11 @@ set -e
 REPO_ROOT={{ cache.repo }}
 REPO_ROOT_FILES={{ cache.base }}
 
+# Fall back to current directory root
+if [[ ! -d $REPO_ROOT ]]; then
+    REPO_ROOT=`pwd`
+fi
+
 # Hold onto the original data
 # TMP_REPO_ROOT_FILES=$REPO_ROOT_FILES
 # TMP_REPO_ROOT=$REPO_ROOT
