@@ -18,9 +18,10 @@
 
 # Deletes the tags on all nodes. BE CAREFUL!
 
+source {{ cache.root }}/bootstrap/common/base_colors.sh
 source {{ cache.root }}/bootstrap/common/base.sh
 
-echo "Updating run_list..."
+echo_yellow "====> Updating run_list..."
 
 # NOTE: run_list *set* is used to REPLACE any existing run_list. run_list *add* is used to append a role/recipe
 # to an existing run_list.

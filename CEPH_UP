@@ -36,10 +36,10 @@ set -eu
 # Purple       0;35     Light Purple  1;35
 # Cyan         0;36     Light Cyan    1;36
 # Light Gray   0;37     White         1;37
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+# RED='\033[0;31m'
+# YELLOW='\033[0;33m'
+# GREEN='\033[0;32m'
+# NC='\033[0m' # No Color
 
 # Default values...
 export CEPH_DEV_MODE=0
@@ -159,6 +159,8 @@ while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
     esac
 done
 
+source $REPO_ROOT/bootstrap/common/base_colors.sh
+
 if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
     clear
     echo -e "${GREEN}"
@@ -173,9 +175,9 @@ if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
     echo -e "Bootstrapping local CEPH environment using Vagrant...${NC}"
     echo
 else
-    echo -e "${GREEN}"
-    echo "====> CEPH_UP being called..."
-    echo -e "${NC}"
+    echo
+    echo_green "====> CEPH_UP being called..."
+    echo
 fi
 
 # Create *initial* build.yaml from common.yaml
@@ -184,7 +186,7 @@ cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTE
 # Build bootstrapping environment based on yaml data
 BUILD=data/build.sh
 
-echo -e "${YELLOW}====> Generating $REPO_ROOT/$BUILD from $REPO_ROOT/data/common.yaml...${NC}"
+echo_yellow "====> Generating $REPO_ROOT/$BUILD from $REPO_ROOT/data/common.yaml..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
 sudo chmod +x $REPO_ROOT/$BUILD
 
@@ -202,7 +204,7 @@ sudo chmod +x $REPO_ROOT/$BUILD
 
 # Add all other data files to the final build.yaml
 BUILD_DATA=data/data_files.sh
-echo -e "${YELLOW}====> Generating $REPO_ROOT/$BUILD_DATA from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml...${NC}"
+echo_yellow "====> Generating $REPO_ROOT/$BUILD_DATA from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
 sudo chmod +x $REPO_ROOT/$BUILD_DATA
 
@@ -211,11 +213,11 @@ sudo chmod +x $REPO_ROOT/$BUILD_DATA
 # Data portion is executed first to create the required data files.
 # Execute the freshly built `data_files.sh` script that was just built from the template.
 #
-echo -e "${YELLOW}====> Executing $REPO_ROOT/$BUILD_DATA...${NC}"
+echo_yellow "====> Executing $REPO_ROOT/$BUILD_DATA..."
 source $REPO_ROOT/$BUILD_DATA
 #
 # Execute the freshly built `build.sh` script that was just built from the template.
-echo -e "${YELLOW}====> Executing $REPO_ROOT/$BUILD...${NC}"
+echo_yellow "====> Executing $REPO_ROOT/$BUILD..."
 source $REPO_ROOT/$BUILD
 #
 ## Execution phase end block
@@ -223,43 +225,40 @@ source $REPO_ROOT/$BUILD
 
 # Build the init and update scripts
 BUILD_INIT_UPDATE=data/build_init_update.sh
-echo -e "${YELLOW}====> Generating $REPO_ROOT/$BUILD_INIT_UPDATE from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml...${NC}"
+echo_yellow "====> Generating $REPO_ROOT/$BUILD_INIT_UPDATE from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/$BUILD_INIT_UPDATE.j2 -o $REPO_ROOT/$BUILD_INIT_UPDATE
 sudo chmod +x $REPO_ROOT/$BUILD_INIT_UPDATE
 
-echo -e "${YELLOW}====> Executing $REPO_ROOT/$BUILD_INIT_UPDATE...${NC}"
+echo_yellow "====> Executing $REPO_ROOT/$BUILD_INIT_UPDATE..."
 source $REPO_ROOT/$BUILD_INIT_UPDATE
 
 # Build environments file for Chef
-echo -e "${YELLOW}====> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json...${NC}"
+echo_yellow "====> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
 
 if [[ $BUILD_TEMPLATES_ONLY -ne 0 ]]; then
-    echo -e "${GREEN}"
-    echo "====> Built templates only..."
-    echo -e "${NC}"
+    echo
+    echo_yellow "====> Built templates only - Complete <===="
     echo
     exit 0
 fi
 
 # Configure and test any proxies configured.
 if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
-  echo "====> Testing configured proxies..."
+  echo_yellow "====> Testing configured proxies..."
   source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
 fi
 
 # Do prerequisite work prior to starting build, downloading files and
 # creating local directories. It can do one of two things - download or execute commands. The end result is a filled cache.
-echo "====> Downloading necessary files to local cache..."
+echo_yellow "====> Downloading necessary files to local cache..."
 # The /ceph-files parameter will need to be addressed!
 source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh /ceph-files
 
 # If prerequisites only then end after getting them
 if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then
     echo
-    echo -e "${GREEN}"
-    echo "====> Prerequisites have been updated and exiting."
-    echo -e "${NC}"
+    echo_green "====> Prerequisites have been updated - Complete <===="
     echo
     exit 1
 fi
@@ -275,26 +274,21 @@ if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
     fi
 else
     # Build out or update the given environment.
-    echo -e "${YELLOW}====> Calling cepheus_bootstrap_init.sh...${NC}"
+    echo_yellow "====> Calling cepheus_bootstrap_init.sh..."
     sudo $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
 
-    echo -e "${YELLOW}====> Calling bootstrap_chef_server.sh...${NC}"
+    echo_yellow "====> Calling bootstrap_chef_server.sh..."
     # Just a safe check because this part can fail and be fine.
-    set +e
     source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
-    set -e
 
-    echo -e "${GREEN}"
-    echo "====> Completed Bootstrapping!"
-    echo -e "${NC}"
+    echo_green "====> Bootstrapping phase - Complete <===="
     echo
     exit 0
 fi
 
-echo -e "${YELLOW}====> Calling cepheus_build_update.sh...${NC}"
+echo_yellow "====> Calling cepheus_build_update.sh..."
 source $TMP_REPO_ROOT/bootstrap/common/cepheus_build_update.sh
 
-echo -e "${GREEN}"
-echo "====> Complete!"
-echo -e "${NC}"
+echo
+echo_green "====> Complete <===="
 echo

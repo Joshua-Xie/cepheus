@@ -20,6 +20,9 @@
 # Exit immediately if anything goes wrong!
 set -eu
 
+# Same directory as this script
+source base_colors.sh
+
 REPO_ROOT_FILES=$1
 REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}
 
@@ -31,20 +34,21 @@ CACHE_LOADER={{ cache.loader }}
 CACHE_COOKBOOK={{ cache.cookbook }}
 CACHE_GEM={{ cache.gem }}
 
-echo "====> Checking local environment..."
+# Set color in this script to Orange to see it better...
+echo_orange "====> Checking local environment..."
 
 # Check variables before use below...
 USER=`id -un`
 GROUP=`id -gn`
 
-echo "====> Checking cache: $REPO_ROOT_FILES..."
+echo_orange "====> Checking cache: $REPO_ROOT_FILES..."
 
 # If set then it will remove the cache directories
 if [[ $BOOTSTRAP_REMOVE_PREREQS -ne 0 ]]; then
     sudo rm -rf $REPO_ROOT_FILES
 fi
 
-echo "====> Creating cache directories..."
+echo_orange "====> Creating cache directories..."
 
 # Create the cache directories...
 sudo mkdir -p $REPO_ROOT_FILES/{{ cache.pxe_boot }}/{$CACHE_ISO,$CACHE_LOADER}
@@ -55,11 +59,11 @@ sudo chown -R $USER:$GROUP $REPO_ROOT_FILES
 # calling this...
 {% if cache.download != True %}
 # Execute raw `commands` as-is...
-echo "====> Executing raw commands to fill cache..."
+echo_orange "====> Executing raw commands to fill cache..."
 {{ cache.commands }}
 # NB: If this is present then the template_engine allowed the cache directories to be created and then executed the `commands`
 # and exited normally
-echo "====> Success in executing commands!"
+echo_green "====> Success in executing commands - Complete <===="
 echo
 exit 0
 {% endif %}
@@ -67,97 +71,85 @@ exit 0
 # download_file wraps the usual behavior of curling a remote URL to a local file
 # NOTE: PROXY - Make sure your http_proxy and https_proxy envrionment variables are set correctly if behind a proxy.
 download_file() {
-  FILE=$1
-  URL=$2
+      FILE=$1
+      URL=$2
 
-  if [[ ! -f $REPO_ROOT_FILES/$FILE && ! -f $REPO_ROOT_FILES/${FILE}_downloaded ]]; then
-    echo $FILE
-    echo $URL
+      if [[ ! -f $REPO_ROOT_FILES/$FILE && ! -f $REPO_ROOT_FILES/${FILE}_downloaded ]]; then
+            echo_orange "$FILE"
+            echo_orange "$URL"
 
-    rm -f $REPO_ROOT_FILES/$FILE
-    curl -L --progress-bar -o $REPO_ROOT_FILES/$FILE $URL
-    touch $REPO_ROOT_FILES/${FILE}_downloaded
-  fi
+            rm -f $REPO_ROOT_FILES/$FILE
+            echo -e "${PURPLE}"
+            curl -L --progress-bar -o $REPO_ROOT_FILES/$FILE $URL
+            echo -e "${NC}"
+            touch $REPO_ROOT_FILES/${FILE}_downloaded
+      fi
 }
 
 # NOTE: PROXY - Make sure your ftp_proxy envrionment variable is set correctly if behind a proxy.
 ftp_file() {
-  FILE=$1
-  URL=$2
+      FILE=$1
+      URL=$2
 
-  if [[ ! -f $REPO_ROOT_FILES/$FILE && ! -f $REPO_ROOT_FILES/${FILE}_downloaded ]]; then
-    echo $FILE
-    echo $URL
+      if [[ ! -f $REPO_ROOT_FILES/$FILE && ! -f $REPO_ROOT_FILES/${FILE}_downloaded ]]; then
+            echo_orange "$FILE"
+            echo_orange "$URL"
 
-    rm -f $REPO_ROOT_FILES/$FILE
-    wget $URL -O $REPO_ROOT_FILES/$FILE
-    touch $REPO_ROOT_FILES/${FILE}_downloaded
-  fi
+            rm -f $REPO_ROOT_FILES/$FILE
+            wget $URL -O $REPO_ROOT_FILES/$FILE
+            touch $REPO_ROOT_FILES/${FILE}_downloaded
+      fi
 }
 
 git_clone_or_update() {
-  local NAME=$1
-  local URL=$2
+      local NAME=$1
+      local URL=$2
 
-  echo "====> Git clone or update..."
-  if [[ ! -f $REPO_ROOT_FILES/${NAME}_downloaded ]]; then
-    if [[ ! -d $REPO_ROOT_FILES/$NAME ]]; then
-      git clone $URL $REPO_ROOT_FILES/$NAME || true
-    else
-      ( cd $REPO_ROOT_FILES/$NAME && git pull --ff-only $URL )
-    fi
-    touch $REPO_ROOT_FILES/${NAME}_downloaded
-  fi
+      echo_orange "====> Git clone or update..."
+      if [[ ! -f $REPO_ROOT_FILES/${NAME}_downloaded ]]; then
+            if [[ ! -d $REPO_ROOT_FILES/$NAME ]]; then
+                git clone $URL $REPO_ROOT_FILES/$NAME || true
+            else
+                ( cd $REPO_ROOT_FILES/$NAME && git pull --ff-only $URL )
+            fi
+            touch $REPO_ROOT_FILES/${NAME}_downloaded
+      fi
 }
 
 {# Using method gate instead of pxe_boot.enable since we only want common.yaml to be used as data input #}
 {% if method == "pxe" %}
 # Obtain an RHEL 7.2 image to be used for PXE booting in production.
-echo "====> Downloading ISO..."
+echo_blue "====> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
-  if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
-    # NOTE: the +e is because the hardware  We can change it later...
-    set +e
-    download_file {{ cache.pxe_boot }}/{{ cache.iso }}/{{ pxe_boot.iso.name }} {{ pxe_boot.iso.url }}
-    set -e
-  fi
+      if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
+            # NOTE: the +e is because the hardware  We can change it later...
+            set +e
+            download_file {{ cache.pxe_boot }}/{{ cache.iso }}/{{ pxe_boot.iso.name }} {{ pxe_boot.iso.url }}
+            set -e
+      fi
 fi
 
-# if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
-  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
-  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
-  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
-  download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
-# fi
+download_file {{ cache.pxe_boot }}/{{ cache.loader }}/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
+download_file {{ cache.pxe_boot }}/{{ cache.loader }}/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
+download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
+download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
 {% endif %}
 
-echo "====> Downloading Chef..."
+echo_orange "====> Downloading Chef..."
 download_file /{{ cache.packages }}/{{ chef_repo.client.package }} https://packages.chef.io/files/stable/chef/{{ chef_repo.client.version }}/el/7/{{ chef_repo.client.package }}
 download_file /{{ cache.packages }}/{{ chef_repo.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef_repo.server.version }}/el/7/{{ chef_repo.server.package }}
 
 # BIRD is a little different
-echo "====> Downloading Bird..."
+echo_light_purple "====> Downloading Bird..."
 # Bird ftp site sometimes has connection issues so...
 set +e
 ftp_file /{{ cache.packages }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/pub/bird/redhat/{{ adc_repo.bgp.bird.package }}
 set -e
 
-# Most important cookbook
-# If set then it will not download but remove from cache and use the development version that should be set in the cepheus/cookbooks directory.
-# if [[ $CHEF_CEPHEUS_DEBUG -eq 0 ]]; then
-#     echo "====> Downloading ceph-chef..."
-#     download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
-# else
-#   # Remove it so it's not used.
-#   echo "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
-#   rm -f $REPO_ROOT_FILES/{{ cache.cookbook }}/ceph-chef-*
-# fi
-
 {# Don't want debug enabled on initial build out or ceph-chef may not get uploaded!! #}
 {%- if ceph_chef.debug %}
-
 # Remove it so it's not used - ONLY if the directories exists else skip it because that means it will be handled differently later.
-echo "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
+echo_light_red "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
 if [[ -d $REPO_ROOT_FILES/{{ cache.cookbook }} ]]; then
     rm -f $REPO_ROOT_FILES/{{ cache.cookbook }}/ceph-chef-*
 fi
@@ -167,32 +159,30 @@ if [[ -d $REPO_ROOT/cookbooks/ceph-chef ]]; then
     git clone -b {{ ceph_chef.git.branch }} {{ ceph_chef.git.url }}/{{ ceph_chef.git.repo }} $REPO_ROOT/cookbooks/ceph-chef
 fi
 {% else %}
-
-echo "====> Downloading ceph-chef..."
+echo_orange "====> Downloading ceph-chef..."
 download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
-
 {%- endif %}
 
 if [[ $CEPH_DEV_MODE -ne 0 ]]; then
-  echo "====> Cloning Ceph..."
+  echo_purple "====> Cloning Ceph..."
   git_clone_or_update git/ceph https://github.com/ceph/ceph.git
 fi
 
 # Python
-echo "====> Downloading Python based dependencies..."
+echo_orange "====> Downloading Python based dependencies..."
 # NB: If this section is empty it means that no python 'pip like' dependency was asked for so the template_engine skipped it.
 {%- for item in python %}
 download_file /python/{{ item.name }}-{{ item.verion }}.tar.gz {{ item.url }}{%- if item.inline %}{{ item.name }}-{{ item.version }}.tar.gz{%- endif %}
 {%- endfor %}
 
 # Cookbooks
-echo "====> Downloading Cookbook dependencies..."
+echo_orange "====> Downloading Cookbook dependencies..."
 {%- for item in cookbooks %}
 download_file {{ cache.cookbook }}/{{ item.name }}-{{ item.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/{{ item.name }}/versions/{{ item.version }}/download
 {%- endfor %}
 
 # Gems
-echo "====> Downloading GEM dependencies..."
+echo_orange "====> Downloading GEM dependencies..."
 # REQUIRED for ceph-chef cookbook - must be installed before doing 'sudo chef-client' on any node
 {%- for item in ceph_chef.gems %}
 download_file {{ cache.gem }}/{{ item.name }}-{{ item.version }}.gem https://rubygems.org/downloads/{{ item.name }}-{{ item.version }}.gem
@@ -208,5 +198,6 @@ done
 # Pull knife-acl gem. This is ONLY needed if using data bags where the data bag is created with a recipe!
 download_file {{ cache.gem }}/knife-acl-{{ chef_repo.knife_acl_version }}.gem https://rubygems.global.ssl.fastly.net/gems/knife-acl-{{ chef_repo.knife_acl_version }}.gem
 
-echo "====> Completed bootstrap_prereqs.sh. Success!"
+echo
+echo_green "====> Completed bootstrap_prereqs.sh - Complete <===="
 echo

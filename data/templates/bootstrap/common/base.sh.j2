@@ -24,8 +24,11 @@
 set -e
 
 export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
+
+source $REPO_ROOT/bootstrap/common/base_colors.sh
+
 if [[ ! -f $REPO_ROOT ]]; then
-    echo "$REPO_ROOT has not been created yet. Success (exit)."
+    echo_red "$REPO_ROOT has not been created yet. Success (exit)."
     echo
 else
 
@@ -81,8 +84,8 @@ else
 
     do_on_node() {
       echo
-      echo "Issuing command: ssh $1 ${2}"
-      echo "----------------------------------------------------------------------------------------"
+      echo_green "Issuing command: ssh $1 ${2}"
+      echo_green "----------------------------------------------------------------------------------------"
       NODE=$1
       shift
       COMMAND="${*}"
@@ -98,11 +101,11 @@ else
 
     if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
         echo
-        echo "##########"
-        echo "Root: $REPO_ROOT"
-        echo "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
-        echo "Ceph Nodes: ${CEPH_NODES[@]}"
-        echo "##########"
+        echo_yellow "##########"
+        echo_yellow "Root: $REPO_ROOT"
+        echo_yellow "Cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
+        echo_yellow "Ceph Nodes: ${CEPH_NODES[@]}"
+        echo_yellow "##########"
         echo
     fi
 fi

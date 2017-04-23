@@ -18,9 +18,10 @@
 
 # Sets the base roles for the nodes so as to start over...
 
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 source {{ cache.repo }}/bootstrap/common/base.sh
 
-echo "====> Creating Chef Tags..."
+echo_yellow "====> Creating Chef Tags..."
 
 # IMPORTANT: DO NOT attempt to put the run_list all together!!! If that happens we then need to create checks, wait
 # and quorum checks!

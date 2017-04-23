@@ -28,27 +28,29 @@ REPO_ROOT=$1
 BUILD_LOCATION=$2
 BUILD_DATA_CENTER=$3
 
+source base_colors.sh
+
 if [[ -z $REPO_ROOT ]]; then
-    echo "MUST specify the REPO_ROOT variable"
+    echo_red "====> MUST specify the REPO_ROOT variable <===="
     exit 1
 fi
 
 if [[ -z $BUILD_LOCATION ]]; then
-    echo "MUST specify the BUILD_LOCATION variable"
+    echo_red "====> MUST specify the BUILD_LOCATION variable <===="
     exit 1
 fi
 
 if [[ -z $BUILD_DATA_CENTER ]]; then
-    echo "MUST specify the BUILD_DATA_CENTER variable"
+    echo_red "====> MUST specify the BUILD_DATA_CENTER variable <===="
     exit 1
 fi
 
 {% if os.type != "ubuntu" %}
 for pack in kernel-devel gcc make perl bzip2 epel-release rsync vim git wget curl python2-pip python-jinja2 PyYAML ipmitool yum-utils createrepo ntp tmux; do
     found=$(rpm -qa | grep ^$pack- | head -1)
-    echo "====> Package $pack - found: $found"
+    echo_yellow "====> Package $pack - found: $found"
     if [[ -z $found ]]; then
-        echo "====> Installing $pack"
+        echo_green "====> Installing $pack"
         yum install -y $pack
     fi
 done
@@ -56,47 +58,47 @@ done
 
 {%- for user in users %}
 
-echo "====> Checking user {{ user.name }}"
+echo_yellow "====> Checking user {{ user.name }}"
 found=$(grep {{ user.name }} /etc/passwd)
 if [[ $? -ne 0 ]]; then
-    echo "====> Adding user $user"
+    echo_green "====> Adding user $user"
     useradd {{ user.name }} -g {{ user.group }} -p {{ user.passwd }}
 fi
 
 {%- endfor %}
 
-echo "====> Checking group for {{ primary_user.name }}"
+echo_yellow "====> Checking group for {{ primary_user.name }}"
 found=$(grep "{{ primary_user.name }}:" /etc/group)
 if [[ $? -ne 0 ]]; then
-    echo "====> Adding group for {{ primary_user.name }}"
+    echo_green "====> Adding group for {{ primary_user.name }}"
     groupadd {{ primary_user.name }}
 fi
 
-echo "====> Checking user group {{ primary_user.name }}"
+echo_yellow "====> Checking user group {{ primary_user.name }}"
 found=$(grep wheel /etc/group | grep {{ primary_user.name }})
 if [[ $? -ne 0 ]]; then
-    echo "====> Modifying user {{ primary_user.name }}"
+    echo_green "====> Modifying user {{ primary_user.name }}"
     usermod -a -G wheel,{{ primary_user.name }} {{ primary_user.name }}
 fi
 
-echo "====> Checking directory /home/{{ primary_user.name }}/.ssh"
+echo_yellow "====> Checking directory /home/{{ primary_user.name }}/.ssh"
 if [[ ! -d /home/{{ primary_user.name }}/.ssh ]]; then
-    echo "====> Creating directory /home/{{ primary_user.name }}/.ssh"
+    echo_green "====> Creating directory /home/{{ primary_user.name }}/.ssh"
     mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
 fi
 
 # Checking for private key from environment.yaml file...
-echo "====> Checking $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
+echo_light_purple "====> Checking $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
 if [[ ! -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} ]]; then
-    echo "====> Creating $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
+    echo_green "====> Creating $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
     ssh-keygen -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} -C "{{ primary_user.comment }}" -P "{{ primary_user.passphrase }}" -q
     chmod 0600 $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}*
     chown -R {{ primary_user.name }}:{{ primary_user.group }} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}*
 fi
 
-echo "====> Checking /home/{{ primary_user.name }}/.ssh/authorized_keys"
+echo_light_purple "====> Checking /home/{{ primary_user.name }}/.ssh/authorized_keys"
 if [[ ! -f /home/{{ primary_user.name }}/.ssh/authorized_keys ]]; then
-    echo "====> Creating /home/{{ primary_user.name }}/.ssh/authorized_keys"
+    echo_green "====> Creating /home/{{ primary_user.name }}/.ssh/authorized_keys"
 {% if primary_user.public_key.startswith('ssh-rsa') %}
 cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
 echo "{{ primary_user.public_key }}" >> /home/{{ primary_user.name }}/.ssh/authorized_keys
@@ -106,9 +108,9 @@ EOM
 {% endif %}
 fi
 
-echo "====> Checking /home/{{ primary_user.name }}/.ssh/id_rsa"
+echo_light_purple "====> Checking /home/{{ primary_user.name }}/.ssh/id_rsa"
 if [[ ! -f /home/{{ primary_user.name }}/.ssh/id_rsa ]]; then
-    echo "====> Creating /home/{{ primary_user.name }}/.ssh/id_rsa"
+    echo_green "====> Creating /home/{{ primary_user.name }}/.ssh/id_rsa"
 
     cp $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
 
@@ -118,9 +120,9 @@ if [[ ! -f /home/{{ primary_user.name }}/.ssh/id_rsa ]]; then
 fi
 
 # Setup sudoer
-echo "====> Checking sudoer for {{ primary_user.name }}"
+echo_yellow "====> Checking sudoer for {{ primary_user.name }}"
 if sudo bash -c '[[ ! -f "/etc/sudoers.d/{{ primary_user.name }}" ]]'; then
-    echo "====> Updating sudoer for {{ primary_user.name }}"
+    echo_green "====> Updating sudoer for {{ primary_user.name }}"
 
     sudo echo "%{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
     sudo sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
@@ -129,9 +131,6 @@ fi
 
 {%- if subscription.enable %}
 {{ subscription.commands }}
-# Other way...
-# subscription.commands.C1
-# subscription.commands.C2
 # Go ahead and create a script in /tmp if the network has issues during the process.
 cat <<EOM >/tmp/rhelsub.sh
 # service network restart
@@ -143,5 +142,6 @@ chmod +x /tmp/rhelsub.sh
 
 # May need to do something with NICs here since some require a little extra love before they are happy!
 
-echo "====> cepheus_bootstrap_init.sh Success!"
+echo
+echo_green "====> cepheus_bootstrap_init.sh - Complete <===="
 echo

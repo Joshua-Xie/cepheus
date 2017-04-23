@@ -21,14 +21,16 @@ set -e
 
 ENVIRONMENT=$1
 
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
+source {{ cache.repo }}/bootstrap/common/base.sh
+
 if [[ -z $ENVIRONMENT ]]; then
-  echo "====> Must specify an environment <===="
+  echo_red "====> Must specify an environment <===="
   exit 1
 fi
 
-source {{ cache.repo }}/bootstrap/common/base.sh
 
-echo "====> Setting Environment..."
+echo_yellow "====> Setting Environment..."
 
 # CEPH_NODES comes from base.sh (all nodes less bootstrap node)
 for node in ${CEPH_NODES[@]}; do

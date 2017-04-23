@@ -18,14 +18,15 @@
 
 # Sets the base roles for the nodes so as to start over...
 
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 source {{ cache.repo }}/bootstrap/common/base.sh
 
-echo "====> Deleting Chef Tags..."
+echo_yellow "====> Deleting Chef Tags..."
 
 # CEPH_NODES comes from base.sh (all nodes less bootstrap node)
 for node in ${CEPH_NODES[@]}; do
-  # Get tags from given node
-  for tag in $(knife tag list $node); do
-    knife tag delete $node $tag
-  done
+    # Get tags from given node
+    for tag in $(knife tag list $node); do
+        knife tag delete $node $tag
+    done
 done
