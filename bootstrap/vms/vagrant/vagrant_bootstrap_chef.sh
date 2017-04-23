@@ -66,7 +66,7 @@ if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
   do_on_node $CEPH_CHEF_BOOTSTRAP "sudo rm -f \$HOME/cepheus/cookbooks/cepheus/files/loaders/*_downloaded"
 fi
 
-# Add chef info to boostrap node.
+# Add chef info to bootstrap node.
 do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE cookbook upload -a"
 do_on_node $CEPH_CHEF_BOOTSTRAP "cd \$HOME/cepheus/roles && $KNIFE role from file *.json"
 do_on_node $CEPH_CHEF_BOOTSTRAP "cd \$HOME/cepheus/environments && $KNIFE environment from file $BOOTSTRAP_CHEF_ENV.json"

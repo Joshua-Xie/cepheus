@@ -25,11 +25,11 @@ inventory:
     nodes:
         # This node's primary role is Bootstrap. Because of that it will not be in the Cobbler system list so *NO* mac addresses needed!
         # It's mainly here for automation and completness.
-        - name: ceph-boostrap
+        - name: ceph-bootstrap
           description: Bootstrap node that drives everything
           location: rack_01
           ipmi:
-              name: ceph-boostrap-mgmt
+              name: ceph-bootstrap-mgmt
               ip: 10.123.85.130
           roles:
               - bootstrap

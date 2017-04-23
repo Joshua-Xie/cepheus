@@ -143,11 +143,6 @@ sudo mkdir -p $REPO_ROOT_FILES
 sudo chown -R $OWNER:$GROUP $REPO_ROOT_FILES
 #
 
-echo "$REPO_ROOT_FILES"
-ls $REPO_ROOT_FILES
-echo "-----------------"
-ls $WORK_DIR/cepheus-files-staging
-
 if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
     sudo rm -rf $REPO_ROOT_FILES/*
 fi
@@ -235,7 +230,7 @@ set +e
 # Backup ALL important configs, keys etc
 # I have seen this sometimes hang - maybe due to doing a number of crush map gets which means it needs to be
 # optimized to only get configs for each of the node groups since the configs are the same for all in that group and
-# then maybe store the backup on the boostrap as well as the primary node in the given group. Until then, it's OK to ctrl-c out of it.
+# then maybe store the backup on the bootstrap as well as the primary node in the given group. Until then, it's OK to ctrl-c out of it.
 
 # ansible {{ inventory.ceph.backup.primary.mon }},{{ inventory.ceph.backup.primary.osd }},{{ inventory.ceph.backup.primary.rgw }} -m shell -a "sudo /etc/ceph/scripts/ceph_backup_files.sh $VERSION $DATE"
 set -e
