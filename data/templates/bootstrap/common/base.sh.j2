@@ -15,17 +15,16 @@
 # limitations under the License.
 #
 
-export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
+REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
 
 # If DONT_SHOW_BANNER is not set then default it to 0
 DONT_SHOW_BANNER=${DONT_SHOW_BANNER:-1}
 
-if [[ -f $REPO_ROOT/bootstrap/common/base_colors.sh ]]; then
-    source $REPO_ROOT/bootstrap/common/base_colors.sh
-elif [[ -f `pwd`/bootstrap/common/base_colors.sh ]]; then
-    source `pwd`/bootstrap/common/base_colors.sh
-    REPO_ROOT=`pwd`
+if [[ ! -f $REPO_ROOT/bootstrap/common/base_colors.sh ]]; then
+    REPO_ROOT=$(git rev-parse --show-toplevel)
 fi
+
+source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 if [[ ! -d $REPO_ROOT ]]; then
     echo_red "$REPO_ROOT has not been created yet. Success (exit)."

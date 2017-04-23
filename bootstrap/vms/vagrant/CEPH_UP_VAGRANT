@@ -25,6 +25,7 @@
 set -eu
 
 source $REPO_ROOT/bootstrap/common/base_environment.sh
+source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 # remove after testing. This section is now done in the templates.
 # Check for an existing environment_config.yaml file in /bootstrap/vms. If one exists then do nothing else copy over SAMPLE_environment_config.yaml
@@ -71,28 +72,9 @@ if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   fi
 fi
 
-# # Configure and test any proxies configured.
-# if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
-#   echo "====> Testing configured proxies..."
-#   source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
-# fi
-#
-# # Do prerequisite work prior to starting build, downloading files and
-# # creating local directories.
-# echo "====> Downloading necessary files to local cache..."
-# source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh
-
-# # If prerequisites only then end after getting them
-# if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then
-#     echo
-#     echo "Prerequisites have been updated and exiting."
-#     echo
-#     exit 1
-# fi
-
 # Create VMs in Vagrant and start them.
 # VM only tests inside vagrant_create script
-echo "====> Clean up old VMs and Starting new local Vagrant cluster..."
+echo_yellow "====> Clean up old VMs and Starting new local Vagrant cluster..."
 $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create.sh
 
 # IMPORTANT: Inside vagrant_create.sh in the configure_network function the ADDING of OSD drives
@@ -105,26 +87,27 @@ if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
     $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create_shared_folders_in_vms.sh
 
     # Install and configure Chef on all Vagrant hosts.
-    echo "====> Installing and configuring Chef on all nodes using the all in one script."
+    echo_yellow "====> Installing and configuring Chef on all nodes using the all in one script."
     $REPO_ROOT/bootstrap/vms/vagrant/vagrant_configure_chef_aio.sh
 else
     echo
-    echo "--------------------------------"
-    echo "cepheus VMs have been created!"
-    echo "--------------------------------"
+    echo_green "====> Cepheus VMs have been created - Complete <===="
+    echo
 fi
 
 # Added here to refresh the environment vars only
 source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_base.sh
 
-echo "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
-echo "  cd $REPO_ROOT/bootstrap/vms/vagrant"
-echo "All Vagrant commands must originate from that directory."
+echo_green "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
+echo_light_red "  cd $REPO_ROOT/bootstrap/vms/vagrant"
+echo_green "All Vagrant commands must originate from that directory."
 echo
-echo "You can access the vms using the following:"
+echo_green "You can access the vms using the following:"
 
 for vm in ${CEPH_CHEF_HOSTS[@]}; do
-    echo "  vagrant ssh $vm"
+    echo_yellow "  vagrant ssh $vm"
 done
 
-echo "Finished Ceph Vagrant build with Cepheus in $SECONDS seconds"
+echo
+echo_green "====> Finished Ceph Vagrant build with Cepheus in $SECONDS seconds - Complete <===="
+echo

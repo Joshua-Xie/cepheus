@@ -58,13 +58,11 @@ export BUILD_OS=centos
 export BUILD_UPDATE=1
 export BUILD_TEMPLATES_ONLY=0
 
-# NB: May want to add an option for 'build' or 'update' so only the template_engine runs and the files can then be
-# uploaded to Chef for management.
-
 while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
     case $opt in
         b)
-            # (required) MUST call this first. It will bootstrap Chef Server and support items
+            # (required first) MUST call this first. It will bootstrap Chef Server, client and support items.
+            # NB: It will prompt you, as a reminder, and ask if your nodes all have the same ssh key of the primary_user!
             export BOOTSTRAP_INIT=1
             ;;
         c)
@@ -179,6 +177,13 @@ else
     echo
     echo_green "====> CEPH_UP being called..."
     echo
+fi
+
+# NB: Prompt as a reminder to make sure user knows that *ALL* nodes *MUST* have the same SSH KEY! There are many ways this can
+# be done. If PXE_BOOT option is used then this is not needed because it will distribute the key to all nodes.
+if [[ $BOOTSTRAP_INIT -eq 1 || $BUILD_VMS_ONLY -eq 1 ]]; then
+    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_key_prompt.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_key_prompt.sh
+    source $REPO_ROOT/bootstrap/common/bootstrap_key_prompt.sh
 fi
 
 # Create *initial* build.yaml from common.yaml

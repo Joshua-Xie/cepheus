@@ -157,6 +157,7 @@ files:
     -   "bootstrap/common/chef_tags_create.sh"
     -   "bootstrap/common/chef_tags_delete.sh"
     -   "bootstrap/common/chef_environment_nodes.sh"
+    -   "bootstrap/common/bootstrap_key_prompt.sh"
 
 # These files represent the build init and update files.
 build_init_update_files:
