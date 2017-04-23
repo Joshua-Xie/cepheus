@@ -86,8 +86,10 @@ if [[ -z $chef_server ]]; then
         sudo rpm -Uvh $(find $REPO_ROOT_FILES/ -name chef-server\*rpm -not -name \*downloaded | tail -1)
     fi
 
-    echo_white "nginx['non_ssl_port'] = 4000" | sudo tee /etc/opscode/chef-server.rb
-    echo_white "nginx['enable_non_ssl'] = true" | sudo tee --append /etc/opscode/chef-server.rb
+    # Can't use color here since it pipes to file.
+    echo "nginx['non_ssl_port'] = 4000" | sudo tee /etc/opscode/chef-server.rb
+    echo "nginx['enable_non_ssl'] = true" | sudo tee --append /etc/opscode/chef-server.rb
+    echo
 
     sudo chef-server-ctl reconfigure
 
