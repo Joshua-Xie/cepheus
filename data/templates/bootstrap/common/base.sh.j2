@@ -25,7 +25,11 @@ set -e
 
 export REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
 
-source $REPO_ROOT/bootstrap/common/base_colors.sh
+if [[ -f $REPO_ROOT/bootstrap/common/base_colors.sh ]]; then
+    source $REPO_ROOT/bootstrap/common/base_colors.sh
+elif [[ -f `pwd`/bootstrap/common/base_colors.sh ]]; then
+    source `pwd`/bootstrap/common/base_colors.sh
+fi
 
 if [[ ! -f $REPO_ROOT ]]; then
     echo_red "$REPO_ROOT has not been created yet. Success (exit)."
