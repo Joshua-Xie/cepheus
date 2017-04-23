@@ -23,6 +23,8 @@ set -eu
 # Creates the REPO_ROOT env var for everything else to use...
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 
+source $REPO_ROOT/bootstrap/common/base_colors.sh
+
 # Builds the bootstrapping environment based on the templates and data found in this directory.
 
 # NB: Output directories for this process already exists
@@ -33,7 +35,7 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 # Build from template
 {%- for item in files %}
 
-echo "====> Generating {{ item }}..."
+echo_yellow "====> Generating {{ item }}..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Passes through template_engine twice
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}

@@ -23,6 +23,8 @@ set -eu
 # Creates the REPO_ROOT env var for everything else to use...
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 
+source $REPO_ROOT/bootstrap/common/base_colors.sh
+
 # Builds the bootstrapping environment based on the templates and data found in this directory.
 
 # NB: Output directories for this process already exists
@@ -32,7 +34,7 @@ sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment
 
 # Build from other data files listed in the environment.yaml.
 # Pass the data files through the template engine first.
-echo "====> Data_files being processed..."
+echo_yellow "====> Data_files being processed..."
 
 # NOTE: Take a look at running these through the template_engine twice!!!!!!
 # TODO: Check files...
@@ -41,7 +43,7 @@ echo "====> Data_files being processed..."
 # Check data center folder first else use location specific version...
 if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} ]]; then
     # Double check to make sure template there are no 'template' residuals remaining
-    echo "Checking 1 - $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}"
+    echo_orange "Checking 1 - $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}"
     set +e
     J2=$(grep {% raw %}"{%"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }})
     if [[ -z $J2 ]]; then
@@ -54,7 +56,7 @@ if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} ]]; 
     sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 else
     # Double check to make sure template there are no 'template' residuals remaining
-    echo "Checking 0 - $REPO_ROOT/data/$BUILD_LOCATION/{{ item }}"
+    echo_orange "Checking 0 - $REPO_ROOT/data/$BUILD_LOCATION/{{ item }}"
     set +e
     J2=$(grep {% raw %}"{%"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/{{ item }})
     if [[ -z $J2 ]]; then
@@ -73,10 +75,10 @@ fi
 {%- endfor %}
 
 # Process any environment_files
-echo "====> Environment_files being processed..."
+echo_yellow "====> Environment_files being processed..."
 {%- for item in environment_files %}
 
-echo "====> Generating {{ item }}..."
+echo_yellow "====> Generating {{ item }}..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Run through template_engine twice
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
@@ -85,10 +87,10 @@ sudo chmod +x $REPO_ROOT/{{ item }}
 {%- endfor %}
 
 # Process any cookbooks_files
-echo "====> Cookbooks_files being processed..."
+echo_yellow "====> Cookbooks_files being processed..."
 {%- for item in cookbooks_files %}
 
-echo "====> Generating {{ item }}..."
+echo_yellow "====> Generating {{ item }}..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Run through template_engine twice
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
