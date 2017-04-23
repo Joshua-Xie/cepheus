@@ -90,12 +90,6 @@ staging:
             repo: https://github.com/cepheus-io/cepheus.git
             branch: master
             command: ""
-            # command: |
-            #     # This will only build the templates (scripts)
-            #     echo
-            #     echo "====> Calling CEPH_UP -x -z $HOME/cepheus..."
-            #     echo
-            #     cd $HOME/cepheus && ./CEPH_UP -x -z $HOME/cepheus
             layer: 1
         -   output: "$WORK_DIR/cepheus-private-staging"
             comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
@@ -133,7 +127,7 @@ staging:
             # Empty lines also pass through.
             command: |
                 echo
-                echo "====> Layering data..."
+                echo_yellow "====> Layering data..."
 
                 cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
                 cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
@@ -143,7 +137,7 @@ staging:
                 # Need to generate 'build.yaml' from all of the other data files before calling bootstrap_prereqs.sh...
                 cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
                 echo
-                echo "====> Generating bootstrap_prereqs.sh..."
+                echo_yellow "====> Generating bootstrap_prereqs.sh..."
                 source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging $WORK_DIR/cepheus-public-staging
                 ls $WORK_DIR/cepheus-files-staging
             layer: 6
@@ -153,7 +147,7 @@ staging:
             branch: ""
             command: |
                 echo
-                echo "====> Layering cookbooks..."
+                echo_yellow "====> Layering cookbooks..."
 
                 cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
 
