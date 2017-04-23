@@ -23,8 +23,10 @@ set -eu
 REPO_ROOT_FILES=$1
 REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}
 
-REPO_ROOT=$2
-REPO_ROOT=${REPO_ROOT:-"{{ cache.root }}"}
+REPO_ROOT=`pwd`
+if [[ ! -z $2 ]]; then
+    REPO_ROOT=$2
+fi
 
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
