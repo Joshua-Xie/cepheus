@@ -24,6 +24,8 @@ fi
 
 $REPO_ROOT/bootstrap/common/base.sh
 
+
+
 for node in ${CEPH_NODES[@]}; do
   do_on_node $node "sudo rpm -Uvh \$(find /ceph-files/ -name chef-\*rpm -not -name \*downloaded | tail -1)"
 
@@ -43,6 +45,8 @@ for node in ${CEPH_NODES[@]}; do
 
   do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE node environment set $node.$BOOTSTRAP_DOMAIN $BOOTSTRAP_CHEF_ENV"
 done
+
+
 
 # do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE node run_list set $CEPH_CHEF_BOOTSTRAP.$BOOTSTRAP_DOMAIN 'role[ceph-bootstrap]' $CHEF_KNIFE_DEBUG"
 

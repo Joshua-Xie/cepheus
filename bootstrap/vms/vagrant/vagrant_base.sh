@@ -28,13 +28,12 @@ export REPO_ROOT=$(git rev-parse --show-toplevel)
 export BOOTSTRAP_CHEF_ENV=${BOOTSTRAP_CHEF_ENV:-"vagrant"}
 
 source $REPO_ROOT/bootstrap/common/base_environment.sh
+source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 # IMPORTANT - DO NOT MAKE CHANGES unless to add new functionality that does not already exist. This process will
 # soon change to be like the bare metal build process.
 
 source $REPO_ROOT/bootstrap/vms/ceph_chef_bootstrap.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_dns.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_hosts.env
 source $REPO_ROOT/bootstrap/vms/ceph_chef_adapters.env
 source $REPO_ROOT/bootstrap/vms/ceph_chef_proxy.env
 source $REPO_ROOT/bootstrap/vms/ceph_chef_osd_hosts.env
@@ -44,13 +43,16 @@ source $REPO_ROOT/bootstrap/vms/ceph_chef_mds_hosts.env
 source $REPO_ROOT/bootstrap/vms/ceph_chef_admin_hosts.env
 source $REPO_ROOT/bootstrap/vms/ceph_chef_adc_hosts.env
 
+source $REPO_ROOT/bootstrap/vms/ceph_chef_dns.env
+source $REPO_ROOT/bootstrap/vms/ceph_chef_hosts.env
+
 source $REPO_ROOT/bootstrap/vms/vbox_functions.sh
 
 FAILED_ENVVAR_CHECK=0
 REQUIRED_VARS=( BOOTSTRAP_CHEF_ENV BOOTSTRAP_DOMAIN REPO_ROOT CEPH_CHEF_BOOTSTRAP CEPH_CHEF_HOSTS CEPH_OSD_HOSTS CEPH_OSD_DRIVES CEPH_MON_HOSTS CEPH_RGW_HOSTS )
 for ENVVAR in ${REQUIRED_VARS[@]}; do
   if [[ -z ${!ENVVAR} ]]; then
-    echo "Environment variable $ENVVAR must be set!" >&2
+    echo_red "====> Environment variable $ENVVAR must be set!" >&2
     FAILED_ENVVAR_CHECK=1
   fi
 done
@@ -73,8 +75,8 @@ fi
 
 do_on_node() {
   echo
-  echo "Issuing command: vagrant ssh $1 -c ${2}"
-  echo "----------------------------------------------------------------------------------------"
+  echo_green "Issuing command: vagrant ssh $1 -c ${2}"
+  echo_green "----------------------------------------------------------------------------------------"
   NODE=$1
   shift
   COMMAND="${*}"
@@ -92,10 +94,10 @@ ceph_vms=("${CEPH_CHEF_HOSTS[@]/$delete}")
 
 if [[ $DONT_SHOW_BANNER -eq 0 ]]; then
   echo
-  echo "##########"
-  echo "Root: $REPO_ROOT"
-  echo "cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
-  echo "Ceph VMs: ${ceph_vms[@]}"
-  echo "##########"
+  echo_green "##########"
+  echo_green "Root: $REPO_ROOT"
+  echo_green "cepheus Bootstrap: $CEPH_CHEF_BOOTSTRAP"
+  echo_green "Ceph VMs: ${ceph_vms[@]}"
+  echo_green "##########"
   echo
 fi
