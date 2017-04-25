@@ -62,9 +62,9 @@ if [[ -d /etc/ansible ]]; then
 fi
 
 # Set hosts file for cluster init
-if [[ -f $REPO_ROOT/bootstrap/common/hosts ]]; then
-    sudo cp $REPO_ROOT/bootstrap/common/hosts /etc/hosts
-fi
+# if [[ -f $REPO_ROOT/bootstrap/common/hosts ]]; then
+#     sudo cp $REPO_ROOT/bootstrap/common/hosts /etc/hosts
+# fi
 
 {%- for user in users %}
 

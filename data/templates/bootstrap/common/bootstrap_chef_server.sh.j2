@@ -84,7 +84,7 @@ if [[ -z $chef_server ]]; then
     echo_green "====> Creating Chef Server..."
 
     if sudo bash -c '[[ ! -d "/etc/opscode" ]]'; then
-        sudo rpm -Uvh $(find $REPO_ROOT_FILES/ -name chef-server\*rpm -not -name \*downloaded | tail -1)
+        sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.server.package }}
     fi
 
     # Can't use color here since it pipes to file.
@@ -113,6 +113,8 @@ fi
 echo_yellow "====> Creating $HOME/.chef environment..."
 mkdir -p $HOME/.chef
 echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}.{{ domain }}/organizations/{{ chef.org }}'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
+
+echo_yellow "====> Creating certs..."
 $KNIFE ssl fetch
 
 echo_yellow "====> Bootstrapping Chef Server for {{ primary_user.name }}"

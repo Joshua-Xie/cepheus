@@ -39,7 +39,7 @@ ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo tar xzf /home/{{ primary_u
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
 ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo mkdir -p /etc/chef && sudo mkdir =p /var/log"
-ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo rpm -Uvh {{ cache.base }}/packages/{{ chef_repo.client.package }}"
+ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo rpm -Uvh {{ cache.base }}/{{ cache.packages }}/{{ chef_repo.client.package }}"
 ansible "all:!{{ bootstrap.name }}" -m copy -a "src={{ cache.base }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
 
 echo_yellow "====> Installing Ceph-Chef gem requirements..."
