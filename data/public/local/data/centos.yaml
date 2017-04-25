@@ -1,0 +1,175 @@
+---
+# CentOS specific data
+
+# IMPORTANT: Whatever data is here will be appended to the overall `build.yaml` that will be located `public` or
+# `private` based on the value passed to the intial ./CEPH_UP script
+
+# IMPORTANT: No section below can exist in other yaml files be used in the files being appended. For example,
+# 'os' section can not already exist in 'build.yaml'. However, it can and should be in other OS related yaml files.
+
+os:
+    type: centos
+    version: 7.1
+    name: centos-7.1
+    arch: x86_64
+    distro: centos-7-x86_64-minimal.iso
+    breed: redhat
+    # pxe_boot file extension - This will get used when creating the OS specific kickstart file using the profile name and this extension
+    kickstart_ext: ks
+    iso:
+        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+    device: "/dev/"
+    devices:
+        # Change the device name on OS/Platforms that enumerate devices differently.
+        # Size is in GB
+        # NB: Take a look at raid levels later...
+        -   device: sda
+            type: sdd
+            size: 400
+        -   device: sdb
+            type: sdd
+            size: 400
+
+# Unique ISO data for OS
+ISO:
+  volume_id: "CentOS-7.1 Server.x86_64"
+
+
+# Name of the VBox Storage Controller
+vagrant:
+    storage_controller: "SATA Controller"
+    # bento/centos-7.2+ has an ssh issue
+    box: "bento/centos-7.1"
+    front_end_adapter_ip: 10.121.2.1
+    back_end_adapter_ip: 10.121.2.1
+
+
+# NB: Present in all OS data files. RHEL has the full section. CentOS and Ubuntu *must* have only the stub section
+subscription:  # (required for build)
+    enable: false
+
+chef_repo: # (required files for build)
+    knife_acl_version: 0.0.12
+    client:
+        version: 13.0.113
+        package: chef-13.0.113-1.el7.x86_64.rpm
+    server:
+        version: 12.14.0
+        package: chef-server-core-12.14.0-1.el7.x86_64.rpm
+
+adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
+    bgp:
+        bird: # (required files for build)
+            version: 1.5.0
+            package: bird-1.5.0-1.x86_64.rpm
+
+pxe_boot: # (optional) Only used for the PXE Boot method
+    iso:
+        name: centos-7-x86_64-minimal.iso
+        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+
+ceph_repo:
+    branch: stable
+    arch: x86_64
+    revision: 0.el7
+
+# Make sure the following settings are tuned for your OS and drives
+system:
+    scheduler:
+        device:
+            enable: true
+            type: cfq
+
+    sysctl:
+        enable: true
+        sysctls:
+            -   kernel.pid_max=4194303
+            -   fs.file-max=26234859
+            -   net.core.rmem_max=67108864
+            -   net.core.wmem_max=67108864
+            -   net.core.rmem_default=33554432
+            -   net.core.wmem_default=33554432
+            -   net.ipv4.tcp_rmem=\"16777216 33554432 67108864\"
+            -   net.ipv4.tcp_wmem=\"16777216 33554432 67108864\"
+            -   net.core.optmem_max=33554432
+
+security:
+    sshd:
+        permit_root_login: "no"
+        login_grace_time: "2m"
+        max_auth_tries: 6
+        max_sessions: 10
+        banner: "/etc/banner"
+    firewall:
+        enable: false
+        use: rules
+        zone: public
+        rules:
+            - name: ceph
+              roles:
+                  - ceph-mon
+                  - ceph-osd
+                  - ceph-rgd
+                  - ceph-rgw
+                  - ceph-mds
+                  - ceph-admin
+                  - ceph-restapi
+                  - ceph-adc
+              type: rich-rule
+              zone: public
+              permanent: true
+              rules:
+                  - "rule family='ipv4' source address='10.0.100.0/24' accept"
+                  - "rule family='ipv4' source address='10.0.100.0/24' service name='ssh' accept"
+
+            ## All of the ones below are examples. You can get creative.
+            # - name: ceph-osd
+            #   roles:
+            #       - ceph-osd
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' accept"
+            # - name: ceph-rgw
+            #   roles:
+            #       - ceph-rgw
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' port port='8080-8089' protocol='tcp' accept"
+            # - name: ssh
+            #   roles:
+            #       - ceph-bootstrap
+            #       - ceph-mon
+            #       - ceph-osd
+            #       - ceph-rgd
+            #       - ceph-rgw
+            #       - ceph-mds
+            #       - ceph-admin
+            #       - ceph-restapi
+            #       - ceph-adc
+            #   type: service
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - ssh
+            # - name: bootstrap-internal
+            #   roles:
+            #       - ceph-bootstrap
+            #   type: rich-rule
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - "rule family='ipv4' source address='10.0.100.0/24' accept"
+            # - name: adc
+            #   roles:
+            #       - ceph-adc
+            #   type: service
+            #   zone: public
+            #   permanent: true
+            #   rules:
+            #       - http
+            #       - https
+            ##

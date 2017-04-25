@@ -22,6 +22,9 @@ DONT_SHOW_BANNER=${DONT_SHOW_BANNER:-1}
 
 if [[ ! -f $REPO_ROOT/bootstrap/common/base_colors.sh ]]; then
     REPO_ROOT=$(git rev-parse --show-toplevel)
+    if [[ $? -ne 0 ]]; then
+        REPO_ROOT=`pwd`
+    fi
 fi
 
 source $REPO_ROOT/bootstrap/common/base_colors.sh

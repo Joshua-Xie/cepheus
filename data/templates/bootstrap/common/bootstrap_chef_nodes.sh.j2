@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-set -e
 
-REPO_ROOT=$(git rev-parse --show-toplevel)
+REPO_ROOT=$1
+REPO_ROOT=${REPO_ROOT:-"{{ cache.repo }}"}
 
 if [ -n "$CEPH_CHEF_HTTP_PROXY" ]; then
     KNIFE_HTTP_PROXY_PARAM="--bootstrap-proxy \$http_proxy"
@@ -25,6 +25,8 @@ fi
 
 $REPO_ROOT/bootstrap/common/base.sh
 $REPO_ROOT/bootstrap/common/base_colors.sh
+
+set -e
 
 # Not using Ansible Playbooks since we are only orchestrating Chef
 echo_yellow "====> Copying {{ cache.base }}.tar.gz to nodes..."
