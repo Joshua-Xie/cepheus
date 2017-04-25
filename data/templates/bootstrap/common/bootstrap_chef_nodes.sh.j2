@@ -48,6 +48,8 @@ ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo cp {{ cache.base }}/gems/{
 ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/{{ gem.name }}-{{ gem.version }}.gem"
 {% endfor %}
 
+ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo chef-client"
+
 # for node in ${CEPH_NODES[@]}; do
 #
 #     do_on_node $node "sudo rpm -Uvh \$(find /ceph-files/ -name chef-\*rpm -not -name \*downloaded | tail -1)"

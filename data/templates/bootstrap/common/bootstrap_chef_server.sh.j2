@@ -112,7 +112,17 @@ fi
 
 echo_yellow "====> Creating $HOME/.chef environment..."
 mkdir -p $HOME/.chef
-echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}.{{ domain }}/organizations/{{ chef.org }}'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
+
+# Check the cert...
+# NB: /var/opt/opscode/nginx/ca holds the certs for Chef Server. Double check those to make sure of which server name to use...
+# export CHEF_SERVER so it can be used in node bootstrap that gets called later in CEPH_UP...
+# export CHEF_SERVER={{ bootstrap.name }}.{{ domain }}
+#
+# if sudo bash -c '[[ ! -d "/var/opt/opscode/nginx/ca/$CHEF_SERVER" ]]'; then
+#     export CHEF_SERVER={{ bootstrap.name }}
+# fi
+
+echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}/organizations/{{ chef.org }}'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
 
 echo_yellow "====> Creating certs..."
 $KNIFE ssl fetch
