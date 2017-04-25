@@ -61,6 +61,11 @@ if [[ -d /etc/ansible ]]; then
     sudo cp $REPO_ROOT/bootstrap/common/ansible_hosts /etc/ansible/hosts
 fi
 
+# Set hosts file for cluster init
+if [[ -f $REPO_ROOT/bootstrap/common/hosts ]]; then
+    sudo cp $REPO_ROOT/bootstrap/common/hosts /etc/hosts
+fi
+
 {%- for user in users %}
 
 echo_yellow "====> Checking user {{ user.name }}"

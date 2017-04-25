@@ -30,6 +30,10 @@ $REPO_ROOT/bootstrap/common/base_colors.sh
 echo_yellow "====> Copying {{ cache.base }}.tar.gz to nodes..."
 ansible "all:!{{ bootstrap.name }}" -m copy -a "src=/home/{{ primary_user.name }}/{{ cache.base }}.tar.gz dest=/home/{{ primary_user.name }}/{{ cache.base }}.tar.gz"
 
+echo_yellow "====> Copying /etc/hosts to nodes..."
+# /etc/hosts should have been updated in cepheus_bootstrap_init.sh for the initial run
+ansible "all:!{{ bootstrap.name }}" -m copy -a "src=/etc/hosts dest=/etc/hosts"
+
 echo_yellow "====> Setting up {{ cache.base }}.tar.gz on nodes..."
 ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo tar xzf /home/{{ primary_user.name }}/{{ cache.base }}.tar.gz {{ cache.base }} && sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.base }}"
 

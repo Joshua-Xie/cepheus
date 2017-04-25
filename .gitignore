@@ -15,6 +15,7 @@
 /bootstrap/common/base.sh
 /bootstrap/common/base_colors.sh
 /bootstrap/common/ansible_hosts
+/bootstrap/common/hosts
 /bootstrap/common/client.rb
 /bootstrap/common/bootstrap_key_prompt.sh
 /bootstrap/common/bootstrap_chef_server.sh
