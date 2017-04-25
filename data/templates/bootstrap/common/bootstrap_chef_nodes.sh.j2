@@ -28,6 +28,9 @@ $REPO_ROOT/bootstrap/common/base_colors.sh
 
 set -e
 
+# Disable known_host check
+export ANSIBLE_HOST_KEY_CHECKING=False
+
 # Not using Ansible Playbooks since we are only orchestrating Chef
 echo_yellow "====> Copying {{ cache.base }}.tar.gz to nodes..."
 ansible "all:!{{ bootstrap.name }}" -m copy -a "src=/home/{{ primary_user.name }}/{{ cache.base }}.tar.gz dest=/home/{{ primary_user.name }}/{{ cache.base }}.tar.gz"
