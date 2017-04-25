@@ -46,7 +46,7 @@ if [[ -z $BUILD_DATA_CENTER ]]; then
 fi
 
 {% if os.type != "ubuntu" %}
-for pack in kernel-devel gcc make perl bzip2 epel-release rsync vim git wget curl python2-pip python-jinja2 PyYAML ipmitool yum-utils createrepo ntp tmux; do
+for pack in kernel-devel gcc make perl bzip2 epel-release rsync vim git wget curl python2-pip python-jinja2 PyYAML ansible ipmitool yum-utils createrepo ntp tmux; do
     found=$(rpm -qa | grep ^$pack- | head -1)
     echo_yellow "====> Package $pack - found: $found"
     if [[ -z $found ]]; then
@@ -55,6 +55,11 @@ for pack in kernel-devel gcc make perl bzip2 epel-release rsync vim git wget cur
     fi
 done
 {%- endif %}
+
+# If ansible is installed then move it's hosts file.
+if [[ -d /etc/ansible ]]; then
+    sudo cp $REPO_ROOT/bootstrap/common/ansible_hosts /etc/ansible/hosts
+fi
 
 {%- for user in users %}
 
