@@ -18,6 +18,7 @@
 /bootstrap/common/client.rb
 /bootstrap/common/bootstrap_key_prompt.sh
 /bootstrap/common/bootstrap_chef_server.sh
+/bootstrap/common/bootstrap_chef_nodes.sh
 /bootstrap/common/chef_runlists_update.sh
 /bootstrap/common/chef_tags_create.sh
 /bootstrap/common/chef_tags_delete.sh

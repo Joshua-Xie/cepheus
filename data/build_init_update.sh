@@ -63,3 +63,9 @@ $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BU
 # NB: Two passes on output for embedded templates...
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh -o $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh
 sudo chmod +x $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh
+
+echo_yellow "====> Generating bootstrap/common/bootstrap_chef_nodes.sh..."
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_chef_nodes.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_chef_nodes.sh
+# NB: Two passes on output for embedded templates...
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/bootstrap/common/bootstrap_chef_nodes.sh -o $REPO_ROOT/bootstrap/common/bootstrap_chef_nodes.sh
+sudo chmod +x $REPO_ROOT/bootstrap/common/bootstrap_chef_nodes.sh
