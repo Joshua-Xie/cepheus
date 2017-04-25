@@ -95,6 +95,39 @@ else
     echo
 fi
 
+# Just making sure in vagrant directory
+cd $REPO_ROOT/bootstrap/vms/vagrant
+# Create ssh config file from vagrant info
+vagrant ssh-config > vagrant.ssh.config
+
+# Part of 'cepheus-build' step 1 prerequisites.
+{% if os.type != "ubuntu" %}
+vagrant ssh {{ bootstrap.name }} -c "sudo yum install -y git"
+{% else %}
+vagrant ssh {{ bootstrap.name }} -c "sudo apt install -y git"
+{%- endif %}
+
+# Part of 'cepheus-build' step 0 prerequisites.
+# Make sure each node has the public key and certain ones contain the private key.
+{%- if primary_user.key.public.startswith('ssh-rsa') %}
+echo "{{ primary_user.key.public }}" >>tmp_authorized_keys
+{% else %}
+cp {{ primary_user.key.path }}/{{ primary_user.key.public }} tmp_authorized_keys
+{%- endif %}
+
+# Copy the pub key to each node.
+{% for node in inventory.nodes %}
+scp -F vagrant.ssh.config tmp_authorized_keys vagrant@{{ node.name }}:/home/vagrant/.
+vagrant ssh -c "mkdir -p $HOME/.ssh && cat $HOME/tmp_authorized_keys >> $HOME/.ssh/authorized_keys && sudo chmod 0644 $HOME/.ssh/authorized_keys"
+{% endfor %}
+
+# This will allow the bootstrap node to easily access the other nodes since the above put in the public key for each node.
+scp -F vagrant.ssh.config {{ primary_user.key.path }}/{{ primary_user.key.private }} vagrant@{{ bootstrap.name }}:/home/vagrant/.ssh/{{ primary_user.key.private }}
+vagrant ssh -c "sudo chmod 0600 $HOME/.ssh/{{ primary_user.key.private }}"
+
+# No longer need tmp public key
+rm -f tmp_authorized_keys
+
 # Added here to refresh the environment vars only
 source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_base.sh
 

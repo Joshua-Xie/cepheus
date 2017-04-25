@@ -147,6 +147,7 @@ shell:
 # These files should also be in the .gitignore file so that the final version will not be stored.
 # Leave out `build.sh` from this list.
 # Put these in the order you need them to be called in.
+# NB: All of these files automatically have chmod +x added so if you need a different set of rights then do that in your script.
 files:
     -   "bootstrap/common/base_environment.sh"
     -   "bootstrap/common/base.sh"
@@ -158,6 +159,8 @@ files:
     -   "bootstrap/common/chef_tags_delete.sh"
     -   "bootstrap/common/chef_environment_nodes.sh"
     -   "bootstrap/common/bootstrap_key_prompt.sh"
+    -   "bootstrap/common/client.rb"
+    -   "bootstrap/common/ansible_hosts"
 
 # These files represent the build init and update files.
 build_init_update_files:

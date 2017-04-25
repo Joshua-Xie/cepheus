@@ -15,6 +15,12 @@ inventory:
         type: A
         ttl: 1200
 
+    # Locations can be anything you use to group nodes such as pods, cells, racks, rooms, halls, etc...
+    locations:
+        -   rack_01
+        -   rack_02
+        -   rack_03
+
     ceph:
         backup:
             primary:

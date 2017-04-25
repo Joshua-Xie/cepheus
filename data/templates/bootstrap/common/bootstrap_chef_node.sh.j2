@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -e
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
@@ -24,28 +25,40 @@ fi
 
 $REPO_ROOT/bootstrap/common/base.sh
 
+# Not using Ansible Playbooks since we are only orchestrating Chef
+ansible "all:!{{ bootstrap.name }}" -m copy -a "src=/home/{{ primary_user.name }}/{{ cache.base }}.tar.gz dest=/home/{{ primary_user.name }}/{{ cache.base }}.tar.gz"
+ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo tar xzf /home/{{ primary_user.name }}/{{ cache.base }}.tar.gz {{ cache.base }} && sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.base }}"
+ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo mkdir -p /etc/chef && sudo mkdir =p /var/log"
+{% if os.type != "ubuntu" %}
+ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo rpm -Uvh {{ cache.base }}/rpms/{{ chef.rpms.client }}"
+{% endif %}
+ansible "all:!{{ bootstrap.name }}" -m copy -a "src={{ cache.base }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
 
+{% for gem in ceph_chef.gems %}
+ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo cp {{ cache.base }}/gems/{{ gem.name }}-{{ gem.version }}.gem /tmp/. && sudo chown {{ primary_user.name }}:{{ primary_user.name }} /tmp/{{ gem.name }}-{{ gem.version }}.gem"
+ansible "all:!{{ bootstrap.name }}" -m shell -a "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/{{ gem.name }}-{{ gem.version }}.gem"
+{% endfor %}
 
-for node in ${CEPH_NODES[@]}; do
-  do_on_node $node "sudo rpm -Uvh \$(find /ceph-files/ -name chef-\*rpm -not -name \*downloaded | tail -1)"
-
-  # NOTE: If this command seems to stall then the network needs to be reset. Run ./vagrant_reset_network.sh from the
-  # directory this script is located in. This will clean any network issues. Same holds true for other VMs.
-  do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE bootstrap -x vagrant --bootstrap-no-proxy '$CEPH_CHEF_BOOTSTRAP.$BOOTSTRAP_DOMAIN,$node.$BOOTSTRAP_DOMAIN' $KNIFE_HTTP_PROXY_PARAM -P vagrant --sudo $node.$BOOTSTRAP_DOMAIN"
-
-  # REQUIRED gems: netaddr-1.5.1 for ceph-chef Cookbook
-  do_on_node $node "sudo cp /ceph-files/gems/netaddr-1.5.1.gem /tmp/."
-  do_on_node $node "sudo chown vagrant:vagrant /tmp/netaddr-1.5.1.gem"
-  do_on_node $node "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/netaddr-1.5.1.gem"
-
-  # REQUIRED gems: chef-sugar-3.4.0 for ceph-chef Cookbook
-  do_on_node $node "sudo cp /ceph-files/gems/chef-sugar-3.4.0.gem /tmp/."
-  do_on_node $node "sudo chown vagrant:vagrant /tmp/chef-sugar-3.4.0.gem"
-  do_on_node $node "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/chef-sugar-3.4.0.gem"
-
-  do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE node environment set $node.$BOOTSTRAP_DOMAIN $BOOTSTRAP_CHEF_ENV"
-done
-
+# for node in ${CEPH_NODES[@]}; do
+#
+#     do_on_node $node "sudo rpm -Uvh \$(find /ceph-files/ -name chef-\*rpm -not -name \*downloaded | tail -1)"
+#
+#     # NOTE: If this command seems to stall then the network needs to be reset. Run ./vagrant_reset_network.sh from the
+#     # directory this script is located in. This will clean any network issues. Same holds true for other VMs.
+#     do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE bootstrap -x vagrant --bootstrap-no-proxy '$CEPH_CHEF_BOOTSTRAP.$BOOTSTRAP_DOMAIN,$node.$BOOTSTRAP_DOMAIN' $KNIFE_HTTP_PROXY_PARAM -P vagrant --sudo $node.$BOOTSTRAP_DOMAIN"
+#
+#     # REQUIRED gems: netaddr-1.5.1 for ceph-chef Cookbook
+#     do_on_node $node "sudo cp /ceph-files/gems/netaddr-1.5.1.gem /tmp/."
+#     do_on_node $node "sudo chown vagrant:vagrant /tmp/netaddr-1.5.1.gem"
+#     do_on_node $node "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/netaddr-1.5.1.gem"
+#
+#     # REQUIRED gems: chef-sugar-3.4.0 for ceph-chef Cookbook
+#     do_on_node $node "sudo cp /ceph-files/gems/chef-sugar-3.4.0.gem /tmp/."
+#     do_on_node $node "sudo chown vagrant:vagrant /tmp/chef-sugar-3.4.0.gem"
+#     do_on_node $node "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/chef-sugar-3.4.0.gem"
+#
+#     do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE node environment set $node.$BOOTSTRAP_DOMAIN $BOOTSTRAP_CHEF_ENV"
+# done
 
 
 # do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE node run_list set $CEPH_CHEF_BOOTSTRAP.$BOOTSTRAP_DOMAIN 'role[ceph-bootstrap]' $CHEF_KNIFE_DEBUG"

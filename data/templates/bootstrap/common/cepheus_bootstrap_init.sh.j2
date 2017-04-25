@@ -87,24 +87,27 @@ if [[ ! -d /home/{{ primary_user.name }}/.ssh ]]; then
     mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
 fi
 
+{% if primary_user.key.enable %}
 # Checking for private key from environment.yaml file...
-echo_light_purple "====> Checking $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
-if [[ ! -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} ]]; then
-    echo_green "====> Creating $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}"
-    ssh-keygen -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} -C "{{ primary_user.comment }}" -P "{{ primary_user.passphrase }}" -q
-    chmod 0600 $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}*
-    chown -R {{ primary_user.name }}:{{ primary_user.group }} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }}*
+# NB: May want to revisit key management later...
+
+echo_light_purple "====> Checking $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}"
+if [[ ! -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }} ]]; then
+    echo_green "====> Creating $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}"
+    ssh-keygen -b 2048 -t rsa -q -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }} -C "{{ primary_user.comment }}" -P "{{ primary_user.key.passphrase }}"
+    chmod 0600 $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}*
+    chown -R {{ primary_user.name }}:{{ primary_user.group }} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}*
 fi
 
 echo_light_purple "====> Checking /home/{{ primary_user.name }}/.ssh/authorized_keys"
 if [[ ! -f /home/{{ primary_user.name }}/.ssh/authorized_keys ]]; then
     echo_green "====> Creating /home/{{ primary_user.name }}/.ssh/authorized_keys"
-{% if primary_user.public_key.startswith('ssh-rsa') %}
-cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
-echo "{{ primary_user.public_key }}" >> /home/{{ primary_user.name }}/.ssh/authorized_keys
-EOM
+{% if primary_user.key.public.startswith('ssh-rsa') %}
+#cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
+echo "{{ primary_user.key.public }}" >> /home/{{ primary_user.name }}/.ssh/authorized_keys
+#EOM
 {% else %}
-    echo $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.public_key }} >> /home/{{ primary_user.name }}/.ssh/authorized_keys
+    echo $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.public }} >> /home/{{ primary_user.name }}/.ssh/authorized_keys
 {% endif %}
 fi
 
@@ -118,6 +121,7 @@ if [[ ! -f /home/{{ primary_user.name }}/.ssh/id_rsa ]]; then
     chmod 0600 /home/{{ primary_user.name }}/.ssh/id_rsa
     chown -R {{ primary_user.name }}:{{ primary_user.group }} /home/{{ primary_user.name }}/.ssh
 fi
+{% endif %}
 
 # Setup sudoer
 echo_yellow "====> Checking sudoer for {{ primary_user.name }}"

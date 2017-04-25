@@ -60,6 +60,7 @@ data_files:
 # *.env files contain host names for given roles which comes from inventory.yaml.
 environment_files:
     -   "bootstrap/vms/environment_config.yaml"
+    -   "bootstrap/vms/vagrant/CEPH_UP_VAGRANT"
     -   "environments/ceph_chef_adc_hosts.env"
     -   "environments/ceph_chef_admin_hosts.env"
     -   "environments/ceph_chef_bootstrap.env"
@@ -212,14 +213,24 @@ primary_user:
     comment: "Vagrant user"
     passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
     passwd_type: "--iscrypted"
-    # NB: If 'public_key' starts with 'ssh-rsa' then it's assumed the key is content and not a file. EXCEPT for PXE_BOOT - must be content
-    public_key: "operations.pub"
-    # All keys *MUST* end with '.key'. Cepheus will named them correctly during the process.
-    private_key: operations.key
-    # NB: Key management should be done elsewhere. Cepheus will check for existing file and take it. If one is not found then
-    # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
-    # you change your ssh key but use the same name later if you don't already have one!
-    passphrase: "cepheus"
+    key:
+        # 'enable' does not apply to initial keys for vagrant but only adding keys once on the node.
+        enable: false
+        # NB: If 'public_key' starts with 'ssh-rsa' then it's assumed the key is content and not a file. EXCEPT for PXE_BOOT - must be content
+        public: ^
+            ssh-rsa
+            AAAAB3NzaC1yc2EAAAADAQABAAABAQDcfZJtJMz8hdYRzBFhdePEokksgKwb4gpxZcO+Z+ybGluzi4KCaqC8AgiCqI0ujDZDXpKkY+ZnNANyuE7U8ApwYkUMt4PynIlXIdvUlrSY3tEDvIMi9K22/r8IUazXcl0N7D1uaXfw8KlZwhpW51OM7bufyJRVFyPpMm+7JaijjVYzanQLGKPuZpeUNSt8WoOTxAKAj0Pwqz7JIO4JtnvtrFLRXD/j1HCTUfjDlvli5zgQGbkhBGuzundRXdCS5AHYU88oRrovGyuCBZSasN+HZ64bFbqdFdv9O+NNzvvd8OI1TQBLmMko29hlzSnoPVyKY8CrCNp1/yWgx+2NHWT7
+            Cepheus Demo
+        # All keys *MUST* end with '.key'. Cepheus will named them correctly during the process.
+        private: cepheus
+        # 'key_path' represents where the keys are located on *your* machine
+        # Put or create keys in a directory that is *NOT* user specific but generic so it works with anyones build such as '$HOME/.ssh' or
+        # something like '/keys'
+        path: $HOME/.ssh
+        # NB: Key management should be done elsewhere. Cepheus will check for existing file and take it. If one is not found then
+        # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
+        # you change your ssh key but use the same name later if you don't already have one!
+        passphrase: "cepheus"
     # Backup is used for Cepheus backups. The default method is 'rsync' and the 'remote' section refers to a remote
     # 'cluster' and/or 'host' that the rsync process will use to sync this given environment (cluster) to.
     backup:

@@ -197,16 +197,12 @@ sed -i "s/^[^#].*requiretty/#Defaults requiretty/" /etc/sudoers
 echo "{{ primary_user.name }} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/{{ primary_user.name }}
 
 {%- if pxe_boot.kickstart.redhat.management.type %}
-{{ pxe_boot.kickstart.redhat.management.commands.C1 }}
-{{ pxe_boot.kickstart.redhat.management.commands.C2 }}
-{{ pxe_boot.kickstart.redhat.management.commands.C3 }}
+{{ pxe_boot.kickstart.redhat.management.commands }}
 yum update -y
 # Go ahead and create a script in /tmp if the network has issues during the process.
 cat <<EOM >/tmp/rhelsub.sh
 service network restart
-{{ pxe_boot.kickstart.redhat.management.commands.C1 }}
-{{ pxe_boot.kickstart.redhat.management.commands.C2 }}
-{{ pxe_boot.kickstart.redhat.management.commands.C3 }}
+{{ pxe_boot.kickstart.redhat.management.commands }}
 yum update -y
 EOM
 chmod +x /tmp/rhelsub.sh

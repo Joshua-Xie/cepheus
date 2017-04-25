@@ -1,0 +1,104 @@
+#
+# Ansible Hosts File - Automated so do not modify
+#
+
+# Bootstrap
+[bootstrap]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "bootstrap" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# Mons
+[mon]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "mon" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# OSDs
+[osd]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "osd" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# RGWs
+[rgw]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "rgw" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# ADC - Load Balancers
+[adc]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "adc" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# Admin
+[admin]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "admin" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# MGR
+[mgr]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "mgr" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# MDSs
+[mds]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "mds" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# APIs
+[api]
+{%- for node in inventory.nodes %}
+{%- for role in node.roles %}
+{%- if role == "api" %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+# Locations
+{% for loc in inventory.locations %}
+
+[{{ loc }}]
+{%- for node in inventory.nodes %}
+{%- if node.location == loc %}
+{{ node.name }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}

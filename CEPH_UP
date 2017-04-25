@@ -289,6 +289,9 @@ else
     source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
     set -e
 
+    echo_yellow "====> Calling bootstrap_chef_nodes.sh..."
+    source $REPO_ROOT/bootstrap/common/bootstrap_chef_nodes.sh $REPO_ROOT
+
     echo_green "====> Bootstrapping phase - Complete <===="
     echo
     exit 0
