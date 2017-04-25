@@ -186,6 +186,10 @@ fi
 echo_yellow "====> Compressing {{ cache.base }}..."
 tar -zcf /home/{{ primary_user.name }}{{ cache.base }}.tar.gz {{ cache.base }}
 
+# Set the REPO_ROOT to the correct path so bootstrap_chef_nodes.sh will be able to use correct one.
+export REPO_ROOT={{ cache.repo }}
+export REPO_ROOT_FILES={{ cache.base }}
+
 echo
 echo_green "====> bootstrap_chef_server.sh - Complete <===="
 echo
