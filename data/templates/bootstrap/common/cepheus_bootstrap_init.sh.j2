@@ -91,23 +91,21 @@ fi
 # Checking for private key from environment.yaml file...
 # NB: May want to revisit key management later...
 
-echo_light_purple "====> Checking $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}"
-if [[ ! -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }} ]]; then
-    echo_green "====> Creating $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}"
-    ssh-keygen -b 2048 -t rsa -q -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }} -C "{{ primary_user.comment }}" -P "{{ primary_user.key.passphrase }}"
-    chmod 0600 $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}*
-    chown -R {{ primary_user.name }}:{{ primary_user.group }} $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.private }}*
+echo_light_purple "====> Checking {{ primary_user.key.path }}/{{ primary_user.key.private }}"
+if [[ ! -f {{ primary_user.key.path }}/{{ primary_user.key.private }} ]]; then
+    echo_green "====> Creating {{ primary_user.key.path }}/{{ primary_user.key.private }}"
+    ssh-keygen -b 2048 -t rsa -q -f {{ primary_user.key.path }}/{{ primary_user.key.private }} -C "{{ primary_user.comment }}" -P "{{ primary_user.key.passphrase }}"
+    chmod 0600 {{ primary_user.key.path }}/{{ primary_user.key.private }}*
+    chown -R {{ primary_user.name }}:{{ primary_user.group }} {{ primary_user.key.path }}/{{ primary_user.key.private }}*
 fi
 
 echo_light_purple "====> Checking /home/{{ primary_user.name }}/.ssh/authorized_keys"
 if [[ ! -f /home/{{ primary_user.name }}/.ssh/authorized_keys ]]; then
     echo_green "====> Creating /home/{{ primary_user.name }}/.ssh/authorized_keys"
 {% if primary_user.key.public.startswith('ssh-rsa') %}
-#cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
-echo "{{ primary_user.key.public }}" >> /home/{{ primary_user.name }}/.ssh/authorized_keys
-#EOM
+    echo "{{ primary_user.key.public }}" >> /home/{{ primary_user.name }}/.ssh/authorized_keys
 {% else %}
-    echo $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.key.public }} >> /home/{{ primary_user.name }}/.ssh/authorized_keys
+    echo {{ primary_user.key.path }}/{{ primary_user.key.public }} >> /home/{{ primary_user.name }}/.ssh/authorized_keys
 {% endif %}
 fi
 
@@ -115,7 +113,7 @@ echo_light_purple "====> Checking /home/{{ primary_user.name }}/.ssh/id_rsa"
 if [[ ! -f /home/{{ primary_user.name }}/.ssh/id_rsa ]]; then
     echo_green "====> Creating /home/{{ primary_user.name }}/.ssh/id_rsa"
 
-    cp $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
+    cp {{ primary_user.key.path }}/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
 
     chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
     chmod 0600 /home/{{ primary_user.name }}/.ssh/id_rsa

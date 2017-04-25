@@ -214,11 +214,11 @@ logger -t CepheusBackup "Cepheus Chef Server updated to latest packages - $VERSI
 
 # Make sure tmp files are present for cookbooks
 # Hack around gem issue - one of Chef's bad things...
-# NB: Fix in future - Should only run these ansible runs *IF* nodes exists but for now it's ok if they fail on intial run...
+# NB: cepheus_bootstrap_init.sh creates ansible hosts file.
 set +e
-# {% for item in ceph_chef.gems %}
-# ansible all -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item.name }}-{{ item.version }}.gem dest=/tmp/{{ item.name }}-{{ item.version }}.gem owner=$OWNER"
-# {% endfor %}
+{% for item in ceph_chef.gems %}
+ansible "all!{{ bootstrap.name }}" -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item.name }}-{{ item.version }}.gem dest=/tmp/{{ item.name }}-{{ item.version }}.gem owner=$OWNER"
+{% endfor %}
 
 # Backup ALL important configs, keys etc
 # I have seen this sometimes hang - maybe due to doing a number of crush map gets which means it needs to be

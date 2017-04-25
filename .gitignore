@@ -2,7 +2,7 @@
 
 # NO KEYS - Keys should be private
 *.key
-*.key.pub
+*.key.*
 
 # Template built files - these should match the build.yaml files section except with leading '/'
 /bootstrap/common/bootstrap_prereqs.sh
@@ -44,8 +44,10 @@
 /data/private/*.json
 /data/private/*.sh
 
+# Vagrant related
 /bootstrap/vms/vagrant/vagrant.ssh.config
 /bootstrap/vms/vagrant/tmp_authorized_keys
+/bootstrap/vms/vagrant/CEPH_UP_VAGRANT
 
 # Created build file for any environment
 build.yaml

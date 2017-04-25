@@ -111,6 +111,20 @@ kexec-tools
 vim
 tmux
 git
+kernel-devel
+gcc
+make
+perl
+bzip2
+epel-release
+ipmitool
+yum-utils
+createrepo
+rsync
+python-pip
+python-jinja2
+PyYAML
+ansible
 %end
 
 %post --nochroot
@@ -173,7 +187,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
 # NB: public_key must be content for pxe_boot
 cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
-{{ primary_user.public_key }}
+{{ primary_user.key.public }}
 EOM
 chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
 chown -R {{ primary_user.name }}:{{ primary_user.group }} /home/{{ primary_user.name }}/.ssh

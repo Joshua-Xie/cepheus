@@ -154,6 +154,8 @@ if [[ -d $REPO_ROOT_FILES/cobbler ]]; then
 fi
 {% endif %}
 
+echo_yellow "====> Setting up rights and cleaning up..."
+
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus
 
 if [[ -d /tmp/cepheus ]]; then

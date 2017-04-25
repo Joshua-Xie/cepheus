@@ -118,6 +118,16 @@ dnsmasq
 tmux
 genisoimage
 anaconda
+kernel-devel
+gcc
+make
+perl
+bzip2
+epel-release
+python-pip
+python-jinja2
+PyYAML
+ansible
 %end
 
 %post --nochroot
@@ -174,9 +184,9 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 mkdir --mode=0700 -p /home/{{ primary_user.name }}/.ssh
 # NB: pxe_boot *must* have a key content and not file name
 cat <<EOM >/home/{{ primary_user.name }}/.ssh/authorized_keys
-{{ primary_user.public_key }}
+{{ primary_user.key.public }}
 EOM
-cp /ceph-host/bootstrap/data/environment/{{ environment }}/{{ primary_user.private_key }} /home/{{ primary_user.name }}/.ssh/id_rsa
+cp /ceph-host/bootstrap/data/environment/{{ environment }}/{{ primary_user.key.private }} /home/{{ primary_user.name }}/.ssh/id_rsa
 chmod 0600 /home/{{ primary_user.name }}/.ssh/authorized_keys
 chmod 0600 /home/{{ primary_user.name }}/.ssh/id_rsa
 chown -R {{ primary_user.name }}:{{ primary_user.group }} /home/{{ primary_user.name }}/.ssh
