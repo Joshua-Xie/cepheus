@@ -122,7 +122,7 @@ mkdir -p $HOME/.chef
 #     export CHEF_SERVER={{ bootstrap.name }}
 # fi
 
-echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}/organizations/{{ chef.org }}'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
+echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}/organizations/{{ chef.org }}'\nvalidation_client_name '{{ chef.validation_client_name }}'\nvalidation_key '/etc/opscode/{{ chef.validator }}.pem'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
 
 echo_yellow "====> Creating certs..."
 $KNIFE ssl fetch
