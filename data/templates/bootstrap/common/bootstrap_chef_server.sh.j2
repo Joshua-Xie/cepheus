@@ -128,7 +128,8 @@ echo_yellow "====> Creating certs..."
 $KNIFE ssl fetch
 
 echo_yellow "====> Bootstrapping Chef Server for {{ primary_user.name }}"
-$KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} -N {{ bootstrap.name }} -P {{ primary_user.name }} --sudo --yes
+# New way to Chef bootstrap requires -N <bootstrap name> instead of just <bootstrap name>
+$KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} {{ bootstrap.name }} -P {{ primary_user.name }} --sudo --yes
 
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.

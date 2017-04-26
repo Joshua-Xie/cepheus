@@ -297,7 +297,7 @@ chef:
     owner: vagrant
     org: cepheus
     name: Cepheus - LambdaStack.io
-    validator: validator
+    validator: cepheus
     admin:
         user: admin
         email: admin@localhost.com
@@ -305,7 +305,7 @@ chef:
     # May want the group part of the default group of the owner above.
     group: vagrant
     server: http://10.0.100.20:4000
-    validation_client_name: validation
+    validation_client_name: cepheus
 
 monitoring:
   collectd:
