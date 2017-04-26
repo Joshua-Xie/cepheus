@@ -45,7 +45,7 @@ ansible "all:!{{ bootstrap.name }}" -m shell -a "cd /home/{{ primary_user.name }
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
 ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p /etc/chef && sudo mkdir -p /var/log"
 ansible "all:!{{ bootstrap.name }}" -m shell -b -a "rpm -Uvh /home/{{ primary_user.name }}{{ cache.base }}/{{ cache.packages }}/{{ chef_repo.client.package }}"
-ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src=/home/{{ primary_user.name }}{{ cache.base }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
+ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src=/home/{{ primary_user.name }}{{ cache.repo }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
 
 echo_yellow "====> Installing Ceph-Chef gem requirements..."
 {% for gem in ceph_chef.gems %}
