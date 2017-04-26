@@ -104,7 +104,7 @@ if [[ -z $chef_server ]]; then
     # sudo chef-server-ctl org-show {{ chef.org }} 2>/dev/null
     # set -e
     # if [[ $? -ne 0 ]]; then
-        sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association {{ chef.admin.user }} # {# --filename /etc/opscode/{{ chef.validator }}.pem #}
+        sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association {{ chef.admin.user }} --filename /etc/opscode/{{ chef.validator }}.pem
     # fi
 fi
 # NB: May want to think of updating Chef Server here...
