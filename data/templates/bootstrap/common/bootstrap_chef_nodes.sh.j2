@@ -46,10 +46,11 @@ ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p {{ cache.base }} &&
 ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/. && rm -rf /home/{{ primary_user.name }}{{ cache.base }}"
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
-{% for node in inventory.node %}
+{% for node in inventory.nodes %}
 $KNIFE bootstrap {{ node.bootstrap_ip }} -N {{ node.name }} -x {{ primary_user.name }} -i {{ primary_user.key.path }}/{{ primary_user.key.private }} --sudo --yes
 {% endfor %}
 
+# Temp - remove after testing
 # ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p /etc/chef && mkdir -p /var/log/chef"
 # ansible "all:!{{ bootstrap.name }}" -m shell -b -a "rpm -Uvh {{ cache.base }}/{{ cache.packages }}/{{ chef_repo.client.package }}"
 # ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src={{ cache.repo }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
@@ -57,7 +58,6 @@ $KNIFE bootstrap {{ node.bootstrap_ip }} -N {{ node.name }} -x {{ primary_user.n
 echo_yellow "====> Installing Ceph-Chef gem requirements..."
 {% for gem in ceph_chef.gems %}
 ansible "all:!{{ bootstrap.name }}" -m copy -a "src={{ cache.base }}/gems/{{ gem.name }}-{{ gem.version }}.gem dest=/tmp/{{ gem.name }}-{{ gem.version }}.gem"
-ansible "all:!{{ bootstrap.name }}" -m shell -b -a "chown {{ primary_user.name }}:{{ primary_user.name }} /tmp/{{ gem.name }}-{{ gem.version }}.gem"
 ansible "all:!{{ bootstrap.name }}" -m shell -b -a "/opt/chef/embedded/bin/gem install --force --local /tmp/{{ gem.name }}-{{ gem.version }}.gem"
 {% endfor %}
 
