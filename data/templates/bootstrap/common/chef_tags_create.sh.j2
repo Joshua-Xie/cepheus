@@ -30,23 +30,23 @@ echo_yellow "====> Creating Chef Tags..."
 
 # For Ceph Kraken and above - Ceph Mgr runs along side of ceph-mon nodes.
 for i in ${CEPH_MON_HOSTS[@]}; do
-  knife tag create $i 'ceph-mon' $CHEF_KNIFE_DEBUG
+  knife tag create $i 'ceph-mon'
 done
 
 for i in ${CEPH_OSD_HOSTS[@]}; do
-  knife tag create $i 'ceph-osd' $CHEF_KNIFE_DEBUG
+  knife tag create $i 'ceph-osd'
 done
 
 for i in ${CEPH_RGW_HOSTS[@]}; do
-  knife tag create $i 'ceph-rgw' $CHEF_KNIFE_DEBUG
+  knife tag create $i 'ceph-rgw'
 done
 
 for i in ${CEPH_ADMIN_HOSTS[@]}; do
-  knife tag create $i 'ceph-admin' $CHEF_KNIFE_DEBUG
+  knife tag create $i 'ceph-admin'
   # NOTE: ceph-restapi can be split out later if desired
-  knife tag create $i 'ceph-restapi' $CHEF_KNIFE_DEBUG
+  knife tag create $i 'ceph-restapi'
 done
 
 for i in ${CEPH_ADC_HOSTS[@]}; do
-  knife tag create $i 'ceph-adc' $CHEF_KNIFE_DEBUG
+  knife tag create $i 'ceph-adc'
 done

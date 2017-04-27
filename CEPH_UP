@@ -52,11 +52,15 @@ export BOOTSTRAP_INIT=0
 export BUILD_SHOW_LOGO=1
 export BUILD_VMS_ONLY=0
 export BUILD_ENVIRONMENT=vagrant
-export BUILD_LOCATION=public
-export BUILD_DATA_CENTER=local
 export BUILD_OS=centos
 export BUILD_UPDATE=1
 export BUILD_TEMPLATES_ONLY=0
+
+# This is the default - MAKE SURE to pass in the two values that match what is found in the environment.yaml!!!!
+# These two allow Cepheus to find the data you will be using for the given cluster. After this initial specification here
+# it will use the 'location' and 'data_center' variables found in the 'environment.yaml' file.
+export BUILD_LOCATION=public
+export BUILD_DATA_CENTER=local
 
 while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
     case $opt in
@@ -195,18 +199,6 @@ BUILD=data/build.sh
 echo_yellow "====> Generating $REPO_ROOT/$BUILD from $REPO_ROOT/data/common.yaml..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
 sudo chmod +x $REPO_ROOT/$BUILD
-
-## WIP Section
-# Pass data templates through template enginge first
-# BUILD_DATA_TEMPLATES=data/data_templates.sh
-# echo "====> Generating $REPO_ROOT/$BUILD_DATA_TEMPLATES from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data_templates.yaml..."
-# $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data_templates.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA_TEMPLATES.j2 -o $REPO_ROOT/$BUILD_DATA_TEMPLATES
-# sudo chmod +x $REPO_ROOT/$BUILD_DATA_TEMPLATES
-#
-# # This must now be ran to generate environment.yaml for the given environment.
-# echo "====> Executing $REPO_ROOT/$BUILD_DATA_TEMPLATES"
-# source $REPO_ROOT/$BUILD_DATA_TEMPLATES
-##
 
 # Add all other data files to the final build.yaml
 BUILD_DATA=data/data_files.sh

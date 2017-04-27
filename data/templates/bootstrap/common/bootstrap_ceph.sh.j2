@@ -19,10 +19,10 @@
 # This script bootstraps Ceph on all nodes
 # Automated so do not modify directly. Should only be done once!
 
+set -e
+
 REPO_ROOT={{ cache.repo }}
 REPO_ROOT_FILES={{ cache.base }}
-
-# NB: $BUILD_LOCATION and $BUILD_DATA_CENTER are exported in CEPH_UP that calls or gets called by cepheus-build!
 
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
@@ -30,9 +30,9 @@ echo_yellow "====> Bootstrapping Ceph..."
 {% for item in ceph_bootstrap_process_files %}
 
 echo_yellow "====> Generating {{ item }}..."
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/{{ location }}/{{ data_center }}/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Passes through template_engine twice
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/{{ location }}/{{ data_center }}/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {% endfor %}

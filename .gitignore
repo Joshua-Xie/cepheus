@@ -29,6 +29,7 @@
 /bootstrap/common/util_ntp_sync.sh
 
 # Ceph bootstrapping specific
+/bootstrap/common/bootstrap_ceph.sh
 /bootstrap/common/ceph_mon.sh
 /bootstrap/common/ceph_crushmap.sh
 /bootstrap/common/ceph_osd.sh
