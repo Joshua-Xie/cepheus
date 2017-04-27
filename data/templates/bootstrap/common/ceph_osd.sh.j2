@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Author: Chris Jones <chris.jones@lambdastack.io>
+# Copyright 2017, LambdaStack
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+source {{ cache.repo }}/bootstrap/common/scripts/base.sh
+source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+
+# Step 1
+echo_yellow "====> Ceph OSD Step 1 - install..."
+for i in ${CEPH_OSD_HOSTS[@]}; do
+    echo_yellow "====> Working on node: $i..."
+    $KNIFE node run_list add $i 'role[ceph-osd-install]'
+    do_on_node $i "sudo chef-client -o 'role[ceph-osd-install]'"
+done
+
+# Step 2
+echo_yellow "====> Ceph OSD Step 2 - start..."
+for i in ${CEPH_OSD_HOSTS[@]}; do
+    echo_yellow "====> Working on node: $i..."
+    $KNIFE node run_list add $i 'role[ceph-osd-start]'
+    do_on_node $i "sudo chef-client -o 'role[ceph-osd-start]'"
+done
+
+# Step 3
+echo_yellow "====> Ceph OSD Step 3 - crushmap..."
+for i in ${CEPH_OSD_HOSTS[@]}; do
+    echo_yellow "====> Working on node: $i..."
+    $KNIFE node run_list add $i 'role[ceph-osd-crushmap-set]'
+    do_on_node $i "sudo chef-client -o 'role[ceph-osd-crushmap-set]'"
+done

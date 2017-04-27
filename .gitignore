@@ -7,16 +7,15 @@
 # Template built files - these should match the build.yaml files section except with leading '/'
 /bootstrap/common/bootstrap_prereqs.sh
 /bootstrap/common/bootstrap_validate_env.sh
-/bootstrap/common/cepheus_build_update.sh
-/bootstrap/common/cepheus_bootstrap_init.sh
+/bootstrap/common/cepheus_update.sh
+/bootstrap/common/bootstrap_init.sh
 /bootstrap/common/cepheus_backup_no_rsync.sh
 /bootstrap/common/cepheus_backup_rsync.sh
 /bootstrap/common/base_environment.sh
 /bootstrap/common/base.sh
 /bootstrap/common/base_colors.sh
-/bootstrap/common/ansible_hosts
+/bootstrap/common/hosts_ansible
 /bootstrap/common/hosts
-/bootstrap/common/client.rb
 /bootstrap/common/bootstrap_key_prompt.sh
 /bootstrap/common/bootstrap_chef_server.sh
 /bootstrap/common/bootstrap_chef_nodes.sh
@@ -24,7 +23,26 @@
 /bootstrap/common/chef_tags_create.sh
 /bootstrap/common/chef_tags_delete.sh
 /bootstrap/common/chef_environment_nodes.sh
+/bootstrap/common/ceph_check_rgw_logs.sh
+/bootstrap/common/ceph_osd_pgs_per_node.sh
+/bootstrap/common/ceph_osd_tree_node.sh
+/bootstrap/common/util_ntp_sync.sh
+
+# Ceph bootstrapping specific
+/bootstrap/common/ceph_mon.sh
+/bootstrap/common/ceph_crushmap.sh
+/bootstrap/common/ceph_osd.sh
+/bootstrap/common/ceph_osd_tunables.sh
+/bootstrap/common/ceph_osd_pools.sh
+/bootstrap/common/ceph_rgw.sh
+/bootstrap/common/ceph_rgw_users.sh
+/bootstrap/common/ceph_api_rest.sh
+/bootstrap/common/ceph_finish.sh
+/bootstrap/common/ceph_adc.sh
+/bootstrap/common/ceph_mgr.sh
+
 /data/build.sh
+/data/build_init_update.sh
 /data/data_files.sh
 /data/data_templates.sh
 

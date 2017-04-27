@@ -214,7 +214,7 @@ logger -t CepheusBackup "Cepheus Chef Server updated to latest packages - $VERSI
 
 # Make sure tmp files are present for cookbooks
 # Hack around gem issue - one of Chef's bad things...
-# NB: cepheus_bootstrap_init.sh creates ansible hosts file.
+# NB: bootstrap_init.sh creates ansible hosts file.
 set +e
 {% for item in ceph_chef.gems %}
 ansible "all!{{ bootstrap.name }}" -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item.name }}-{{ item.version }}.gem dest=/tmp/{{ item.name }}-{{ item.version }}.gem owner=$OWNER"
@@ -234,6 +234,10 @@ set -e
 # Remove tmp working directory
 rm -rf $WORK_DIR
 
+# Put a hard link to this file (after ran through template_engine) in home directory of primary user.
+cd $HOME
+ln $HOME/cepheus/bootstrap/common/cepheus_update.sh cepheus_update.sh
+
 echo
-echo_green "====> cepheus_build_update.sh - Complete <===="
+echo_green "====> cepheus_update.sh - Complete <===="
 echo

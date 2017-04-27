@@ -58,7 +58,7 @@ done
 
 # If ansible is installed then move it's hosts file.
 if [[ -d /etc/ansible ]]; then
-    sudo cp $REPO_ROOT/bootstrap/common/ansible_hosts /etc/ansible/hosts
+    sudo cp $REPO_ROOT/bootstrap/common/hosts_ansible /etc/ansible/hosts
 fi
 
 # Set hosts file for cluster init
@@ -155,5 +155,5 @@ chmod +x /tmp/rhelsub.sh
 # May need to do something with NICs here since some require a little extra love before they are happy!
 
 echo
-echo_green "====> cepheus_bootstrap_init.sh - Complete <===="
+echo_green "====> bootstrap_init.sh - Complete <===="
 echo

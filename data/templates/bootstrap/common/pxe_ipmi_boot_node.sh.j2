@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# Author: Chris Jones <chris.jones@lambdastack.io>
+# Copyright 2017, LambdaStack
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+{% if pxe_boot.enable %}
+source {{ cache.repo }}/bootstrap/common/scripts/base.sh
+source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+
+node=$1
+
+if [[ ! -z $node ]]; then
+  echo "PXE Booting: $node"
+  echo
+  sudo cobbler system edit --name=$node --netboot-enable=True
+  sudo cobbler sync
+  echo
+  echo "#####################################################"
+  echo
+  ipmitool -I lanplus -H $node-mgmt -U {{ ipmi.user }} -P {{ ipmi.passwd }} chassis bootdev pxe
+  # Force the device off...
+  ipmitool -I lanplus -H $node-mgmt -U {{ ipmi.user }} -P {{ ipmi.passwd }} chassis power off
+  echo "Powering off..."
+  sleep 10
+  ipmitool -I lanplus -H $node-mgmt -U {{ ipmi.user }} -P {{ ipmi.passwd }} chassis power on
+  knife client delete $node -y
+  knife node delete $node -y
+else
+  echo "*MUST* pass in a valid node hostname without -mgmt suffix."
+fi
+{% endif %}

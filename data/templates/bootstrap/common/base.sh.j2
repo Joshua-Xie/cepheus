@@ -17,6 +17,13 @@
 
 REPO_ROOT="/home/{{ primary_user.name }}/cepheus"
 
+# use Chef Server embedded knife instead of the one in /usr/bin
+export KNIFE=/opt/opscode/embedded/bin/knife
+
+# These two are residuals from previous versions. They can go away later...
+export CHEF_CLIENT_DEBUG=
+export CHEF_KNIFE_DEBUG=
+
 # If DONT_SHOW_BANNER is not set then default it to 0
 DONT_SHOW_BANNER=${DONT_SHOW_BANNER:-1}
 
@@ -96,9 +103,6 @@ do_on_node() {
   COMMAND="${*}"
   ssh -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
 }
-
-# use Chef Server embedded knife instead of the one in /usr/bin
-KNIFE=/opt/opscode/embedded/bin/knife
 
 # Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
 delete=($CEPH_CHEF_BOOTSTRAP)

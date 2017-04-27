@@ -18,7 +18,7 @@
 
 REPO_ROOT=$1
 REPO_ROOT=${REPO_ROOT:-"{{ cache.repo }}"}
-KNIFE=/opt/opscode/embedded/bin/knife
+# KNIFE=/opt/opscode/embedded/bin/knife
 
 if [ -n "$CEPH_CHEF_HTTP_PROXY" ]; then
     KNIFE_HTTP_PROXY_PARAM="--bootstrap-proxy \$http_proxy"
@@ -37,7 +37,7 @@ echo_yellow "====> Copying {{ cache.base }}.tar.gz to nodes..."
 ansible "all:!{{ bootstrap.name }}" -m copy -a "src=/home/{{ primary_user.name }}{{ cache.base }}.tar.gz dest=/home/{{ primary_user.name }}{{ cache.base }}.tar.gz"
 
 echo_yellow "====> Copying /etc/hosts to nodes..."
-# /etc/hosts should have been updated in cepheus_bootstrap_init.sh for the initial run
+# /etc/hosts should have been updated in bootstrap_init.sh for the initial run
 ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src=/etc/hosts dest=/etc/hosts"
 
 echo_yellow "====> Setting up {{ cache.base }}.tar.gz on nodes..."
@@ -47,13 +47,9 @@ ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.nam
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
 {% for node in inventory.nodes %}
+# TODO: Add bootstrap proxy option...
 $KNIFE bootstrap {{ node.bootstrap_ip }} -N {{ node.name }} -x {{ primary_user.name }} -i {{ primary_user.key.path }}/{{ primary_user.key.private }} --sudo --yes
 {% endfor %}
-
-# Temp - remove after testing
-# ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p /etc/chef && mkdir -p /var/log/chef"
-# ansible "all:!{{ bootstrap.name }}" -m shell -b -a "rpm -Uvh {{ cache.base }}/{{ cache.packages }}/{{ chef_repo.client.package }}"
-# ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src={{ cache.repo }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
 
 echo_yellow "====> Installing Ceph-Chef gem requirements..."
 {% for gem in ceph_chef.gems %}

@@ -280,8 +280,8 @@ if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
     fi
 else
     # Build out or update the given environment.
-    echo_yellow "====> Calling cepheus_bootstrap_init.sh..."
-    sudo $REPO_ROOT/bootstrap/common/cepheus_bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
+    echo_yellow "====> Calling bootstrap_init.sh..."
+    sudo $REPO_ROOT/bootstrap/common/bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
 
     echo_yellow "====> Calling bootstrap_chef_server.sh..."
     # Just a safe check because this part can fail and be fine.
@@ -297,9 +297,9 @@ else
     exit 0
 fi
 
-echo_yellow "====> Calling cepheus_build_update.sh..."
-source $TMP_REPO_ROOT/bootstrap/common/cepheus_build_update.sh
+echo_yellow "====> Calling cepheus_update.sh..."
+source $TMP_REPO_ROOT/bootstrap/common/cepheus_update.sh
 
 echo
-echo_green "====> Complete <===="
+echo_green "====> CEPH_UP - Completed! <===="
 echo

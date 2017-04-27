@@ -288,11 +288,6 @@ bootstrap:
         gateway: ""
         mac: ""
 
-# Hardware vendor specific
-ipmi:
-  user: ""
-  passwd: ""
-
 chef:
     owner: vagrant
     org: cepheus

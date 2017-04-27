@@ -6,6 +6,11 @@
 ISO:
   packer: LambdaStack
 
+# Hardware vendor specific
+ipmi:
+  user: ""
+  passwd: ""
+
 # This data will not show up in the final Chef environment.json file unless `method` is set to 'pxe'
 pxe_boot:
     # This enable flag is present for those installations that are pxe_booting but want to turn it off
@@ -73,3 +78,13 @@ pxe_boot:
             comment: "OSD type nodes either dedicated OSD or converged with other services like MON and RGW."
         -   name: ceph_non_osd_node
             comment: "NON-OSD type nodes. Services like MON, RGW or MDS."
+
+# IPMI and PXE_BOOT related files/scripts. These will only appear if PXE is enabled.
+pxe_files:
+    -   "bootstrap/common/pxe_ipmi_boot_all.sh"
+    -   "bootstrap/common/pxe_ipmi_boot_node.sh"
+    -   "bootstrap/common/pxe_ipmi_check_node_status.sh"
+    -   "bootstrap/common/pxe_ipmi_power_off_all.sh"
+    -   "bootstrap/common/pxe_ipmi_restart_hard.sh"
+    -   "bootstrap/common/pxe_ipmi_restart_soft.sh"
+    -   "bootstrap/common/pxe_reset_nodes.sh"

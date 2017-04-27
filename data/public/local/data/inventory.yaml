@@ -89,6 +89,7 @@ inventory:
               - rgw
               - adc
               - admin
+              - api
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
           # *MUST* match one of the profiles in pxe_boot.yaml
           profile: ceph_non_osd_node
@@ -139,6 +140,7 @@ inventory:
               - rgw
               - adc
               - admin
+              - api
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
           # *MUST* match one of the profiles in pxe_boot.yaml
           profile: ceph_non_osd_node
@@ -189,6 +191,7 @@ inventory:
               - rgw
               - adc
               - admin
+              - api
           # Profile is PXE related. If an OSD role is being used on PXE then set profile to `ceph_osd_node` instead of `ceph_non_osd_node`
           # *MUST* match one of the profiles in pxe_boot.yaml
           profile: ceph_non_osd_node
