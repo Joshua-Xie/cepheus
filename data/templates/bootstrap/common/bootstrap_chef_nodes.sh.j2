@@ -43,12 +43,12 @@ ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src=/etc/hosts dest=/etc/host
 echo_yellow "====> Setting up {{ cache.base }}.tar.gz on nodes..."
 ansible "all:!{{ bootstrap.name }}" -m shell -a "cd /home/{{ primary_user.name }} && tar xzf *.tar.gz"
 ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p {{ cache.base }} && chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.base }}"
-ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/."
+ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/. && rm -rf /home/{{ primary_user.name }}{{ cache.base }}"
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
-$KNIFE bootstrap 10.0.100.21 -N ceph-vm1 -i /home/{{ primary_user }}/.ssh/{{ primary_user.key.private }} --sudo --yes
-$KNIFE bootstrap 10.0.100.22 -N ceph-vm2 -i /home/{{ primary_user }}/.ssh/{{ primary_user.key.private }} --sudo --yes
-$KNIFE bootstrap 10.0.100.23 -N ceph-vm3 -i /home/{{ primary_user }}/.ssh/{{ primary_user.key.private }} --sudo --yes
+{% for node in inventory.node %}
+$KNIFE bootstrap {{ node.bootstrap_ip }} -N {{ node.name }} -x {{ primary_user.name }} -i {{ primary_user.key.path }}/{{ primary_user.key.private }} --sudo --yes
+{% endfor %}
 
 # ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p /etc/chef && mkdir -p /var/log/chef"
 # ansible "all:!{{ bootstrap.name }}" -m shell -b -a "rpm -Uvh {{ cache.base }}/{{ cache.packages }}/{{ chef_repo.client.package }}"
@@ -62,38 +62,3 @@ ansible "all:!{{ bootstrap.name }}" -m shell -b -a "/opt/chef/embedded/bin/gem i
 {% endfor %}
 
 ansible "all:!{{ bootstrap.name }}" -m shell -b -a "chef-client"
-
-# for node in ${CEPH_NODES[@]}; do
-#
-#     do_on_node $node "sudo rpm -Uvh \$(find /ceph-files/ -name chef-\*rpm -not -name \*downloaded | tail -1)"
-#
-#     # NOTE: If this command seems to stall then the network needs to be reset. Run ./vagrant_reset_network.sh from the
-#     # directory this script is located in. This will clean any network issues. Same holds true for other VMs.
-#     do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE bootstrap -x vagrant --bootstrap-no-proxy '$CEPH_CHEF_BOOTSTRAP.$BOOTSTRAP_DOMAIN,$node.$BOOTSTRAP_DOMAIN' $KNIFE_HTTP_PROXY_PARAM -P vagrant --sudo $node.$BOOTSTRAP_DOMAIN"
-#
-#     # REQUIRED gems: netaddr-1.5.1 for ceph-chef Cookbook
-#     do_on_node $node "sudo cp /ceph-files/gems/netaddr-1.5.1.gem /tmp/."
-#     do_on_node $node "sudo chown vagrant:vagrant /tmp/netaddr-1.5.1.gem"
-#     do_on_node $node "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/netaddr-1.5.1.gem"
-#
-#     # REQUIRED gems: chef-sugar-3.4.0 for ceph-chef Cookbook
-#     do_on_node $node "sudo cp /ceph-files/gems/chef-sugar-3.4.0.gem /tmp/."
-#     do_on_node $node "sudo chown vagrant:vagrant /tmp/chef-sugar-3.4.0.gem"
-#     do_on_node $node "sudo /opt/chef/embedded/bin/gem install --force --local /tmp/chef-sugar-3.4.0.gem"
-#
-#     do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE node environment set $node.$BOOTSTRAP_DOMAIN $BOOTSTRAP_CHEF_ENV"
-# done
-
-
-# do_on_node $CEPH_CHEF_BOOTSTRAP "$KNIFE node run_list set $CEPH_CHEF_BOOTSTRAP.$BOOTSTRAP_DOMAIN 'role[ceph-bootstrap]' $CHEF_KNIFE_DEBUG"
-
-##### TEST
-# generate actor map
-##### do_on_node $CEPH_CHEF_BOOTSTRAP "cd \$HOME && $KNIFE actor map"
-# using the actor map, set ceph-bootstrap, ceph-*-vms (if any) as admins so that they can write into the data bag
-# do_on_node ceph-bootstrap "cd \$HOME && $KNIFE group add actor admins ceph-bootstrap.$BOOTSTRAP_DOMAIN"  # && $KNIFE group add actor admins cos-vm1.$BOOTSTRAP_DOMAIN"
-
-# Add each node to the bootstrap actor map
-#####for vm in ${CEPH_CHEF_HOSTS[@]}; do
-#####  do_on_node $CEPH_CHEF_BOOTSTRAP "cd \$HOME && $KNIFE group add actor admins $vm.$BOOTSTRAP_DOMAIN"
-#####done

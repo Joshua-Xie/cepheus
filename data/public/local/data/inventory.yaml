@@ -34,6 +34,7 @@ inventory:
         - name: ceph-bootstrap
           description: Bootstrap node that drives everything
           location: rack_01
+          bootstrap_ip: 10.0.100.20
           ipmi:
               name: ceph-bootstrap-mgmt
               ip: 10.123.85.130
@@ -77,6 +78,7 @@ inventory:
         - name: ceph-vm1
           description: Hyperconverged node with every Ceph process running
           location: rack_01
+          bootstrap_ip: 10.0.100.21
           ipmi:
               name: ceph-vm1-mgmt
               ip: 10.123.85.131
@@ -126,6 +128,7 @@ inventory:
         - name: ceph-vm2
           description: Hyperconverged node with every Ceph process running
           location: rack_02
+          bootstrap_ip: 10.0.100.22
           ipmi:
               name: ceph-vm2-mgmt
               ip: 10.123.85.132
@@ -175,6 +178,7 @@ inventory:
         - name: ceph-vm3
           description: Hyperconverged node with every Ceph process running
           location: rack_03
+          bootstrap_ip: 10.0.100.23
           ipmi:
               name: ceph-vm3-mgmt
               ip: 10.123.85.133
