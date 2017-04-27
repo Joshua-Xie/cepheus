@@ -18,6 +18,7 @@
 
 REPO_ROOT=$1
 REPO_ROOT=${REPO_ROOT:-"{{ cache.repo }}"}
+KNIFE=/opt/opscode/embedded/bin/knife
 
 if [ -n "$CEPH_CHEF_HTTP_PROXY" ]; then
     KNIFE_HTTP_PROXY_PARAM="--bootstrap-proxy \$http_proxy"
@@ -41,11 +42,17 @@ ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src=/etc/hosts dest=/etc/host
 
 echo_yellow "====> Setting up {{ cache.base }}.tar.gz on nodes..."
 ansible "all:!{{ bootstrap.name }}" -m shell -a "cd /home/{{ primary_user.name }} && tar xzf *.tar.gz"
+ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p {{ cache.base }} && chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.base }}"
+ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/."
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
-ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p /etc/chef && mkdir -p /var/log/chef"
-ansible "all:!{{ bootstrap.name }}" -m shell -b -a "rpm -Uvh /home/{{ primary_user.name }}{{ cache.base }}/{{ cache.packages }}/{{ chef_repo.client.package }}"
-ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src={{ cache.repo }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
+$KNIFE bootstrap 10.0.100.21 -N ceph-vm1 -i /home/{{ primary_user }}/.ssh/{{ primary_user.key.private }} --sudo --yes
+$KNIFE bootstrap 10.0.100.22 -N ceph-vm2 -i /home/{{ primary_user }}/.ssh/{{ primary_user.key.private }} --sudo --yes
+$KNIFE bootstrap 10.0.100.23 -N ceph-vm3 -i /home/{{ primary_user }}/.ssh/{{ primary_user.key.private }} --sudo --yes
+
+# ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p /etc/chef && mkdir -p /var/log/chef"
+# ansible "all:!{{ bootstrap.name }}" -m shell -b -a "rpm -Uvh {{ cache.base }}/{{ cache.packages }}/{{ chef_repo.client.package }}"
+# ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src={{ cache.repo }}/bootstrap/common/client.rb dest=/etc/chef/client.rb mode=0644"
 
 echo_yellow "====> Installing Ceph-Chef gem requirements..."
 {% for gem in ceph_chef.gems %}

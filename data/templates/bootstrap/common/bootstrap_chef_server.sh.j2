@@ -104,7 +104,7 @@ if [[ -z $chef_server ]]; then
     # sudo chef-server-ctl org-show {{ chef.org }} 2>/dev/null
     # set -e
     # if [[ $? -ne 0 ]]; then
-        sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association {{ chef.admin.user }} --filename /etc/opscode/{{ chef.validator }}.pem
+        sudo chef-server-ctl org-create {{ chef.org }} "{{ chef.name }}" --association {{ chef.admin.user }} # --filename /etc/opscode/{{ chef.validator }}.pem
     # fi
 fi
 # NB: May want to think of updating Chef Server here...
@@ -122,14 +122,15 @@ mkdir -p $HOME/.chef
 #     export CHEF_SERVER={{ bootstrap.name }}
 # fi
 
-echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}/organizations/{{ chef.org }}'\nvalidation_client_name '{{ chef.validation_client_name }}'\nvalidation_key '/etc/opscode/{{ chef.validator }}.pem'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
+# \nvalidation_client_name '{{ chef.validation_client_name }}'\nvalidation_key '/etc/opscode/{{ chef.validator }}.pem'
+echo -e "knife[:bootstrap_install_command] = 'sudo rpm -Uvh $REPO_ROOT_FILES/{{ cache.packages }}/{{ chef_repo.client.package }}'\nchef_server_url 'https://{{ bootstrap.name }}/organizations/{{ chef.org }}'\nnode_name 'admin'\nclient_key '/etc/opscode/admin.pem'\nknife['editor'] = 'vim'\ncookbook_path [ \"/home/{{ primary_user.name }}/cepheus/cookbooks\" ]" > $HOME/.chef/knife.rb
 
 echo_yellow "====> Creating certs..."
 $KNIFE ssl fetch
 
 echo_yellow "====> Bootstrapping Chef Server for {{ primary_user.name }}"
 # New way to Chef bootstrap requires -N <bootstrap name> instead of just <bootstrap name>
-$KNIFE bootstrap {{ bootstrap.ip }} -x {{ primary_user.name }} {{ bootstrap.name }} -P {{ primary_user.name }} --sudo --yes
+$KNIFE bootstrap {{ bootstrap.ip }} -N {{ bootstrap.name }} -x {{ primary_user.name }} -P {{ primary_user.name }} --sudo --yes
 
 # Puts everything where it needs to be...
 # Cepheus-build should have put together the proper layering so that everything here is assumed to be correct.
