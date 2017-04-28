@@ -236,10 +236,10 @@ rm -rf $WORK_DIR
 
 # Put a hard link to this file (after ran through template_engine) in home directory of primary user.
 cd $HOME
-# if [[ -f cepheus_update.sh ]]; then
-#     rm -f cepheus_update.sh
-# fi
-# ln $HOME/cepheus/bootstrap/common/cepheus_update.sh cepheus_update.sh
+if [[ -f cepheus_update.sh ]]; then
+    rm -f cepheus_update.sh
+fi
+ln $HOME/cepheus/bootstrap/common/cepheus_update.sh cepheus_update.sh
 
 echo
 echo_green "====> cepheus_update.sh - Complete <===="
