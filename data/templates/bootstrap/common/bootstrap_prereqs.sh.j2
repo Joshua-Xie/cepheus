@@ -26,6 +26,8 @@ REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}
 REPO_ROOT=$2
 REPO_ROOT=${REPO_ROOT:-`pwd`}
 
+BOOTSTRAP_REMOVE_PREREQS=${BOOTSTRAP_REMOVE_PREREQS:-0}
+
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 # Create directory for download cache.
