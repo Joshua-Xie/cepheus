@@ -46,8 +46,8 @@ source $REPO_ROOT/{{ item }}
 {% endfor %}
 
 # Remove Ceph Bootstrapping Gate File
-if [[ -f $HOME/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }} ]]; then
-    rm -f $HOME/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }}
+if [[ -f /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }} ]]; then
+    rm -f /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }}
     echo
     echo_green "====> CEPH Bootstrapping Complete <===="
     echo

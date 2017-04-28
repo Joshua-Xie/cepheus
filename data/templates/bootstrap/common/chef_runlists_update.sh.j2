@@ -26,7 +26,7 @@ if [[ -d /home/vagrant ]]; then
 fi
 
 # Check to make sure bootstrapping is not taking place...
-if [[ ! -f $HOME/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }} ]]; then
+if [[ ! -f /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }} ]]; then
     source {{ cache.repo }}/bootstrap/common/base_colors.sh
     source {{ cache.repo }}/bootstrap/common/base.sh
 

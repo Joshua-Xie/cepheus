@@ -37,6 +37,7 @@ fi
 ##############
 # IMPORTANT
 echo "{{ build.ceph.bootstrap_gate_message }}" > /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }}
+sudo chown {{ primary_user.name }}:{{ primary_user.name }} /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }}
 ##############
 
 REPO_ROOT=$1
