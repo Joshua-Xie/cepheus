@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 echo_yellow "====> NTP Sync..."
 ansible all -m shell -b -a "chef-client -o 'recipe[chef-bcs::ntp-sync]'"

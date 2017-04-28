@@ -17,8 +17,8 @@
 #
 
 {% if adc.enable %}
-# source {{ cache.repo }}/bootstrap/common/scripts/base.sh
-source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+# source {{ cache.repo }}/bootstrap/common/base.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 # NOTE: This sets up the ADC (haproxy and keepalived)
 # for i in ${CEPH_ADC_HOSTS[@]}; do

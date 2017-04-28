@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-source {{ cache.repo }}/bootstrap/common/scripts/base.sh
-source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+source {{ cache.repo }}/bootstrap/common/base.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 do_on_node ${CEPH_MON_HOSTS[@]:1:1} "ceph osd tree | grep $1 -A 12"

@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 
-# source {{ cache.repo }}/bootstrap/common/scripts/base.sh
-source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+# source {{ cache.repo }}/bootstrap/common/base.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 # for i in ${CEPH_ADMIN_HOSTS[@]}; do
 #   $KNIFE node run_list add $i 'role[ceph-restapi]' $CHEF_KNIFE_DEBUG

@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 
-# source {{ cache.repo }}/bootstrap/common/scripts/base.sh
-source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+# source {{ cache.repo }}/bootstrap/common/base.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 echo_yellow "====> Ceph - MON Finish..."
 ansible mon -m shell -b -a "chef-client -o 'recipe[ceph-chef::finish]'"

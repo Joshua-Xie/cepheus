@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 
-source {{ cache.repo }}/bootstrap/common/scripts/base.sh
-source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+source {{ cache.repo }}/bootstrap/common/base.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 # Should ONLY run this once. It's here just in case you want to break it out and use it that way.
 echo_yellow "====> Ceph RGW - Setting up users..."

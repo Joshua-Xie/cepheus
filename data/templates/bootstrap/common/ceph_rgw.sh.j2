@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 
-source {{ cache.repo }}/bootstrap/common/scripts/base.sh
-source {{ cache.repo }}/bootstrap/common/scripts/base_colors.sh
+source {{ cache.repo }}/bootstrap/common/base.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 echo_yellow "====> Ceph RGW Setting up..."
 for i in ${CEPH_RGW_HOSTS[@]}; do
