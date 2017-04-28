@@ -68,10 +68,10 @@ if [[ -d "/opt/opscode/" && -f "/home/{{ primary_user.name }}/cepheus_update.sh"
     if [[ -d $REPO_ROOT ]]; then
         {% if primary_user.backup.remote.enable %}
         # Call the backup and rsync script
-        source $REPO_ROOT/cepheus_backup_rsync.sh $DATE $VERSION
+        source $REPO_ROOT/bootstrap/common/cepheus_backup_rsync.sh $DATE $VERSION
         {% else %}
         # Call the backup
-        source $REPO_ROOT/cepheus_backup_no_rsync.sh $DATE $VERSION
+        source $REPO_ROOT/bootstrap/common/cepheus_backup_no_rsync.sh $DATE $VERSION
         {% endif %}
     fi
 fi
