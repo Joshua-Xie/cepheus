@@ -4,8 +4,6 @@
     },
     "json_class": "Chef::Role",
     "run_list": [
-      "recipe[cepheus::build-env]",
-      "recipe[cepheus::ansible]",
       "role[pxe_boot]",
       "role[monitoring]"
     ],

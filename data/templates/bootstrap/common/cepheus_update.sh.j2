@@ -58,9 +58,13 @@ git config --global credential.helper 'cache --timeout=25'
 
 ## End colors section
 
+echo
+echo_red "====> CEPHEUS Update Process Starting <===="
+echo
+
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
 {% if primary_user.backup.enable %}
-if [[ -d "/opt/opscode/" ]]; then
+if [[ -d "/opt/opscode/" && -f "/home/{{ primary_user.name }}/cepheus_update.sh" ]]; then
     if [[ -d $REPO_ROOT ]]; then
         {% if primary_user.backup.remote.enable %}
         # Call the backup and rsync script
@@ -93,14 +97,14 @@ echo_yellow "====> Clean staging process directories..."
 # NOTE: Important - Do this BEFORE moving data into directories on bootstrap since *all* is used!!
 
 # NOTE: Come back to this later because attempting to run this section on new system fails badly!
-# set +e
-# # Only if Chef has been installed which means ansible is loaded and host files exist
-# if [[ -d "/opt/opscode/" ]]; then
-#     # Nodes may not exist during initial build so it's ok to fail...
-#     ansible all -m shell -a "sudo rm -rf $REPO_ROOT"
-#     ansible all -m shell -a "sudo rm -rf $REPO_ROOT_FILES"
-# fi
-# set -e
+set +e
+# Only if Chef has been installed which means ansible is loaded and host files exist
+if [[ -d "/opt/opscode/" ]]; then
+    # Nodes may not exist during initial build so it's ok to fail...
+    ansible "all!{{ bootstrap.name }}" -m shell -b -a "rm -rf $REPO_ROOT"
+    ansible "all!{{ bootstrap.name }}" -m shell -b -a "rm -rf $REPO_ROOT_FILES"
+fi
+set -e
 
 echo_yellow "====> Building update..."
 # Build new {{ cache.repo }} environment and replace existing version
@@ -242,5 +246,7 @@ fi
 ln $HOME/cepheus/bootstrap/common/cepheus_update.sh cepheus_update.sh
 
 echo
-echo_green "====> cepheus_update.sh - Complete <===="
+echo_green "====================================="
+echo_green "====> CEPHEUS Update - Complete <===="
+echo_green "====================================="
 echo

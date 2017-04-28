@@ -12,7 +12,6 @@
     "recipe[cepheus::ceph-mon]",
     "recipe[cepheus::ceph-admin]",
     "recipe[ceph-chef::mon]",
-    "recipe[cepheus::ansible]",
     "recipe[cepheus::ceph-scripts]",
     "role[monitoring]"
   ]
