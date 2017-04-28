@@ -63,7 +63,7 @@ logger -t CepheusBackup "Cepheus Chef Server backed up - $VERSION-$DATE"
 
 # Make backup of current "ceph-host" and "cepheus" version
 if [[ -d $REPO_ROOT ]]; then
-    if [[ $(ls -A /ceph-host) ]]; then
+    if [[ $(ls -A {{ cache.repo }}) ]]; then
         echo_light_red "====> Backing up $REPO_ROOT..."
         mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
         cp -r $REPO_ROOT/* $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
@@ -85,11 +85,13 @@ fi
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus-backups/cepheus/
 
 # Backup supporting files - These are the same for ALL clusters.
-if [[ -d /ceph-files ]]; then
+if [[ -d {{ cache.base }} ]]; then
     if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
         echo_light_red "====> Backing up $REPO_ROOT_FILES..."
         mkdir -p $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
         cp -r $REPO_ROOT_FILES/* $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
+        tar -cjf $HOME/cepheus-backups/cepheus-files/cepheus-files-$VERSION-$DATE.tar.bz2 $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
+        sudo rm -rf $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
     fi
 fi
 

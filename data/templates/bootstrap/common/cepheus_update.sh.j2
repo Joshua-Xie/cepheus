@@ -62,6 +62,11 @@ echo
 echo_red "====> CEPHEUS Update Process Starting <===="
 echo
 
+# If ansible is installed then move it's hosts file.
+if [[ -d /etc/ansible ]]; then
+    sudo cp $REPO_ROOT/bootstrap/common/hosts_ansible /etc/ansible/hosts
+fi
+
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
 {% if primary_user.backup.enable %}
 if [[ -d "/opt/opscode/" && -f "/home/{{ primary_user.name }}/cepheus_update.sh" ]]; then
