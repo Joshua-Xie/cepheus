@@ -34,5 +34,6 @@ $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/{{ location }}/{{ d
 # NB: Passes through template_engine twice
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/{{ location }}/{{ data_center }}/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
-
+echo_yellow "====> Executing {{ item }}..."
+source $REPO_ROOT/{{ item }}
 {% endfor %}
