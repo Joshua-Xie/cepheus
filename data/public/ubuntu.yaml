@@ -44,8 +44,8 @@ chef_repo: # (required files for build)
         version: 13.0.118
         package: chef_13.0.118-1_amd64.deb
     server:
-        version: 12.14.0
-        package: chef-server-core_12.14.0-1_amd64.deb
+        version: 12.15.0
+        package: chef-server-core_12.15.0-1_amd64.deb
 
 # NB: Present in all OS data files. RHEL has the full section. CentOS and Ubuntu *must* have only the stub section
 subscription:  # (required for build)

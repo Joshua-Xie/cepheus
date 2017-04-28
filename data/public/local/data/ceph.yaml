@@ -4,8 +4,8 @@
 
 ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
     cluster: ceph
-    name: luminous
-    version: 10.2.6
+    name: hammer #luminous
+    version: 0.94.10 #10.2.6
 
     tcmalloc: # This becomes the default after Jewel
         enable: true
