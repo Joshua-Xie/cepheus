@@ -15,6 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Test
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
 
 source {{ cache.repo }}/bootstrap/common/base.sh
 source {{ cache.repo }}/bootstrap/common/base_colors.sh

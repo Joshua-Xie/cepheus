@@ -41,6 +41,12 @@ set -eu
 # GREEN='\033[0;32m'
 # NC='\033[0m' # No Color
 
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
+
+
 # Default values...
 export CEPH_DEV_MODE=0
 export CHEF_CEPHEUS_DEBUG=0

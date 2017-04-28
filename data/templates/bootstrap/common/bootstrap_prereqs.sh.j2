@@ -19,6 +19,11 @@
 
 # Exit immediately if anything goes wrong!
 set -eu
+# Test
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
 
 REPO_ROOT_FILES=$1
 REPO_ROOT_FILES=${REPO_ROOT_FILES:-"{{ cache.base }}"}

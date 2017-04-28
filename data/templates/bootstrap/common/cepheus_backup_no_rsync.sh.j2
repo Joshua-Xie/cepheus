@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 set -e
+# Test
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
 
 REPO_ROOT={{ cache.repo }}
 REPO_ROOT_FILES={{ cache.base }}

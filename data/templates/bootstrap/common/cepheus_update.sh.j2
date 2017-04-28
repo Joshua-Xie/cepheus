@@ -238,6 +238,12 @@ ansible "all!{{ bootstrap.name }}" -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item
 set -e
 ##################
 
+# Test
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
+
 echo_yellow "====> Cleaning up and setting links..."
 
 # Remove tmp working directory

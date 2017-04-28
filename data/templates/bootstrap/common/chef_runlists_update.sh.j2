@@ -17,6 +17,11 @@
 #
 
 # Deletes the tags on all nodes. BE CAREFUL!
+# Test
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
 
 source {{ cache.repo }}/bootstrap/common/base_colors.sh
 source {{ cache.repo }}/bootstrap/common/base.sh

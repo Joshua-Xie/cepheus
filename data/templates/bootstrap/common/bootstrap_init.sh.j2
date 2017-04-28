@@ -23,6 +23,11 @@
 # NB: set -e is not set here since '$?' is being checked and taking action.
 
 # export REPO_ROOT=$(git rev-parse --show-toplevel)
+# Test
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
 
 REPO_ROOT=$1
 BUILD_LOCATION=$2

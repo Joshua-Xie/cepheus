@@ -18,6 +18,11 @@
 
 # Sets the base roles for the nodes so as to start over...
 set -e
+# Test
+DATE=`date`
+PARENT="$(ps -o comm= $PPID)"
+NAME=`basename "$0"`
+echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
 
 ENVIRONMENT=$1
 
