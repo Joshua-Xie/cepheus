@@ -73,8 +73,6 @@ cache:
         echo "test3"
     cookbook: cookbooks
     gem: gems
-    # rpm: rpms
-    # deb: debs
     packages: packages
     python: python
     pxe_boot: pxe_boot
@@ -85,35 +83,35 @@ cookbooks: # (required files for build)
     - name: poise
       version: 2.7.2
     - name: chef-client
-      version: 7.2.0
+      version: 8.0.1
     - name: windows
-      version: 2.1.1
+      version: 3.0.5
     - name: ohai
-      version: 5.0.0
+      version: 5.0.4
     - name: cron
-      version: 4.1.0
+      version: 4.1.1
     - name: logrotate
       version: 2.1.0
     - name: compat_resource
-      version: 12.16.3
+      version: 12.19.0
     - name: ntp
       version: 3.3.1
     - name: yum
-      version: 5.0.0
+      version: 5.0.1
     - name: yum-epel
       version: 2.1.1
     - name: apt
-      version: 6.0.1
+      version: 6.1.0
     - name: apache2
-      version: 3.2.2
+      version: 3.3.0
     - name: chef_handler
-      version: 2.1.0
+      version: 2.1.1
     - name: firewall
-      version: 2.5.4
+      version: 2.6.1
     - name: chef-sugar
       version: 3.4.0
     - name: sudo
-      version: 3.3.1
+      version: 3.4.0
     - name: collectd
       version: 2.2.4
     - name: collectd_plugins

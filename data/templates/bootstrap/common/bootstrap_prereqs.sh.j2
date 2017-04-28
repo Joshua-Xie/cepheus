@@ -142,14 +142,14 @@ download_file {{ cache.pxe_boot }}/{{ cache.loader }}/grub-x86_64.efi http://cob
 {% endif %}
 
 echo_orange "====> Downloading Chef..."
-download_file /{{ cache.packages }}/{{ chef_repo.client.package }} https://packages.chef.io/files/stable/chef/{{ chef_repo.client.version }}/el/7/{{ chef_repo.client.package }}
-download_file /{{ cache.packages }}/{{ chef_repo.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef_repo.server.version }}/el/7/{{ chef_repo.server.package }}
+download_file /{{ cache.packages }}/{{ chef_repo.client.package }} https://packages.chef.io/files/stable/chef/{{ chef_repo.client.version }}/{{ chef_repo.type }}/{{ chef_repo.os }}/{{ chef_repo.client.package }}
+download_file /{{ cache.packages }}/{{ chef_repo.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef_repo.server.version }}/{{ chef_repo.type }}/{{ chef_repo.os }}/{{ chef_repo.server.package }}
 
 # BIRD is a little different
 echo_orange "====> Downloading Bird..."
 # Bird ftp site sometimes has connection issues so...
 set +e
-ftp_file /{{ cache.packages }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/pub/bird/redhat/{{ adc_repo.bgp.bird.package }}
+ftp_file /{{ cache.packages }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/pub/bird/{{ adc_repo.bgp.bird.type }}/{{ adc_repo.bgp.bird.package }}
 set -e
 
 {# Don't want debug enabled on initial build out or ceph-chef may not get uploaded!! #}

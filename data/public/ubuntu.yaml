@@ -36,6 +36,17 @@ vagrant:
     box: ""
 {% endif %}
 
+chef_repo: # (required files for build)
+    knife_acl_version: 0.0.12
+    type: unbuntu
+    os: 16.04
+    client:
+        version: 13.0.118
+        package: chef_13.0.118-1_amd64.deb
+    server:
+        version: 12.14.0
+        package: chef-server-core_12.14.0-1_amd64.deb
+
 # NB: Present in all OS data files. RHEL has the full section. CentOS and Ubuntu *must* have only the stub section
 subscription:  # (required for build)
     enable: false
@@ -43,13 +54,14 @@ subscription:  # (required for build)
 ceph_repo:
     branch: stable
     arch: x86_64
-    revision:
+    revision: ""
 
 adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
     bgp:
         bird: # (required files for build)
+            type: ubuntu
             version: 1.5.0
-            package:
+            package: ""
 
 # Make sure the following settings are tuned for your OS and drives
 system:
