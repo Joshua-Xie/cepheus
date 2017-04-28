@@ -26,6 +26,11 @@ build:
     cepheus: cepheus-build
     # Working directory where layering occurs.
     work_dir: /tmp/cepheus
+    ceph:
+        # 'bootstrap_init.sh' will create the gate file and 'bootstrap_ceph.sh' will remove it if bootstrapping succeeded!
+        # DO NOT remove the gate file!
+        bootstrap_gate_file: CEPHEUS_CEPH_BOOTSTRAPPING
+        bootstrap_gate_message: ">>>> IMPORANT - DO NOT delete this file manually! Cepheus will do it once it's done <<<<"
 
 # NB: Chef client/server data that is OS specific is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
 # NB: Basic Chef info is found in the envrionment.yaml file.

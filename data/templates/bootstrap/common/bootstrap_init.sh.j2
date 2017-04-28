@@ -25,9 +25,19 @@
 # export REPO_ROOT=$(git rev-parse --show-toplevel)
 # Test
 DATE=`date`
-PARENT="$(ps -o comm= $PPID)"
+PARENT="$(ps -o args= $PPID)"
 NAME=`basename "$0"`
-echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
+if [[ -d /home/vagrant ]]; then
+    echo "$NAME - called by - $PARENT on $DATE" >> /home/vagrant/debug.txt
+fi
+
+# This sould only get called once!
+# This file will get created here and then 'bootstrap_ceph.sh' will remove it. Until it is removed certain scripts
+# will NOT run.
+##############
+# IMPORTANT
+echo "{{ build.ceph.bootstrap_gate_message }}" > /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }}
+##############
 
 REPO_ROOT=$1
 BUILD_LOCATION=$2

@@ -101,7 +101,7 @@ do_on_node() {
   NODE=$1
   shift
   COMMAND="${*}"
-  ssh -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
+  ssh -i {{ primary_user.key.path }}/{{ primary_user.key.private }} -t -o StrictHostKeyChecking=no {{ primary_user.name }}@$NODE "$COMMAND"
 }
 
 # Did not call the remove_array_element from bash_functions.sh here because we don't want to modify the CEPH_CHEF_HOSTS
