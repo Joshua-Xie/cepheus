@@ -45,6 +45,12 @@ echo_yellow "====> Executing {{ item }}..."
 source $REPO_ROOT/{{ item }}
 {% endfor %}
 
+{% for item in ceph_bootstrap_process_files %}
+
+echo_yellow "====> Executing {{ item }}..."
+source $REPO_ROOT/{{ item }}
+{% endfor %}
+
 # Remove Ceph Bootstrapping Gate File
 if [[ -f /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }} ]]; then
     rm -f /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }}

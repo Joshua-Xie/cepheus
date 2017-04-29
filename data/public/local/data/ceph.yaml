@@ -47,7 +47,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     pools:
         active:
             -   radosgw
-        version: 1
+        version: 2
         crush_rule: 1
         radosgw:
             - name: ".log"

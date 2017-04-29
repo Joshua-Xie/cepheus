@@ -21,4 +21,4 @@ source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 # Should ONLY run this once. It's here just in case you want to break it out and use it that way.
 echo_yellow "====> Ceph RGW - Setting up users..."
-do_on_node ${CEPH_RGW_HOSTS[@]:0:1} "sudo chef-client -o 'recipe[chef-bcs::ceph-radosgw-users]'"
+do_on_node ${CEPH_RGW_HOSTS[@]:0:1} "sudo chef-client -o 'recipe[cepheus::ceph-radosgw-users]'"
