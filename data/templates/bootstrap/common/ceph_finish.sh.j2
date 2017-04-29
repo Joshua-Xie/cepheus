@@ -22,20 +22,8 @@ source {{ cache.repo }}/bootstrap/common/base_colors.sh
 echo_yellow "====> Ceph - MON Finish..."
 ansible mon -m shell -b -a "chef-client -o 'recipe[ceph-chef::finish]'"
 
-# for i in ${CEPH_MON_HOSTS[@]}; do
-#   do_on_node $i "sudo chef-client -o 'recipe[ceph-chef::finish]'"
-# done
-
 echo_yellow "====> Ceph - OSD Finish..."
 ansible osd -m shell -b -a "chef-client -o 'recipe[ceph-chef::finish]'"
 
-# for i in ${CEPH_OSD_HOSTS[@]}; do
-#   do_on_node $i "sudo chef-client -o 'recipe[ceph-chef::finish]'"
-# done
-
 echo_yellow "====> Ceph - RGW Finish..."
 ansible rgw -m shell -b -a "chef-client -o 'recipe[ceph-chef::finish]'"
-
-# for i in ${CEPH_RGW_HOSTS[@]}; do
-#   do_on_node $i "sudo chef-client -o 'recipe[ceph-chef::finish]'"
-# done

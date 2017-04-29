@@ -28,27 +28,22 @@ if [[ -d /home/vagrant ]]; then
     echo "$NAME - called by - $PARENT on $DATE" >> /home/vagrant/debug.txt
 fi
 
-REPO_ROOT={{ cache.repo }}
-REPO_ROOT_FILES={{ cache.base }}
-
-source $REPO_ROOT/bootstrap/common/base_colors.sh
+source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 echo_yellow "====> Bootstrapping Ceph..."
 {% for item in ceph_bootstrap_process_files %}
 
 echo_yellow "====> Generating {{ item }}..."
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/{{ location }}/{{ data_center }}/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+{{ cache.repo }}/data/templates/template_engine -d {{ cache.repo }}/data/{{ location }}/{{ data_center }}/build.yaml -i {{ cache.repo }}/data/templates/{{ item }}.j2 -o {{ cache.repo }}/{{ item }}
 # NB: Passes through template_engine twice
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/{{ location }}/{{ data_center }}/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
-sudo chmod +x $REPO_ROOT/{{ item }}
-echo_yellow "====> Executing {{ item }}..."
-source $REPO_ROOT/{{ item }}
+{{ cache.repo }}/data/templates/template_engine -d {{ cache.repo }}/data/{{ location }}/{{ data_center }}/build.yaml -i {{ cache.repo }}/{{ item }} -o {{ cache.repo }}/{{ item }}
+sudo chmod +x {{ cache.repo }}/{{ item }}
 {% endfor %}
 
 {% for item in ceph_bootstrap_process_files %}
 
 echo_yellow "====> Executing {{ item }}..."
-source $REPO_ROOT/{{ item }}
+source {{ cache.repo }}/{{ item }}
 {% endfor %}
 
 # Remove Ceph Bootstrapping Gate File

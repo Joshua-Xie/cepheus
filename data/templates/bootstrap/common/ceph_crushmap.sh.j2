@@ -16,11 +16,23 @@
 # limitations under the License.
 #
 
-source {{ cache.repo }}/bootstrap/common/base.sh
+# source {{ cache.repo }}/bootstrap/common/base.sh
 source {{ cache.repo }}/bootstrap/common/base_colors.sh
 
 # NOTE: Only needs to be done on first mon node
 echo_yellow "====> Ceph - Crushmap..."
 
-knife node run_list add ${CEPH_MON_HOSTS[@]:0:1} 'role[ceph-crushmap]'
-do_on_node ${CEPH_MON_HOSTS[@]:0:1} "sudo chef-client -o 'role[ceph-crushmap]'"
+{% set found = 0 %}
+{% for item in inventory.nodes %}
+{% for role in item.roles  %}
+{% if role == "mon" %}
+{% set found = 1 %}
+knife node run_list add {{ item.name }} 'role[ceph-crushmap]'
+do_on_node {{ item.name }} "sudo chef-client -o 'role[ceph-crushmap]'"
+{% break %}
+{% endif %}
+{% endfor %}
+{% if found == 1 %}
+{% break %}
+{% endif %}
+{% endfor %}

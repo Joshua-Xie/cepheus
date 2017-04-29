@@ -26,7 +26,8 @@
 # to name your production.json file more descriptive of the environment it actually belongs to. For example,
 # prod-dc101.json or something like it.
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, ext.loopcontrols
+# import jinja2.ext.loopcontrols
 import traceback
 import os
 import yaml
