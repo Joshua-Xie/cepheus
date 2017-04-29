@@ -47,7 +47,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     pools:
         active:
             -   radosgw
-        version: 2
+        version: 1
         crush_rule: 1
         radosgw:
             - name: ".log"
@@ -284,7 +284,8 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
         rebalance: false
         niceness: -10
         crush:
-            update: true # true for production...
+            # The attribute 'update' does not work with jinja2 because that is a builtin. Add something unique to it like 'update_crush'.
+            update_crush: true # true for production...
             update_on_start: false # false for production...
             chooseleaf_type: 1
         device: "/dev/"

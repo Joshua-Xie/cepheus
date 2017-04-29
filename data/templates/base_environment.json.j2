@@ -472,7 +472,7 @@
               {%- endfor %}
           ],
           "crush": {
-            "update": {%- if ceph.osd.crush.update == True %} true, {% else %} false, {%- endif %}
+            "update": {%- if ceph.osd.crush.update_crush == True %} true, {% else %} false, {%- endif %}
             "update_on_start": {%- if ceph.osd.crush.update_on_start == True %} true, {% else %} false, {%- endif %}
             "chooseleaf_type": {{ ceph.osd.crush.chooseleaf_type }}
           },
