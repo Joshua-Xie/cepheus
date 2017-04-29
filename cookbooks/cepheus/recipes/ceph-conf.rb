@@ -73,6 +73,9 @@ node.default['ceph']['pools']['radosgw']['pools'] = node['cepheus']['ceph']['poo
 node.default['ceph']['pools']['radosgw']['settings'] = node['cepheus']['ceph']['pools']['radosgw']['settings']
 node.default['ceph']['pools']['pgs']['num'] = node['cepheus']['ceph']['pools']['pgs']['num']
 
+# Bypass the ceph-chef resource
+node.default['ceph']['pools']['version'] = node['cepheus']['ceph']['pools']['version']
+
 node.default['ceph']['pools']['radosgw']['federated_enable'] = node['cepheus']['ceph']['pools']['radosgw']['federated']['enable']
 node.default['ceph']['pools']['radosgw']['federated_multisite_replication'] = node['cepheus']['ceph']['pools']['radosgw']['federated']['multisite_replication']
 node.default['ceph']['pools']['radosgw']['federated_enable_regions_zones'] = node['cepheus']['ceph']['pools']['radosgw']['federated']['enable_regions_zones']

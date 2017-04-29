@@ -493,7 +493,10 @@
           }
         },
         "pools": {
-          "active": ["radosgw"],
+          "active": [
+            "{{ ceph.pools.active|join('", "') }}"
+          ],
+          "version": {{ ceph.pools.version }},
           "crush": {
             "rule": {{ ceph.pools.crush_rule }}
           },
@@ -506,7 +509,6 @@
             "federated": {
               "enable": {%- if ceph.radosgw.federated.enable == True %} true, {% else %} false, {%- endif %}
               "multisite_replication": false,
-              {#- Instances represent network tiers #}
               {#- Instance name MUST match VIPs name and Backend/Server instance variables. IF Federation is not used then Backend/Server instance variable should be empty. #}
               "zone_instances": [
                 {%- for item in adc.vip.vips %}

@@ -19,4 +19,12 @@
 
 include_recipe 'cepheus::ceph-conf'
 
-include_recipe 'ceph-chef::erasure_profiles_set'
+# include_recipe 'ceph-chef::erasure_profiles_set'
+
+# NB: Use our version instead of ceph-chef's version!
+node['cepheus']['ceph']['pools']['erasure_coding']['profiles'].each do |profile|
+    execute "ec-pool-action-#{profile['profile']}" do
+      command lazy { "ceph osd erasure-code-profile set #{profile['profile']} technique=#{profile['technique']} ruleset-root=#{profile['ruleset_root']} ruleset-failure-domain=#{profile['ruleset_failure_domain']} k=#{profile['key_value']['k']} m=#{profile['key_value']['m']}" }
+      not_if "ceph osd erasure-code-profile get #{profile['profile']}"
+    end
+end

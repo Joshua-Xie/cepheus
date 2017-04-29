@@ -45,6 +45,9 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
         priority: 7
 
     pools:
+        active:
+            -   radosgw
+        version: 2
         crush_rule: 1
         radosgw:
             - name: ".log"
@@ -258,6 +261,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               zones:
                   # Empty zone
         federated:
+            # Federated pools get created by a combination of the 'pools''radosgw' above and the 'regions''zones' below.
             enable: false
             # master_zone must match one of the vip names.
             master_zone: dev
