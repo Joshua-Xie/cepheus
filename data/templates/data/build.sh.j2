@@ -60,8 +60,8 @@ echo_yellow "====> Building Ceph Files..."
 {% for item in ceph_bootstrap_process_files %}
 
 echo_yellow "====> Generating {{ item }}..."
-{{ cache.repo }}/data/templates/template_engine -d {{ cache.repo }}/data/{{ location }}/{{ data_center }}/build.yaml -i {{ cache.repo }}/data/templates/{{ item }}.j2 -o {{ cache.repo }}/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Passes through template_engine twice
-{{ cache.repo }}/data/templates/template_engine -d {{ cache.repo }}/data/{{ location }}/{{ data_center }}/build.yaml -i {{ cache.repo }}/{{ item }} -o {{ cache.repo }}/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x {{ cache.repo }}/{{ item }}
 {% endfor %}
