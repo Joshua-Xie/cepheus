@@ -6,6 +6,7 @@
 
 # Template built files - these should match the build.yaml files section except with leading '/'
 /bootstrap/common/*
+!/bootstrap/common/README.md
 
 /data/build.sh
 /data/build_init_update.sh
