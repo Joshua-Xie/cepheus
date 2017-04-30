@@ -139,6 +139,7 @@ echo_yellow "====> Cleaning up..."
 rm -f tmp_authorized_keys
 
 echo
+echo_green "==================================================================================="
 echo_green "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
 echo_light_red "  cd $REPO_ROOT/bootstrap/vms/vagrant"
 echo_green "All Vagrant commands must originate from that directory."
@@ -150,5 +151,6 @@ for vm in ${CEPH_CHEF_HOSTS[@]}; do
 done
 
 echo
-echo_green "====> Finished Ceph Vagrant build with Cepheus in $SECONDS seconds - Complete <===="
+echo_green "====> Finished Ceph Vagrant build with Cepheus in $SECONDS seconds - Complete"
+echo_green "==================================================================================="
 echo
