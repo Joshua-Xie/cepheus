@@ -23,6 +23,8 @@
 
 # Creates the REPO_ROOT env var for everything else to use...
 export REPO_ROOT=$(git rev-parse --show-toplevel)
+# Set a default value for repo_root_files
+export REPO_ROOT_FILES=/ceph-files
 
 # Exit immediately if anything goes wrong, instead of making things worse.
 set -eu
@@ -63,6 +65,7 @@ export BUILD_ENVIRONMENT=vagrant
 export BUILD_OS=centos
 export BUILD_UPDATE=1
 export BUILD_TEMPLATES_ONLY=0
+export LINUX_ENVIRONMENT=$(uname | tr '[:upper:]' '[:lower:]')
 
 # This is the default - MAKE SURE to pass in the two values that match what is found in the environment.yaml!!!!
 # These two allow Cepheus to find the data you will be using for the given cluster. After this initial specification here
@@ -70,7 +73,7 @@ export BUILD_TEMPLATES_ONLY=0
 export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
 
-while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
+while getopts cbglrsxvu:n:e:f:d:p:o:t:z: opt; do
     case $opt in
         b)
             # (required first) MUST call this first. It will bootstrap Chef Server, client and support items.
@@ -82,7 +85,6 @@ while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
             # VERY verbose. The (-v below) option is meant for `bash` verbose and not Chef. You can combine both.
             CHEF_KNIFE_DEBUG="-VV"
             CHEF_CLIENT_DEBUG="-l debug"
-
             ;;
         d)
             # (optional) NB: Use this option if you want to change the default 'data center' from `local` to something
@@ -97,6 +99,13 @@ while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
             export BUILD_ENVIRONMENT=$OPTARG
 
             # NB: ./CEPH_UP -e production
+            ;;
+        f)
+            # (optional) NB: Use this option if you want to change the default REPO_ROOT_FILES variable. It *MUST* be
+            # valid root directory!
+            export REPO_ROOT_FILES=$OPTARG
+
+            # NB: ./CEPH_UP -f /ceph-files
             ;;
         g)
             # (optional) -g to simply get the prerequisites and exit. Use it with (-r below) and it will remove the
@@ -169,21 +178,22 @@ while getopts cbglrsxvu:n:e:d:p:o:t:z: opt; do
     esac
 done
 
+# Build colors file...
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/base_colors.sh.j2 -o $REPO_ROOT/bootstrap/common/base_colors.sh
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
     clear
     echo -e "${GREEN}"
-    echo "                    __     "
-    echo "                    \ \    "
-    echo "                     > \   "
-    echo "                    / ^ \  "
-    echo "                   /_/ \_\ "
+    echo "            ____     "
+    echo "            \   \    "
+    echo "             >   \   "
+    echo "            /  ^  \  "
+    echo "           /__/ \__\ "
     echo
-    echo "            Cepheus Vagrant Build"
-    echo "-----------------------------------------------------"
-    echo -e "Bootstrapping local CEPH environment using Vagrant...${NC}"
+    echo "        Cepheus Build"
+    echo "-----------------------------"
+    echo -e "    Bootstrapping CEPH...${NC}"
     echo
 else
     echo
@@ -193,7 +203,7 @@ fi
 
 # NB: Prompt as a reminder to make sure user knows that *ALL* nodes *MUST* have the same SSH KEY! There are many ways this can
 # be done. If PXE_BOOT option is used then this is not needed because it will distribute the key to all nodes.
-if [[ $BOOTSTRAP_INIT -eq 1 || $BUILD_VMS_ONLY -eq 1 ]]; then
+if [[ $BOOTSTRAP_INIT -eq 1 && $BUILD_ENVIRONMENT != "vagrant" ]]; then
     $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_key_prompt.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_key_prompt.sh
     source $REPO_ROOT/bootstrap/common/bootstrap_key_prompt.sh
 fi
@@ -204,13 +214,13 @@ cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTE
 # Build bootstrapping environment based on yaml data
 BUILD=data/build.sh
 
-echo_yellow "====> Generating $REPO_ROOT/$BUILD from $REPO_ROOT/data/common.yaml..."
+echo_yellow "====> Generating $REPO_ROOT/$BUILD..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
 sudo chmod +x $REPO_ROOT/$BUILD
 
 # Add all other data files to the final build.yaml
 BUILD_DATA=data/data_files.sh
-echo_yellow "====> Generating $REPO_ROOT/$BUILD_DATA from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml..."
+echo_yellow "====> Generating $REPO_ROOT/$BUILD_DATA..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
 sudo chmod +x $REPO_ROOT/$BUILD_DATA
 
@@ -231,7 +241,7 @@ source $REPO_ROOT/$BUILD
 
 # Build the init and update scripts
 BUILD_INIT_UPDATE=data/build_init_update.sh
-echo_yellow "====> Generating $REPO_ROOT/$BUILD_INIT_UPDATE from $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml..."
+echo_yellow "====> Generating $REPO_ROOT/$BUILD_INIT_UPDATE..."
 $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/$BUILD_INIT_UPDATE.j2 -o $REPO_ROOT/$BUILD_INIT_UPDATE
 sudo chmod +x $REPO_ROOT/$BUILD_INIT_UPDATE
 
@@ -257,9 +267,8 @@ fi
 
 # Do prerequisite work prior to starting build, downloading files and
 # creating local directories. It can do one of two things - download or execute commands. The end result is a filled cache.
-echo_yellow "====> Downloading necessary files to local cache..."
-# The /ceph-files parameter will need to be addressed!
-source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh /ceph-files `pwd`
+echo_yellow "====> Downloading prerequisites to a local cache..."
+source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh $REPO_ROOT_FILES `pwd`
 
 # If prerequisites only then end after getting them
 if [[ $BOOTSTRAP_GET_PREREQS_ONLY -ne 0 ]]; then
@@ -278,27 +287,32 @@ if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
         ./CEPH_UP_VAGRANT
         exit 0
     fi
-else
-    # Build out or update the given environment.
-    echo_yellow "====> Calling bootstrap_init.sh..."
-    sudo $REPO_ROOT/bootstrap/common/bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
-
-    echo_yellow "====> Calling bootstrap_chef_server.sh..."
-    # Just a safe check because this part can fail and be fine.
-    set +e
-    source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
-    set -e
-
-    echo_yellow "====> Calling bootstrap_chef_nodes.sh..."
-    source $REPO_ROOT/bootstrap/common/bootstrap_chef_nodes.sh $REPO_ROOT
-
-    echo_green "====> Bootstrapping phase - Complete <===="
-    echo
-    exit 0
 fi
 
-echo_yellow "====> Calling cepheus_update.sh..."
-source $TMP_REPO_ROOT/bootstrap/common/cepheus_update.sh
+if [[ $LINUX_ENVIRONMENT == "linux" ]]; then
+    # Add check so that the following only get called once during the init phase.
+    if [[ $BOOTSTRAP_INIT -eq 1 ]]; then
+        # Build out or update the given environment.
+        echo_yellow "====> Calling bootstrap_init.sh..."
+        sudo $REPO_ROOT/bootstrap/common/bootstrap_init.sh $REPO_ROOT $BUILD_LOCATION $BUILD_DATA_CENTER
+
+        echo_yellow "====> Calling bootstrap_chef_server.sh..."
+        # Just a safe check because this part can fail and be fine.
+        set +e
+        source $REPO_ROOT/bootstrap/common/bootstrap_chef_server.sh $REPO_ROOT
+        set -e
+
+        echo_yellow "====> Calling bootstrap_chef_nodes.sh..."
+        source $REPO_ROOT/bootstrap/common/bootstrap_chef_nodes.sh $REPO_ROOT
+
+        echo_green "====> Bootstrapping phase - Complete <===="
+        echo
+        exit 0
+    fi
+
+    echo_yellow "====> Calling cepheus_update.sh..."
+    source $TMP_REPO_ROOT/bootstrap/common/cepheus_update.sh
+fi
 
 echo
 echo_green "====> CEPH_UP - Completed! <===="

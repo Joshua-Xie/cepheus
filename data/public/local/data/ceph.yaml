@@ -4,8 +4,8 @@
 
 ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
     cluster: ceph
-    name: hammer #luminous
-    version: 0.94.10 #10.2.6
+    name: luminous
+    version: 12.0.2
 
     tcmalloc: # This becomes the default after Jewel
         enable: true
@@ -186,19 +186,19 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
 
         # Quotas are in MB
         users:
-            - uid: radosgw
-              name: Admin
-              admin_caps: "users=*;buckets=*;metadata=*;usage=*;zone=*"
-              # Keys are not required and NOT there for real users.
-              access_key: ""
-              secret_key: ""
-              email: ""
-              max_buckets: 0
-              # status can be: enable, suspend or remove. Remove will remove the user and purge all data! You will then need
-              # to remove the entry block here after the user has been removed from the cluster.
-              status: enable
-              key_type: s3
-              quota:
+            -   uid: radosgw
+                name: Admin
+                admin_caps: "users=*;buckets=*;metadata=*;usage=*;zone=*"
+                # Keys are not required and NOT there for real users.
+                access_key: ""
+                secret_key: ""
+                email: ""
+                max_buckets: 0
+                # status can be: enable, suspend or remove. Remove will remove the user and purge all data! You will then need
+                # to remove the entry block here after the user has been removed from the cluster.
+                status: enable
+                key_type: s3
+                quota:
                     user:
                         # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
                         status: disable
@@ -210,23 +210,27 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                           status: disable
                           size: -1
                           objects: -1
-              zones:
-                  # Empty zone
+                zones:
+                    # Empty zone
 
-              # buckets are for the initial bucket to create if desired. The first 3 users here are system users so we create the buckets.
-              # The remaining users are real users and there are no buckets unless we know them and want to place them here
-              buckets:
-                  - fill_test
-            - uid: cepheus_log_admin
-              name: "Ceheus Log Admin"
-              admin_caps: ""
-              access_key: ""
-              secret_key: ""
-              email: ""
-              max_buckets: 0
-              status: enable
-              key_type: s3
-              quota:
+                # buckets are for the initial bucket to create if desired. The first 3 users here are system users so we create the buckets.
+                # The remaining users are real users and there are no buckets unless we know them and want to place them here
+                buckets:
+                    # Acls - private, public, public-read <=== public is both read/write
+                    -   name: fill_test
+                        acl: private
+                    -   name: adc_check
+                        acl: public-read
+            -   uid: cepheus_log_admin
+                name: "Ceheus Log Admin"
+                admin_caps: ""
+                access_key: ""
+                secret_key: ""
+                email: ""
+                max_buckets: 0
+                status: enable
+                key_type: s3
+                quota:
                     user:
                         # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
                         status: disable
@@ -238,28 +242,33 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                           status: disable
                           size: -1
                           objects: -1
-              zones:
-                  # Empty zone
-              buckets:
-                  - cepheus_logs
-            - uid: tester
-              name: Tester
-              admin_caps: "usage=read; user=read; bucket=*"
-              access_key: ""
-              secret_key: ""
-              email: ""
-              max_buckets: 3
-              status: enable
-              key_type: s3
-              quota:
+                zones:
+                    # Empty zone
+                buckets:
+                    # Acls - private, public, public-read <=== public is both read/write
+                    -   name: cepheus_logs
+                        acl: private
+            -   uid: tester
+                name: Tester
+                admin_caps: "usage=read; user=read; bucket=*"
+                access_key: ""
+                secret_key: ""
+                email: ""
+                max_buckets: 3
+                status: enable
+                key_type: s3
+                quota:
                     user:
                         # Allows you to temporarily disable and then later re-enable without have to change the quota amounts
                         status: enable
                         size: 10
                         objects: -1
                         # NOTE: buckets are missing for quotas here just to show it can
-              zones:
-                  # Empty zone
+                zones:
+                    # Empty zone
+                buckets:
+                    # Acls - private, public, public-read <=== public is both read/write
+                    # Empty bucket list
         federated:
             # Federated pools get created by a combination of the 'pools''radosgw' above and the 'regions''zones' below.
             enable: false
