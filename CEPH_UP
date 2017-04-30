@@ -217,6 +217,7 @@ echo_yellow "====> Check for generated files..."
 FOUND_BUILD_FILES=0
 # If the first and last file are found then most likely 'build.yaml' is complete along with environments file.
 if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml && -f $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json ]]; then
+    echo_orange "====> Found generated files cache..."
     FOUND_BUILD_FILES=1
 fi
 
@@ -263,6 +264,10 @@ if [[ $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 ]]; then
     # Build environments file for Chef
     echo_yellow "====> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."
     $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
+else
+    echo
+    echo_orange "====> Using found generated files cache - No files will be generated <===="
+    echo
 fi
 
 if [[ $BUILD_TEMPLATES_ONLY -ne 0 ]]; then
