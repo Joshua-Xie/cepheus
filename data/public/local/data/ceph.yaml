@@ -280,7 +280,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
             regions:
                 - *data_center
             # Zones represent network tiers
-            zones:
+            # zones:
                 # Empty zone
     mon:
         port: 6789
