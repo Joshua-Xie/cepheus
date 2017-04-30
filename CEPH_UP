@@ -281,6 +281,8 @@ fi
 # Do prerequisite work prior to starting build, downloading files and
 # creating local directories. It can do one of two things - download or execute commands. The end result is a filled cache.
 if [[ $BOOTSTRAP_GET_PREREQS -eq 1 ]]; then
+    echo
+    echo_orange "====> Calling $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh..."
     echo_yellow "====> Downloading prerequisites to a local cache..."
     source $REPO_ROOT/bootstrap/common/bootstrap_prereqs.sh $REPO_ROOT_FILES `pwd`
 fi
