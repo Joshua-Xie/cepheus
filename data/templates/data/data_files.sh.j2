@@ -56,19 +56,22 @@ if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} ]]; 
     sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 else
     # Double check to make sure template there are no 'template' residuals remaining
-    echo_orange "Checking 0 - $REPO_ROOT/data/$BUILD_LOCATION/{{ item }}"
+
+    # TODO: $BUILD_LOCATION/ was removed from 'data/$BUILD_LOCATION/' and common was added - Remove this comment after testing...
+
+    echo_orange "Checking 0 - $REPO_ROOT/data/common/{{ item }}"
     set +e
-    J2=$(grep {% raw %}"{%"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/{{ item }})
+    J2=$(grep {% raw %}"{%"{% endraw %} $REPO_ROOT/data/common/{{ item }})
     if [[ -z $J2 ]]; then
-        J2=$(grep {% raw %}"{{"{% endraw %} $REPO_ROOT/data/$BUILD_LOCATION/{{ item }})
+        J2=$(grep {% raw %}"{{"{% endraw %} $REPO_ROOT/data/common/{{ item }})
     fi
     set -e
     if [[ ! -z $J2 ]]; then
         # Go ahead and move the output to the 'data' folder to be used since it's modified...
-        $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
-        sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+        $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/common/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
+        sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/common/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
     else
-        sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+        sed '/---/d' $REPO_ROOT/data/common/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
     fi
 fi
 

@@ -14,7 +14,7 @@ We have provided an example repo called https://github.com/cepheus-io/cepheus-pr
 
 The final data file that gets built is called `build.yaml`. It does not get saved (in .gitignore) in a repo. The data files:
 
->/data/common.yaml
+>/data/common/common.yaml
 >
 >/data/(public|private)/(local|whatever_you_want)/environment.yaml
 >

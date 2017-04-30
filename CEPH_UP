@@ -184,7 +184,7 @@ while getopts cbglrsxvupn:e:f:d:p:o:t:z: opt; do
 done
 
 # Build colors file...
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/base_colors.sh.j2 -o $REPO_ROOT/bootstrap/common/base_colors.sh
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/base_colors.sh.j2 -o $REPO_ROOT/bootstrap/common/base_colors.sh
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
@@ -209,7 +209,7 @@ fi
 # NB: Prompt as a reminder to make sure user knows that *ALL* nodes *MUST* have the same SSH KEY! There are many ways this can
 # be done. If PXE_BOOT option is used then this is not needed because it will distribute the key to all nodes.
 if [[ $BOOTSTRAP_INIT -eq 1 && $BUILD_ENVIRONMENT != "vagrant" ]]; then
-    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_key_prompt.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_key_prompt.sh
+    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common/common.yaml -i $REPO_ROOT/data/templates/bootstrap/common/bootstrap_key_prompt.sh.j2 -o $REPO_ROOT/bootstrap/common/bootstrap_key_prompt.sh
     source $REPO_ROOT/bootstrap/common/bootstrap_key_prompt.sh
 fi
 
@@ -223,13 +223,13 @@ fi
 # Skip if files already built *OR* if doing intial bootstrapping...
 if [[ $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 ]]; then
     # Create *initial* build.yaml from common.yaml
-    cp $REPO_ROOT/data/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+    cp $REPO_ROOT/data/common/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 
     # Build bootstrapping environment based on yaml data
     BUILD=data/build.sh
 
     echo_yellow "====> Generating $REPO_ROOT/$BUILD..."
-    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
+    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
     sudo chmod +x $REPO_ROOT/$BUILD
 
     # Add all other data files to the final build.yaml

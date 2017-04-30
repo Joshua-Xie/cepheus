@@ -56,6 +56,7 @@ sudo chmod +x $REPO_ROOT/{{ item }}
 {%- endfor %}
 {% endif %}
 
+echo
 echo_yellow "====> Building Ceph Files..."
 {% for item in ceph_bootstrap_process_files %}
 
