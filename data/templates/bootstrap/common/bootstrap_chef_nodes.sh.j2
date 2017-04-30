@@ -50,7 +50,7 @@ ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src=/etc/hosts dest=/etc/host
 echo_yellow "====> Setting up {{ cache.base }}.tar.gz on nodes..."
 ansible "all:!{{ bootstrap.name }}" -m shell -a "cd /home/{{ primary_user.name }} && tar xzf *.tar.gz"
 ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p {{ cache.base }} && chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.base }}"
-ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/. && rm -rf /home/{{ primary_user.name }}{{ cache.base }}"
+ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/. && rm -rf /home/{{ primary_user.name }}{{ cache.base }} && rm -f /home/{{ primary_user.name }}{{ cache.base }}.tar.gz"
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
 {% for node in inventory.nodes %}

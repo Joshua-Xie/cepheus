@@ -116,6 +116,8 @@ node.default['ceph']['radosgw']['gc']['processor_max_time'] = node['cepheus']['c
 node.default['ceph']['radosgw']['gc']['processor_period'] = node['cepheus']['ceph']['radosgw']['gc']['processor_period']
 
 # Add whatever users and buckets you want the cookbook to automatically set up for you in the  node['cepheus']['ceph']['radosgw']['users']
+# NB: If you add more attributes to 'cepheus' data then 'ceph-chef' may not have the same data so a more precise way of transfering
+# the data over besides assignment like below will be required!
 node.default['ceph']['radosgw']['users'] = node['cepheus']['ceph']['radosgw']['users']
 
 node.default['ceph']['restapi']['url'] = node['cepheus']['ceph']['restapi']['url']

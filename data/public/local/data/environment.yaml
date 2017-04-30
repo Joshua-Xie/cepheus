@@ -83,82 +83,92 @@ cookbooks_files:
 # By default 'ceph-chef' gets downloaded in the 'bootstrap_prereqs.sh' script. However, there are times when you
 # may want a different version. This section will allow for adding environment specific 'staging' like repo endpoints
 # that will override existing versions of specific repos...
-staging:
-    access: internet
-    process:
-        -   output: "$WORK_DIR/cepheus-public-staging"
-            comment: "Public Cepheus repo"
-            repo: https://github.com/cepheus-io/cepheus.git
-            branch: master
-            command: ""
-            layer: 1
-        -   output: "$WORK_DIR/cepheus-private-staging"
-            comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
-            repo: https://github.com/cepheus-io/cepheus.git
-            branch: master
-            command: ""
-            layer: 2
-        -   output: "$WORK_DIR/ceph-chef-public-staging"
-            comment: "Public Ceph-Chef Cookbook repo"
-            repo: https://github.com/ceph/ceph-chef.git
-            branch: master
-            command: ""
-            layer: 3
-        -   output: "$WORK_DIR/ceph-chef-private-staging"
-            comment: "Private Ceph-Chef. Here to show that there could be a private version with your company specific items"
-            repo: https://github.com/cepheus-io/ceph-chef
-            branch: master
-            command: ""
-            layer: 4
-        -   output: "$WORK_DIR/cepheus-data-staging"
-            comment: "Private data. This one is public but should be private for production envrionments"
-            repo: https://github.com/cepheus-io/cepheus-data
-            branch: master
-            command: ""
-            layer: 5
-        -   output: ""
-            comment: "Layering data. Cepheus files are basically dependencies. This can be a git repo, object-storage or whatever. Just make sure the data is fed into 'output'"
-            repo: ""
-            branch: ""
-            # NB: The below $ variables are present in the script this will go in so keep that in mind. Need to create global vars later.
-            # NB: This example is for vagrant so the commands below would be different for production such as calling bootstrap_prereqs.sh
-            # may not be called in a production environment if it had no access to the outside world. Instead it may pull from a
-            # private git repo or something like artifactory. Below it's redundant...
-            # NB: When using '|' even embedded '#' are not treated as comments in yaml but pass through as desired.
-            # Empty lines also pass through.
-            command: |
-                echo
-                echo_yellow "====> Layering data..."
+# NB: Staging Layers
+layers:
+    staging:
+        access: internet
+        description: "Staging Layers - Code"
+        process:
+            -   name: "Cepheus Public Repo Layer"
+                output: "$WORK_DIR/cepheus-public-staging"
+                comment: "Public Cepheus repo"
+                repo: https://github.com/cepheus-io/cepheus.git
+                branch: master
+                command: ""
+                # layer: 1
+            -   name: "Cepheus Private Repo Layer"
+                output: "$WORK_DIR/cepheus-private-staging"
+                comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
+                repo: https://github.com/cepheus-io/cepheus-private
+                branch: master
+                command: ""
+                # layer: 2
+            -   name: "Ceph-Chef Public Repo Layer"
+                output: "$WORK_DIR/ceph-chef-public-staging"
+                comment: "Public Ceph-Chef Cookbook repo"
+                repo: https://github.com/ceph/ceph-chef.git
+                branch: master
+                command: ""
+                # layer: 3
+            -   name: "Ceph-Chef Private Repo Layer"
+                output: "$WORK_DIR/ceph-chef-private-staging"
+                comment: "Private Ceph-Chef. Here to show that there could be a private version with your company specific items"
+                repo: https://github.com/cepheus-io/ceph-chef
+                branch: master
+                command: ""
+                # layer: 4
+            -   name: "Cepheus Data Repo Layer"
+                output: "$WORK_DIR/cepheus-data-staging"
+                comment: "Private data. This one is public but should be private for production envrionments"
+                repo: https://github.com/cepheus-io/cepheus-data
+                branch: master
+                command: ""
+                # layer: 5
+            -   name: "Layering Code"
+                output: ""
+                comment: "Layering data. Cepheus files are basically dependencies. This can be a git repo, object-storage or whatever. Just make sure the data is fed into 'output'"
+                repo: ""
+                branch: ""
+                # NB: The below $ variables are present in the script this will go in so keep that in mind. Need to create global vars later.
+                # NB: This example is for vagrant so the commands below would be different for production such as calling bootstrap_prereqs.sh
+                # may not be called in a production environment if it had no access to the outside world. Instead it may pull from a
+                # private git repo or something like artifactory. Below it's redundant...
+                # NB: When using '|' even embedded '#' are not treated as comments in yaml but pass through as desired.
+                # Empty lines also pass through.
+                command: |
+                    echo
+                    echo_yellow "====> Layering data..."
 
-                cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
-                cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
-                # NB: Data is required before generating files from templates
-                cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
+                    cp -rp $WORK_DIR/cepheus-private-staging/* $WORK_DIR/cepheus-public-staging/
+                    cp -rp $WORK_DIR/ceph-chef-private-staging/* $WORK_DIR/ceph-chef-public-staging/
+                    # NB: Data is required before generating files from templates
+                    cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
-                # Need to generate 'build.yaml' from all of the other data files before calling bootstrap_prereqs.sh...
-                cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
-                echo
-                echo_yellow "====> Generating bootstrap_prereqs.sh..."
-                source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging $WORK_DIR/cepheus-public-staging
-                ls $WORK_DIR/cepheus-files-staging
-            layer: 6
-        -   output: ""
-            comment: "Layer cookbooks specifically for this environment or generically..."
-            repo: ""
-            branch: ""
-            command: |
-                echo
-                echo_yellow "====> Layering cookbooks..."
+                    # Need to generate 'build.yaml' from all of the other data files before calling bootstrap_prereqs.sh...
+                    cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
+                    echo
+                    echo_yellow "====> Generating bootstrap_prereqs.sh..."
+                    source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging $WORK_DIR/cepheus-public-staging
+                    ls $WORK_DIR/cepheus-files-staging
+                # layer: 6
+            -   name: "Layering Cookbooks"
+                output: ""
+                comment: "Layer cookbooks specifically for this environment or generically..."
+                repo: ""
+                branch: ""
+                command: |
+                    echo
+                    echo_yellow "====> Layering cookbooks..."
 
-                cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
+                    cp $WORK_DIR/cepheus-files-staging/cookbooks/*.tar.gz $WORK_DIR/cepheus-public-staging/cookbooks
 
-                cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% tar xvzf %
-                cd $WORK_DIR/cepheus-public-staging/cookbooks && rm -f *.tar.gz
-                sudo chown -R $OWNER:$GROUP $WORK_DIR/cepheus-public-staging
+                    cd $WORK_DIR/cepheus-public-staging/cookbooks && ls -1 *.tar.gz | xargs -I% tar xvzf %
+                    cd $WORK_DIR/cepheus-public-staging/cookbooks && rm -f *.tar.gz
+                    sudo chown -R $OWNER:$GROUP $WORK_DIR/cepheus-public-staging
 
-                # Override ceph-chef - Useful if debugging or custom version
-                cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
-            layer: 7
+                    # Override ceph-chef - Useful if debugging or custom version
+                    cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
+                # layer: 7
 
 # Info to setup development environment as well
 development:

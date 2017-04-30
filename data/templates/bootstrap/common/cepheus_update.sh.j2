@@ -66,7 +66,9 @@ git config --global credential.helper 'cache --timeout=25'
 ## End colors section
 
 echo
-echo_red "====> CEPHEUS Update Process Starting <===="
+echo_orange "==========================================="
+echo_orange "====> CEPHEUS Update Process Starting <===="
+echo_orange "==========================================="
 echo
 
 # If ansible is installed then move it's hosts file.
@@ -92,7 +94,8 @@ fi
 # IMPORTANT: NEVER push ONLY pull/clone
 # Pull down (public) cepheus (cepheus-public-staging)
 # If the repo exists it will processed first and then the commands if they exists.
-{% for item in staging.process %}
+# NB: {{ layers.staging.description }}
+{% for item in layers.staging.process %}
 # {{ item.comment }}
 {%- if item.repo %}
 git clone -b {{ item.branch }} {{ item.repo }} {{ item.output }}

@@ -216,11 +216,11 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                 # buckets are for the initial bucket to create if desired. The first 3 users here are system users so we create the buckets.
                 # The remaining users are real users and there are no buckets unless we know them and want to place them here
                 buckets:
-                    # Acls - private, public, public-read <=== public is both read/write
+                    # Acls - private, public <== May want to add other acls
                     -   name: fill_test
                         acl: private
                     -   name: adc_check
-                        acl: public-read
+                        acl: public
             -   uid: cepheus_log_admin
                 name: "Ceheus Log Admin"
                 admin_caps: ""
@@ -245,7 +245,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
                 # zones:
                     # Empty zone
                 buckets:
-                    # Acls - private, public, public-read <=== public is both read/write
+                    # Acls - private, public
                     -   name: cepheus_logs
                         acl: private
             -   uid: tester
