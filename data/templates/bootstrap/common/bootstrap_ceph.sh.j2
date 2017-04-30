@@ -40,6 +40,9 @@ echo_yellow "====> Generating {{ item }}..."
 sudo chmod +x {{ cache.repo }}/{{ item }}
 {% endfor %}
 
+# Testing...
+exit 0
+
 {% for item in ceph_bootstrap_process_files %}
 
 echo_yellow "====> Executing {{ item }}..."
