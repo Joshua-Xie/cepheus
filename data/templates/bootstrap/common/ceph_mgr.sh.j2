@@ -23,4 +23,4 @@ source {{ cache.repo }}/bootstrap/common/base_colors.sh
 # and quorum checks!
 
 echo_yellow "====> Ceph MGR..."
-ansible mgr -m shell -b -a "chef-client -o 'recipe[ceph-chef::mgr]'"
+ansible mgr -m shell -b -a "chef-client -o 'role[ceph-mgr]'"
