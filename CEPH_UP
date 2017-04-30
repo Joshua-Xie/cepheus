@@ -74,7 +74,7 @@ export LINUX_ENVIRONMENT=$(uname | tr '[:upper:]' '[:lower:]')
 export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
 
-while getopts cbglrsxvun:e:f:d:p:o:t:z: opt; do
+while getopts cbglrsxvupn:e:f:d:p:o:t:z: opt; do
     case $opt in
         b)
             # (required first) MUST call this first. It will bootstrap Chef Server, client and support items.
