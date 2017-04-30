@@ -60,13 +60,13 @@ export BOOTSTRAP_REMOVE_PREREQS=0
 export BOOTSTRAP_HTTP_PROXY=
 export BOOTSTRAP_HTTPS_PROXY=
 export BOOTSTRAP_INIT=0
-export BUILD_CHECK=0
 export BUILD_SHOW_LOGO=1
 export BUILD_VMS_ONLY=0
 export BUILD_ENVIRONMENT=vagrant
 export BUILD_OS=centos
 export BUILD_UPDATE=1
 export BUILD_TEMPLATES_ONLY=0
+export FORCE=0
 export LINUX_ENVIRONMENT=$(uname | tr '[:upper:]' '[:lower:]')
 
 # This is the default - MAKE SURE to pass in the two values that match what is found in the environment.yaml!!!!
@@ -75,7 +75,7 @@ export LINUX_ENVIRONMENT=$(uname | tr '[:upper:]' '[:lower:]')
 export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
 
-while getopts cbglrsxvupn:e:f:d:p:o:t:z: opt; do
+while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
     case $opt in
         b)
             # (required first) MUST call this first. It will bootstrap Chef Server, client and support items.
@@ -83,8 +83,11 @@ while getopts cbglrsxvupn:e:f:d:p:o:t:z: opt; do
             export BOOTSTRAP_INIT=1
             ;;
         c)
-            # (optional) Check to make sure files from templates have been created.
-            export BUILD_CHECK=1
+            # (optional) NB: Use this option if you want to change the default REPO_ROOT_FILES variable. It *MUST* be a
+            # valid root directory!
+            export REPO_ROOT_FILES=$OPTARG
+
+            # NB: ./CEPH_UP -f /ceph-files
             ;;
         d)
             # (optional) NB: Use this option if you want to change the default 'data center' from `local` to something
@@ -101,11 +104,10 @@ while getopts cbglrsxvupn:e:f:d:p:o:t:z: opt; do
             # NB: ./CEPH_UP -e production
             ;;
         f)
-            # (optional) NB: Use this option if you want to change the default REPO_ROOT_FILES variable. It *MUST* be
-            # valid root directory!
-            export REPO_ROOT_FILES=$OPTARG
+            # (optional) Force templates to get regenerated.
+            export FORCE=1
 
-            # NB: ./CEPH_UP -f /ceph-files
+            # NB: ./CEPH_UP -f
             ;;
         g)
             # (optional) -g to simply get the prerequisites and exit. Use it with (-r below) and it will remove the
@@ -222,7 +224,7 @@ if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml && -f $RE
 fi
 
 # Skip if files already built *OR* if doing intial bootstrapping...
-if [[ $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 ]]; then
+if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 ]]; then
     # Create *initial* build.yaml from common.yaml
     cp $REPO_ROOT/data/common/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 
