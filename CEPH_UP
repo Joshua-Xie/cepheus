@@ -317,6 +317,7 @@ if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
     fi
 fi
 
+# NB: This section will do an automated Vagrant standup of Ceph on the default of 4 nodes.
 if [[ $BUILD_VMS_ONLY -eq 1 && $BOOTSTRAP_INIT -eq 1 && $BUILD_UPDATE -eq 1 && $BUILD_ENVIRONMENT == "vagrant" ]]; then
     cd $REPO_ROOT/bootstrap/vagrant
     # NB: The `1` means to execute the `build.init.bootstrap.commands` at the end of the script

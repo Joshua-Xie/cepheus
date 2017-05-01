@@ -34,30 +34,30 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 # Not using Ansible Playbooks since we are only orchestrating Chef
 echo_yellow "====> Copying {{ cache.base }}.tar.gz to nodes..."
-ansible "all:!{{ bootstrap.name }}" -m copy -a "src=/home/{{ primary_user.name }}{{ cache.base }}.tar.gz dest=/home/{{ primary_user.name }}{{ cache.base }}.tar.gz"
+ansible "all!{{ bootstrap.name }}" -m copy -a "src=/home/{{ primary_user.name }}{{ cache.base }}.tar.gz dest=/home/{{ primary_user.name }}{{ cache.base }}.tar.gz"
 
 echo_yellow "====> Copying /etc/hosts to nodes..."
 # /etc/hosts should have been updated in bootstrap_init.sh for the initial run
-ansible "all:!{{ bootstrap.name }}" -m copy -b -a "src=/etc/hosts dest=/etc/hosts"
+ansible "all!{{ bootstrap.name }}" -m copy -b -a "src=/etc/hosts dest=/etc/hosts"
 
 echo_yellow "====> Setting up {{ cache.base }}.tar.gz on nodes..."
-ansible "all:!{{ bootstrap.name }}" -m shell -a "cd /home/{{ primary_user.name }} && tar xzf *.tar.gz"
-ansible "all:!{{ bootstrap.name }}" -m shell -b -a "mkdir -p {{ cache.base }} && chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.base }}"
-ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/. && rm -rf /home/{{ primary_user.name }}{{ cache.base }} && rm -f /home/{{ primary_user.name }}{{ cache.base }}.tar.gz"
+ansible "all!{{ bootstrap.name }}" -m shell -a "cd /home/{{ primary_user.name }} && tar xzf *.tar.gz"
+ansible "all!{{ bootstrap.name }}" -m shell -b -a "mkdir -p {{ cache.base }} && chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ cache.base }}"
+ansible "all!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.name }}{{ cache.base }}/* {{ cache.base }}/. && rm -rf /home/{{ primary_user.name }}{{ cache.base }} && rm -f /home/{{ primary_user.name }}{{ cache.base }}.tar.gz"
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
-{% for node in inventory.nodes %}
+{%- for node in inventory.nodes %}
 {# Don't want bootstrap node since that was done in bootstrap_chef_server #}
-{% if node.name != bootstrap.name %}
+{%- if node.name != bootstrap.name %}
 # TODO: Add bootstrap proxy option...
 $KNIFE bootstrap {{ node.bootstrap_ip }} -N {{ node.name }} -x {{ primary_user.name }} -i {{ primary_user.key.path }}/{{ primary_user.key.private }} --sudo --yes
-{% endif %}
-{% endfor %}
+{%- endif %}
+{%- endfor %}
 
 echo_yellow "====> Installing Ceph-Chef gem requirements..."
-{% for gem in ceph_chef.gems %}
-ansible "all:!{{ bootstrap.name }}" -m copy -a "src={{ cache.base }}/gems/{{ gem.name }}-{{ gem.version }}.gem dest=/tmp/{{ gem.name }}-{{ gem.version }}.gem"
-ansible "all:!{{ bootstrap.name }}" -m shell -b -a "/opt/chef/embedded/bin/gem install --force --local /tmp/{{ gem.name }}-{{ gem.version }}.gem"
-{% endfor %}
+{%- for gem in ceph_chef.gems %}
+ansible "all!{{ bootstrap.name }}" -m copy -a "src={{ cache.base }}/gems/{{ gem.name }}-{{ gem.version }}.gem dest=/tmp/{{ gem.name }}-{{ gem.version }}.gem"
+ansible "all!{{ bootstrap.name }}" -m shell -b -a "/opt/chef/embedded/bin/gem install --force --local /tmp/{{ gem.name }}-{{ gem.version }}.gem"
+{%- endfor %}
 
-ansible "all:!{{ bootstrap.name }}" -m shell -b -a "chef-client"
+ansible "all!{{ bootstrap.name }}" -m shell -b -a "chef-client"
