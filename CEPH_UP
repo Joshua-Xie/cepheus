@@ -200,6 +200,11 @@ else
     echo
 fi
 
+# NB: ./CEPH_UP -v -b will set the BOOTSTRAP_GET_PREREQS=1 to download prereqs such as chef server etc. You can also pass '-p' on the command line.
+if [[ $BUILD_VMS_ONLY -eq 1 && $BOOTSTRAP_INIT -eq 1 && $BUILD_ENVIRONMENT == "vagrant" ]]; then
+    export BOOTSTRAP_GET_PREREQS=1
+fi
+
 # NB: Prompt as a reminder to make sure user knows that *ALL* nodes *MUST* have the same SSH KEY! There are many ways this can
 # be done. If PXE_BOOT option is used then this is not needed because it will distribute the key to all nodes.
 if [[ $BOOTSTRAP_INIT -eq 1 && $BUILD_ENVIRONMENT != "vagrant" ]]; then
@@ -305,8 +310,20 @@ if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
     if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -ne 0 ]]; then
         cd $REPO_ROOT/bootstrap/vagrant
         ./CEPH_UP_VAGRANT
+        echo
+        echo_green "====> CEPH_UP - Completed! <===="
+        echo
         exit 0
     fi
+fi
+
+if [[ $BUILD_VMS_ONLY -eq 1 && $BOOTSTRAP_INIT -eq 1 && $BUILD_UPDATE -eq 1 && $BUILD_ENVIRONMENT == "vagrant" ]]; then
+    cd $REPO_ROOT/bootstrap/vagrant
+    ./CEPH_UP_VAGRANT "vagrant ssh ceph-bootstrap -c \"git clone https://github.com/cepheus-io/cepheus-build && ./cepheus-build/cepheus-build.sh\""
+    echo
+    echo_green "====> CEPH_UP - Completed! <===="
+    echo
+    exit 0
 fi
 
 if [[ $LINUX_ENVIRONMENT == "linux" ]]; then

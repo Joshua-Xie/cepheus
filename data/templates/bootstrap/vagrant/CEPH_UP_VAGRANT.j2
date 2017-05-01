@@ -24,6 +24,13 @@
 # Exit immediately if anything goes wrong, instead of making things worse.
 set -eu
 
+# NB: Optionally pass in a command to run at end of this script...
+CMD=$1
+CMD=${CMD:-""}
+
+# This is usually set in CEPH_UP which calls this.
+REPO_ROOT=${REPO_ROOT:-$(git rev-parse --show-toplevel)}
+
 source $REPO_ROOT/bootstrap/common/base_environment.sh
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
@@ -132,19 +139,34 @@ vagrant ssh {{ bootstrap.name }} -c "sudo chmod 0600 /home/{{ primary_user.name 
 echo_yellow "====> Cleaning up..."
 rm -f tmp_authorized_keys
 
-echo
-echo_green "==================================================================================="
-echo_green "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
-echo_light_red "  cd $REPO_ROOT/bootstrap/vagrant"
-echo_green "All Vagrant commands must originate from that directory."
-echo
-echo_green "You can access Vagrant using the following:"
+if [[ -z $CMD ]]; then
+    echo
+    echo_green "==================================================================================="
+    echo_green "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
+    echo_light_red "  cd $REPO_ROOT/bootstrap/vagrant"
+    echo_green "All Vagrant commands must originate from that directory."
+    echo
+    echo_green "You can access Vagrant using the following:"
 
-{% for item in inventory.nodes %}
-    echo_yellow "  vagrant ssh {{ item.name }}"
-{% endfor %}
+    {% for item in inventory.nodes %}
+        echo_yellow "  vagrant ssh {{ item.name }}"
+    {% endfor %}
 
-echo
-echo_green "====> Finished Ceph Vagrant build with Cepheus in $SECONDS seconds - Complete"
-echo_green "==================================================================================="
-echo
+    echo
+    echo_green "====> Finished Ceph Vagrant build with Cepheus in $SECONDS seconds - Complete"
+    echo_green "==================================================================================="
+    echo
+else
+    echo
+    echo_green "====> Ceph Vagrant Finished. Executing $CMD"
+    echo
+
+    # No sourcing...
+    $CMD
+
+    echo
+    echo
+    echo_green "==================================================================================="
+    echo_green "====> Finished Ceph Vagrant build with Cepheus in $SECONDS seconds - Complete"
+    echo_green "==================================================================================="
+fi
