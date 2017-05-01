@@ -47,8 +47,11 @@ ansible "all:!{{ bootstrap.name }}" -m shell -a "cp -r /home/{{ primary_user.nam
 
 echo_yellow "====> Bootstrapping Chef Client on nodes..."
 {% for node in inventory.nodes %}
+{# Don't want bootstrap node since that was done in bootstrap_chef_server #}
+{% if node.name != boostrap.name %}
 # TODO: Add bootstrap proxy option...
 $KNIFE bootstrap {{ node.bootstrap_ip }} -N {{ node.name }} -x {{ primary_user.name }} -i {{ primary_user.key.path }}/{{ primary_user.key.private }} --sudo --yes
+{% endif %}
 {% endfor %}
 
 echo_yellow "====> Installing Ceph-Chef gem requirements..."
