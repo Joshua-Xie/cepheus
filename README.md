@@ -132,7 +132,7 @@ NB: Behind firewall:
 
 1. Download CentOS 7.1 box version from Chef Bento upstream (7.2 and 7.3 versions of the bento/centos have sshd issues)
 2. Download required cookbooks including ceph-chef which is the most important
-3. Issue vagrant up that creates 4 VMs (dynamic and part of yaml file in /bootstrap/vms directory)
+3. Issue vagrant up that creates 4 VMs (dynamic and part of yaml file in /bootstrap/vagrant directory)
 4. Spins down VMs and adds network adapters and interfaces, sets up folder sharing and start VMs again
 5. Mounts shared folders (makes it easy to move cookbooks etc to VMs) and sets network and then setups up the bootstrap node ceph-bootstrap as a Chef Server
 6. Sets up chef-client on all other VMs
@@ -160,7 +160,7 @@ These are the default names. You can can call them anything you want. The main t
 RADOS Gateway (RGW) uses **civetweb** as the embedded web server. You can login to any VM and issue a simple curl command (i.e., curl localhost or curl ceph-vm1.example.com or curl ceph-vm1). The hosts file is updated on all three VMs to support FQDN and short names.
 
 ### Login to VMs (Vagrant)
-*Must* be located in the [wherever root dir]/bootstrap/vms/vagrant directory (vagrant keeps a .vagrant directory with node information in it)
+*Must* be located in the [wherever root dir]/bootstrap/vagrant directory (vagrant keeps a .vagrant directory with node information in it)
 
 Command(s):
 
@@ -172,7 +172,7 @@ Command(s):
 
 >**vagrant ssh ceph-vm3**
 
-NOTE: These names can be changed in the [wherever root dir]/bootstrap/vms/servers_config.yaml file.
+NOTE: These names can be changed in the [wherever root dir]/bootstrap/vagrant/servers_config.yaml file.
 ***
 **Sidebar:** Vagrant uses port forwarding on the first network adapter of a given VM it manages. It then uses ssh port on the localhost to make it simple on itself.
 
@@ -180,9 +180,7 @@ NOTE: These names can be changed in the [wherever root dir]/bootstrap/vms/server
 
 **<wherever repo>/bootstrap/common**
 
-**<wherever repo>/bootstrap/vms**
-
-**<wherever repo>/bootstrap/vms/vagrant**
+**<wherever repo>/bootstrap/vagrant**
 
 Note: The only one you must call is CEPH_UP which starts the whole process from creation of VMs to running Ceph cluster
 
@@ -437,7 +435,7 @@ This cookbook uses Test Kitchen to verify functionality. A Pull Request can't be
 6. `bundle exec kitchen test aio-ubuntu-1404`
 
 ## LICENSE
-* Author: Chris Jones <chris.jones@lambdastack.io> - Original creator of `Chef-CEPHEUS` for Bloomberg and Maintainer of `Ceph-Chef` and `Ceph-Rust` for Ceph
+* Author: Chris Jones <chris.jones@lambdastack.io> - Original creator of `Chef-BCS` for Bloomberg and Maintainer of `Ceph-Chef` and `Ceph-Rust` for Ceph
 
 * Copyright 2017, lambdastack.
 

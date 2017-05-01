@@ -42,6 +42,7 @@ build.yaml
 # Environment
 /bootstrap/data/environment/
 /bootstrap/vagrant/environment_config.yaml
+/bootstrap/vagrant/servers_config.yaml
 /bootstrap/vagrant/build_environment_config.yaml
 environment_config.yaml
 build_environment_config.yaml

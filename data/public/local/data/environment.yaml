@@ -60,6 +60,7 @@ data_files:
 # *.env files contain host names for given roles which comes from inventory.yaml.
 environment_files:
     -   "bootstrap/vagrant/environment_config.yaml"
+    -   "bootstrap/vagrant/servers_config.yaml"
     -   "bootstrap/vagrant/CEPH_UP_VAGRANT"
     -   "environments/ceph_chef_adc_hosts.env"
     -   "environments/ceph_chef_admin_hosts.env"

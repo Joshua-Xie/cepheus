@@ -1,0 +1,22 @@
+---
+# Vagrant Server Config - Defines the role that a given node will play in the Ceph cluster.
+# Any of these values can be changed for any given environment by changing the inventory.yaml data
+# NOTE: The bootstrap role is a build and/or admin node used to hold the Chef Server and launch access to the other nodes
+# in a production like environment. There is no Ceph related data on the bootstrap node.
+
+{% for item in inventory.nodes %}
+-   name: {{ item.name }}
+    roles:
+        {%- for role in item.roles %}
+        - {{ role }}
+        {%- endfor %}
+    {%- for interface in item.interfaces %}
+    {%- if interface.profile == "public" %}
+    front_end_ip: {{ interface.ip }}
+    {%- endif %}
+    {%- for interface in item.interfaces %}
+    {%- if interface.profile == "cluster" %}
+    back_end_ip: {{ interface.ip }}
+    {%- endif %}
+
+{% endfor %}
