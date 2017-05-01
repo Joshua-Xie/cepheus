@@ -136,8 +136,8 @@ set +e
 # Only if Chef has been installed which means ansible is loaded and host files exist
 if [[ -d "/opt/opscode/" ]]; then
     # Nodes may not exist during initial build so it's ok to fail...
-    ansible "all!{{ bootstrap.name }}" -m shell -b -a "rm -rf $REPO_ROOT"
-    ansible "all!{{ bootstrap.name }}" -m shell -b -a "rm -rf $REPO_ROOT_FILES"
+    ansible 'all:!{{ bootstrap.name }}' -m shell -b -a "rm -rf $REPO_ROOT"
+    ansible 'all:!{{ bootstrap.name }}' -m shell -b -a "rm -rf $REPO_ROOT_FILES"
 fi
 set -e
 
@@ -256,7 +256,7 @@ logger -t CepheusBackup "Cepheus Chef Server updated to latest packages - $VERSI
 # NB: bootstrap_init.sh creates ansible hosts file.
 set +e
 {% for item in ceph_chef.gems %}
-ansible "all!{{ bootstrap.name }}" -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item.name }}-{{ item.version }}.gem dest=/tmp/{{ item.name }}-{{ item.version }}.gem owner=$OWNER"
+ansible 'all:!{{ bootstrap.name }}' -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item.name }}-{{ item.version }}.gem dest=/tmp/{{ item.name }}-{{ item.version }}.gem owner=$OWNER"
 {% endfor %}
 
 # Backup ALL important configs, keys etc

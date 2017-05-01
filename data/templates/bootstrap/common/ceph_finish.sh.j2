@@ -30,5 +30,5 @@ ansible rgw -m shell -b -a "chef-client -o 'recipe[ceph-chef::finish]'"
 
 {% if ceph.name != "hammer" %}
 echo_yellow "====> Adding {{ primary_user.name }} to Ceph Group..."
-ansible "all!{{ bootstrap.name }}" -m shell -b -a "usermod -a -G wheel,ceph,{{ primary_user.name }} {{ primary_user.name }}"
+ansible 'all:!{{ bootstrap.name }}' -m shell -b -a "usermod -a -G wheel,ceph,{{ primary_user.name }} {{ primary_user.name }}"
 {% endif %}
