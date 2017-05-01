@@ -27,12 +27,6 @@ set -eu
 source $REPO_ROOT/bootstrap/common/base_environment.sh
 source $REPO_ROOT/bootstrap/common/base_colors.sh
 
-# remove after testing. This section is now done in the templates.
-# Check for an existing environment_config.yaml file in /bootstrap/vms. If one exists then do nothing else copy over SAMPLE_environment_config.yaml
-# if [[ ! -f $REPO_ROOT/bootstrap/vms/environment_config.yaml ]]; then
-#   cp $REPO_ROOT/bootstrap/vms/SAMPLE_environment_config.yaml $REPO_ROOT/bootstrap/vms/environment_config.yaml
-# fi
-
 # IMPORTANT!!!!!
 # Copy over the Vagrantfile_cepheus to Vagrantfile
 # There are two Vagrantfile* files. One for building the build environment (Vagrant_build_env) and one for
@@ -61,13 +55,13 @@ export BOOTSTRAP_VAGRANT_DEBUG=${BOOTSTRAP_VAGRANT_DEBUG:-0}
 export DONT_SHOW_BANNER=0
 
 # Perform preflight checks to validate environment sanity as much as possible.
-echo "====> Performing preflight environment validation..."
+echo_yellow "====> Performing preflight environment validation..."
 source $REPO_ROOT/bootstrap/common/bootstrap_validate_env.sh
 
 if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   # Test that Vagrant is really installed and of an appropriate version.
   if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
-    echo "====> Checking VirtualBox and Vagrant..."
+    echo_yellow "====> Checking VirtualBox and Vagrant..."
     source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_test.sh
   fi
 fi
@@ -146,9 +140,9 @@ echo_green "All Vagrant commands must originate from that directory."
 echo
 echo_green "You can access the vms using the following:"
 
-for vm in ${CEPH_CHEF_HOSTS[@]}; do
-    echo_yellow "  vagrant ssh $vm"
-done
+{% for item in inventory.nodes %}
+    echo_yellow "  vagrant ssh {{ item.name }}"
+{% endfor %}
 
 echo
 echo_green "====> Finished Ceph Vagrant build with Cepheus in $SECONDS seconds - Complete"

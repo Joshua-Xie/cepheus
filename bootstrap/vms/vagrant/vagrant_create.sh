@@ -20,10 +20,12 @@ set -e
 
 # Important
 source $REPO_ROOT/bootstrap/vms/vbox_functions.sh
+source $REPO_ROOT/bootstrap/common/base.sh
+source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 function update_network_interfaces {
-  echo ${CEPH_CHEF_HOSTS[@]}
-  echo '---------------------------------------------'
+  echo_yellow ${CEPH_CHEF_HOSTS[@]}
+  echo_yellow '---------------------------------------------'
 
   # set +e
   for vm in ${CEPH_CHEF_HOSTS[@]}; do
@@ -35,7 +37,7 @@ function update_network_interfaces {
 # This function calls a function by the same name on the given node to update the interfaces
 function node_update_network_interfaces {
     local node=$1
-    echo "$node (vagrant_create)..."
+    echo_yellow "====> $node (vagrant_create)..."
 
     vagrant ssh $node -c ". network.sh && node_update_network_interfaces"
     vagrant ssh $node -c ". network.sh && . network_setup.sh && node_update_network_ips"
@@ -45,7 +47,7 @@ function node_update_network_interfaces {
 # Function to create all VMs using Vagrant
 function create_vagrant_vms {
     cd $REPO_ROOT/bootstrap/vms/vagrant
-    echo "Shutting down and unregistering VMs from VirtualBox..."
+    echo_orange "====> Shutting down and unregistering VMs from VirtualBox..."
     $REPO_ROOT/bootstrap/vms/vagrant/vagrant_clean.sh
     ssh-keygen -b 2048 -t rsa -f $REPO_ROOT/bootstrap/vms/cepheus -q -N ""
     if [[ $BOOTSTRAP_VAGRANT_DEBUG -eq 0 ]]; then
@@ -55,9 +57,9 @@ function create_vagrant_vms {
     fi
 
     echo
-    echo "-----------------"
-    echo "Vagrant complete!"
-    echo "-----------------"
+    echo_green "===================================="
+    echo_green "====> Initial Vagrant Complete <===="
+    echo_green "===================================="
     echo
 
     export BOOTSTRAP_LAST_COMPLETE=2
@@ -72,9 +74,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   fi
 
   # These files are created during the vagrant build 'create_vagrant_vms' and reside in the vagrant_scripts directory
-  source $REPO_ROOT/bootstrap/vms/ceph_chef_hosts.env
+  source $REPO_ROOT/environments/ceph_chef_hosts.env
   source $REPO_ROOT/bootstrap/vms/ceph_chef_adapters.env
-  source $REPO_ROOT/bootstrap/vms/ceph_chef_bootstrap.env
+  source $REPO_ROOT/environments/ceph_chef_bootstrap.env
 
   if [[ $BOOTSTRAP_SKIP_VMS -eq 0 ]]; then
     config_networks

@@ -22,7 +22,6 @@ set -e
 export REPO_ROOT=$(git rev-parse --show-toplevel)
 
 source $REPO_ROOT/bootstrap/common/base_environment.sh
-# source $REPO_ROOT/bootstrap/common/bash_functions.sh
 
 # NOTE: These VirtualBox functions are purpose built for cepheus and not generic vbox functions.
 # However, they can be modified with parameter passing to make more generic.
@@ -240,9 +239,10 @@ function config_networks {
     # Force a pause to allow all of the vms to settle
     echo "Preparing to shutdown VMs. Please wait..."
 
-    source $REPO_ROOT/bootstrap/vms/ceph_chef_hosts.env
+    source $REPO_ROOT/environments/ceph_chef_hosts.env
+    source $REPO_ROOT/environments/ceph_chef_bootstrap.env
+
     source $REPO_ROOT/bootstrap/vms/ceph_chef_adapters.env
-    source $REPO_ROOT/bootstrap/vms/ceph_chef_bootstrap.env
 
     echo "Gracefully shutting down VMs to install adapters. Please wait..."
     shutdown_vms

@@ -15,7 +15,9 @@
 # limitations under the License.
 #
 
+source $REPO_ROOT/bootstrap/common/base_colors.sh
+
 if ! which vagrant >/dev/null; then
-  echo "You must have Vagrant installed to build an environment using Vagrant. Go to http://vagrantup.com" >&2
+  echo_red "====> You must have Vagrant installed to build an environment using Vagrant. Go to http://vagrantup.com" >&2
   exit 1
 fi

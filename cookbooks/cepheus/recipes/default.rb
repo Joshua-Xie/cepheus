@@ -64,55 +64,55 @@ package 'sshpass'
 # package 'jp'
 
 if node['cepheus']['init_style'] == 'upstart'
-  package 'python-dev'
-  package 'build-essential'
+    package 'python-dev'
+    package 'build-essential'
 else
-  # Yum versionlock - Check the yum-versionlock recipe for details...
-  package 'yum-versionlock'
-  package 'kexec-tools'
-  package 'python2-boto3' do
-    :upgrade
-  end
+    # Yum versionlock - Check the yum-versionlock recipe for details...
+    package 'yum-versionlock'
+    package 'kexec-tools'
+    package 'python2-boto3' do
+        :upgrade
+    end
 end
 
 package 'python-pip' do
-  :upgrade
+    :upgrade
 end
 package 'python-boto' do
-  :upgrade
+    :upgrade
 end
 
 # Copy the scripts to the nodes
-remote_directory '/etc/ceph/scripts' do
-  source 'scripts'
-  action :create
-  owner node['cepheus']['chef']['owner']
-  mode 0755
+remote_directory '/opt/cepheus/scripts' do
+    source 'scripts'
+    action :create
+    owner node['cepheus']['chef']['owner']
+    mode 0755
 end
 
 execute 'set-scripts-perm' do
-  command "sudo chmod +x /etc/ceph/scripts/*.sh"
+    command "sudo chmod +x /opt/cepheus/scripts/*.sh"
 end
 
 # Create user(s) if not already existing
 node['cepheus']['users'].each do | user_value |
-  user user_value['name'] do
-    comment user_value['comment']
-    shell user_value['shell']
-    password user_value['passwd']
-    ignore_failure true
-  end
+    user user_value['name'] do
+        comment user_value['comment']
+        shell user_value['shell']
+        password user_value['passwd']
+        ignore_failure true
+    end
 end
 
 template "/etc/profile.d/cepheus.sh" do
-  source 'cepheus.sh.erb'
-  ignore_failure true
+    source 'cepheus.sh.erb'
+    ignore_failure true
 end
 
 # Add the scary MOTD to let people know it's production!!
 template '/etc/motd' do
-  source 'motd.tail.erb'
-  mode 00644
+    source 'motd.tail.erb'
+    mode 00644
 end
 
 # Set ntp servers
@@ -131,7 +131,7 @@ if node['cepheus']['development']['enabled']
     # libssl in Ubuntu
     package 'openssl-devel'
     yumgroup 'Development Tools' do
-      action :install
+        action :install
     end
     # NB: At the end of the ceph install, librados libraries will have been installed. Symlink them:
     # sudo ln -s /usr/lib64/librados.so.2.0.0 /usr/lib64/librados.so

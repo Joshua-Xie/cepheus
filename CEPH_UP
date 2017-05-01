@@ -225,6 +225,10 @@ fi
 
 # Skip if files already built *OR* if doing intial bootstrapping...
 if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 ]]; then
+    if [[ $FORCE -eq 1 ]]; then
+        echo_orange "====> Forcing the regeneration of files..."
+    fi
+
     # Create *initial* build.yaml from common.yaml
     cp $REPO_ROOT/data/common/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
 

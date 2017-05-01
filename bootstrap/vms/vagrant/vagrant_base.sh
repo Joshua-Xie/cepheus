@@ -33,18 +33,18 @@ source $REPO_ROOT/bootstrap/common/base_colors.sh
 # IMPORTANT - DO NOT MAKE CHANGES unless to add new functionality that does not already exist. This process will
 # soon change to be like the bare metal build process.
 
-source $REPO_ROOT/bootstrap/vms/ceph_chef_bootstrap.env
+source $REPO_ROOT/environments/ceph_chef_bootstrap.env
 source $REPO_ROOT/bootstrap/vms/ceph_chef_adapters.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_proxy.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_osd_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_mon_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_rgw_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_mds_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_admin_hosts.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_adc_hosts.env
+source $REPO_ROOT/environments/ceph_chef_proxy.env
+source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
+source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
+source $REPO_ROOT/environments/ceph_chef_rgw_hosts.env
+source $REPO_ROOT/environments/ceph_chef_mds_hosts.env
+source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
+source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
 
-source $REPO_ROOT/bootstrap/vms/ceph_chef_dns.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_hosts.env
+# source $REPO_ROOT/environments/ceph_chef_dns.env
+source $REPO_ROOT/environments/ceph_chef_hosts.env
 
 source $REPO_ROOT/bootstrap/vms/vbox_functions.sh
 
