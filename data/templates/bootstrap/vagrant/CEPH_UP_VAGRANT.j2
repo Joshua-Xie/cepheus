@@ -26,7 +26,7 @@ set -eu
 
 # NB: Optionally pass in a command to run at end of this script...
 CMD=$1
-CMD=${CMD:-""}
+CMD=${CMD:-0}
 
 # This is usually set in CEPH_UP which calls this.
 REPO_ROOT=${REPO_ROOT:-$(git rev-parse --show-toplevel)}
@@ -139,7 +139,7 @@ vagrant ssh {{ bootstrap.name }} -c "sudo chmod 0600 /home/{{ primary_user.name 
 echo_yellow "====> Cleaning up..."
 rm -f tmp_authorized_keys
 
-if [[ -z $CMD ]]; then
+if [[ $CMD -eq 0 ]]; then
     echo
     echo_green "==================================================================================="
     echo_green "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
@@ -163,7 +163,9 @@ else
 
     # No sourcing...
     cd $REPO_ROOT/bootstrap/vagrant
-    vagrant ssh {{ bootstrap.name }} "$CMD"
+    {% for item in build.init.bootstrap.commands %}
+    vagrant ssh {{ bootstrap.name }} "{{ item }}"
+    {% endfor %}
 
     echo
     echo

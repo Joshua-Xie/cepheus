@@ -1,5 +1,19 @@
 ## Cepheus - Build and Manage Ceph Clusters
 
+#### Summary
+If you're like me then you just want to start going and you **may** read later :). Cepheus will do a full automated build of Ceph for any size cluster. To jump right in and build a Vagrant version of Ceph do the following:
+
+>./CEPH_UP -b -v
+
+1. The Vagrant version will allow you to build a 4 node system using VBox.
+2. It can take up to an hour depending on the machine your building this on!
+3. **It's doing A LOT!**
+4. You can test different versions of Ceph or whatever you can dream up.
+5. **It's doing A WHOLE LOT!**
+
+Details are below TL;DR...
+
+#### Cepheus
 Powerful and flexible automated build/maintenance and management environment for Ceph based on the following tools:
 
 >Ceph
@@ -72,16 +86,12 @@ The `/data/build.yaml` contains a list of GEMs, RPMs or DEBs and tarballs that a
 ## Building - Cepheus Repo (Simplest)
 This process is similar to the Vagrant Local Build seen below except that all nodes are actual bare-metal and all of the nodes used by Cepheus has already been built by another process. This is common in Enterprises where a different group is responsible for building out all base nodes according to enterprise specs. In this case the build group will provide the hardware information needed in the `Base Requirements` section above such as NIC MAC addresses, IPs and maybe `operations` like user and ssh keys. It's very important to have SSH Keys for the primary user that will do all Ceph operations (not Ceph user in Jewel and later) but an operations like user account. Ansible needs this to orchestrate commands to all of the nodes.
 
-1. Login to bootstrap node using the `operations` like user (assumes you have information requested above)
-2. Copy and paste the following bash shell block into a file called `cepheus_init.sh`:
+1. Login to bootstrap node using the `operations` like user (`vagrant` user on Vagrant) (assumes you have information requested above)
+2. **Have sudo rights, installed GIT on bootstrap node and ssh keys on all nodes**
+4. Copy and paste the following bash shell block into a file called `cepheus_init.sh`:
 ```bash
 # Cepheus
-echo "... working on it ..."
-```
-3. Issue the following commands:
-```bash
-sudo chmod +x cepheus_init.sh
-./cepheus_init.sh
+git clone https://github.com/cepheus-io/cepheus-build && ./cepheus-build/cepheus-build.sh
 ```
 
 Clone the two private repos `cepheus` and `cepheus-private` that you mirrored and created above

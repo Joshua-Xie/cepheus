@@ -26,6 +26,13 @@ build:
     cepheus: cepheus-build
     # Working directory where layering occurs.
     work_dir: /tmp/cepheus
+    # NB: Not all envrionments *may* use `init.commands` below...
+    init:
+        bootstrap:
+            # These commands pull from `cepheus-build` repo and execute it
+            commands:
+                -   "git clone https://github.com/cepheus-io/cepheus-build"
+                -   "./cepheus-build/cepheus-build.sh"
     ceph:
         # 'bootstrap_init.sh' will create the gate file and 'bootstrap_ceph.sh' will remove it if bootstrapping succeeded!
         # DO NOT remove the gate file!
