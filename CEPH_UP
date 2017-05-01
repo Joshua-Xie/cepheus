@@ -319,7 +319,7 @@ fi
 
 if [[ $BUILD_VMS_ONLY -eq 1 && $BOOTSTRAP_INIT -eq 1 && $BUILD_UPDATE -eq 1 && $BUILD_ENVIRONMENT == "vagrant" ]]; then
     cd $REPO_ROOT/bootstrap/vagrant
-    ./CEPH_UP_VAGRANT "vagrant ssh ceph-bootstrap -c \"git clone https://github.com/cepheus-io/cepheus-build && ./cepheus-build/cepheus-build.sh\""
+    ./CEPH_UP_VAGRANT "git clone https://github.com/cepheus-io/cepheus-build && ./cepheus-build/cepheus-build.sh"
     echo
     echo_green "====> CEPH_UP - Completed! <===="
     echo

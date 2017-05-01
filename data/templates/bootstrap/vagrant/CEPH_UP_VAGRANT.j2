@@ -162,7 +162,8 @@ else
     echo
 
     # No sourcing...
-    $CMD
+    cd $REPO_ROOT/bootstrap/vagrant
+    vagrant ssh {{ bootstrap.name }} "$CMD"
 
     echo
     echo
