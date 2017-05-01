@@ -244,7 +244,7 @@ ansible "all!{{ bootstrap.name }}" -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item
 # optimized to only get configs for each of the node groups since the configs are the same for all in that group and
 # then maybe store the backup on the bootstrap as well as the primary node in the given group. Until then, it's OK to ctrl-c out of it.
 
-# ansible {{ inventory.ceph.backup.primary.mon }},{{ inventory.ceph.backup.primary.osd }},{{ inventory.ceph.backup.primary.rgw }} -m shell -a "sudo /etc/ceph/scripts/ceph_backup_files.sh $VERSION $DATE"
+# ansible {{ inventory.ceph.backup.primary.mon }},{{ inventory.ceph.backup.primary.osd }},{{ inventory.ceph.backup.primary.rgw }} -m shell -a "sudo /opt/cepheus/scripts/ceph_backup_files.sh $VERSION $DATE"
 set -e
 ##################
 
