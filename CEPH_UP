@@ -43,14 +43,6 @@ set -eu
 # GREEN='\033[0;32m'
 # NC='\033[0m' # No Color
 
-DATE=`date`
-PARENT="$(ps -o args= $PPID)"
-NAME=`basename "$0"`
-if [[ -d /home/vagrant ]]; then
-    echo "$NAME - called by - $PARENT on $DATE" >> /home/vagrant/debug.txt
-fi
-
-
 # Default values...
 export CEPH_DEV_MODE=0
 export CHEF_CEPHEUS_DEBUG=0
@@ -224,7 +216,7 @@ if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml && -f $RE
 fi
 
 # Skip if files already built *OR* if doing intial bootstrapping...
-if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 ]]; then
+if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 || $BUILD_TEMPLATES_ONLY -eq 1 ]]; then
     if [[ $FORCE -eq 1 ]]; then
         echo_orange "====> Forcing the regeneration of files..."
     fi
@@ -311,7 +303,7 @@ TMP_REPO_ROOT=$REPO_ROOT
 
 if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
     if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -ne 0 ]]; then
-        cd $REPO_ROOT/bootstrap/vms/vagrant
+        cd $REPO_ROOT/bootstrap/vagrant
         ./CEPH_UP_VAGRANT
         exit 0
     fi
@@ -339,7 +331,8 @@ if [[ $LINUX_ENVIRONMENT == "linux" ]]; then
     fi
 
     echo_yellow "====> Calling cepheus_update.sh..."
-    source $TMP_REPO_ROOT/bootstrap/common/cepheus_update.sh
+    # Pass in 1 to bypass the prompt.
+    source $TMP_REPO_ROOT/bootstrap/common/cepheus_update.sh 1
 fi
 
 echo

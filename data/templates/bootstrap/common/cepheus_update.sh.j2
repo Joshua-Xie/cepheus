@@ -21,12 +21,9 @@
 
 set -e
 
-DATE=`date`
-PARENT="$(ps -o args= $PPID)"
-NAME=`basename "$0"`
-if [[ -d /home/vagrant ]]; then
-    echo "$NAME - called by - $PARENT on $DATE" >> /home/vagrant/debug.txt
-fi
+# NB: This will cause the prompt to be bypassed if set to anything except 0
+BYPASS=$1
+BYPASS=${BYPASS:-0}
 
 # Force a new clone
 REPO_ROOT={{ cache.repo }}
@@ -64,6 +61,29 @@ git config --global credential.helper 'cache --timeout=25'
 {{ colors }}
 
 ## End colors section
+
+# If BYPASS is set to 0 then execute this section.
+if [[ $BYPASS -eq 0 ]]; then
+    clear
+    echo
+    echo_yellow ">>>> This is the update process of ${RED}Cepheus.${YELLOW} There is *NO* turning back once started. <<<<"
+    echo
+    echo -ne "${PURPLE}Are you sure you want to update Cepheus? (y/n) ${NC}"
+    read -n 1 key_answer
+    echo
+
+    if [[ $key_answer != "y" ]]; then
+        echo
+        echo_red "====> Exiting <===="
+        echo
+        echo
+        exit 1
+    fi
+    echo
+
+    # NB: Force a rebuild of scripts etc from the yaml data files just in case they were updated.
+    source {{ cache.repo }}/CEPH_UP -f -x -z {{ cache.repo }}
+fi
 
 echo
 echo_orange "==========================================="
@@ -248,12 +268,6 @@ ansible "all!{{ bootstrap.name }}" -m copy -a "src=$REPO_ROOT_FILES/gems/{{ item
 set -e
 ##################
 
-# Test
-DATE=`date`
-PARENT="$(ps -o comm= $PPID)"
-NAME=`basename "$0"`
-echo "$NAME - called by - $PARENT on $DATE" >> $HOME/debug.txt
-
 echo_yellow "====> Cleaning up and setting links..."
 
 # Remove tmp working directory
@@ -264,7 +278,7 @@ cd $HOME
 if [[ -f cepheus_update.sh ]]; then
     rm -f cepheus_update.sh
 fi
-ln $HOME/cepheus/bootstrap/common/cepheus_update.sh cepheus_update.sh
+ln {{ cache.repo }}/bootstrap/common/cepheus_update.sh cepheus_update.sh
 
 echo
 echo_green "====================================="

@@ -274,11 +274,11 @@ Vagrant.configure("2") do |config|
           s.inline = $repos_script
         end
 
-        # The network.sh file contains network helper functions that are needed on each host to setup the
+        # The vbox_network.sh file contains network helper functions that are needed on each host to setup the
         # network interfaces correctly for consistent interface naming.
-        machine.vm.provision "file", source: "../network.sh", destination: "network.sh"
+        machine.vm.provision "file", source: "vbox_network.sh", destination: "vbox_network.sh"
         # This file will be used to check and update the vbox guest addition
-        machine.vm.provision "file", source: "../vbox_check_guestaddons.sh", destination: "vbox_check_guestaddons.sh"
+        machine.vm.provision "file", source: "vbox_check_guestaddons.sh", destination: "vbox_check_guestaddons.sh"
 
         # This file will be appended to /etc/hosts later...
         # machine.vm.provision "file", source: "#{ENV['REPO_ROOT']}/bootstrap/common/hosts", destination: "ceph_chef_host_file"

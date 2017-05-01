@@ -18,7 +18,6 @@
 # Exit immediately if anything goes wrong, instead of making things worse.
 set -e
 
-# cd $REPO_ROOT/bootstrap/vms/vagrant && vagrant halt && vagrant destroy -f
-cd $REPO_ROOT/bootstrap/vms/vagrant && vagrant destroy -f
-rm -f $REPO_ROOT/bootstrap/vms/cepheus
-rm -f $REPO_ROOT/bootstrap/vms/cepheus.pub
+cd $REPO_ROOT/bootstrap/vagrant && vagrant destroy -f
+rm -f $REPO_ROOT/bootstrap/vagrant/cepheus
+rm -f $REPO_ROOT/bootstrap/vagrant/cepheus.pub

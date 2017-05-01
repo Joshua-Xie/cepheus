@@ -17,13 +17,6 @@
 #
 
 # Deletes the tags on all nodes. BE CAREFUL!
-# Test
-DATE=`date`
-PARENT="$(ps -o args= $PPID)"
-NAME=`basename "$0"`
-if [[ -d /home/vagrant ]]; then
-    echo "$NAME - called by - $PARENT on $DATE" >> /home/vagrant/debug.txt
-fi
 
 # Check to make sure bootstrapping is not taking place...
 if [[ ! -f /home/{{ primary_user.name }}/{{ build.ceph.bootstrap_gate_file }} ]]; then

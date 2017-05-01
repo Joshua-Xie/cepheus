@@ -59,8 +59,8 @@ data_files:
 # Environment specific files that need to run through the template engine
 # *.env files contain host names for given roles which comes from inventory.yaml.
 environment_files:
-    -   "bootstrap/vms/environment_config.yaml"
-    -   "bootstrap/vms/vagrant/CEPH_UP_VAGRANT"
+    -   "bootstrap/vagrant/environment_config.yaml"
+    -   "bootstrap/vagrant/CEPH_UP_VAGRANT"
     -   "environments/ceph_chef_adc_hosts.env"
     -   "environments/ceph_chef_admin_hosts.env"
     -   "environments/ceph_chef_bootstrap.env"
@@ -95,35 +95,30 @@ layers:
                 repo: https://github.com/cepheus-io/cepheus.git
                 branch: master
                 command: ""
-                # layer: 1
             -   name: "Cepheus Private Repo Layer"
                 output: "$WORK_DIR/cepheus-private-staging"
                 comment: "Private Cepheus repo. Here to show that there could be a private version with your company specific items"
                 repo: https://github.com/cepheus-io/cepheus-private
                 branch: master
                 command: ""
-                # layer: 2
             -   name: "Ceph-Chef Public Repo Layer"
                 output: "$WORK_DIR/ceph-chef-public-staging"
                 comment: "Public Ceph-Chef Cookbook repo"
                 repo: https://github.com/ceph/ceph-chef.git
                 branch: master
                 command: ""
-                # layer: 3
             -   name: "Ceph-Chef Private Repo Layer"
                 output: "$WORK_DIR/ceph-chef-private-staging"
                 comment: "Private Ceph-Chef. Here to show that there could be a private version with your company specific items"
                 repo: https://github.com/cepheus-io/ceph-chef
                 branch: master
                 command: ""
-                # layer: 4
             -   name: "Cepheus Data Repo Layer"
                 output: "$WORK_DIR/cepheus-data-staging"
                 comment: "Private data. This one is public but should be private for production envrionments"
                 repo: https://github.com/cepheus-io/cepheus-data
                 branch: master
                 command: ""
-                # layer: 5
             -   name: "Layering Code"
                 output: ""
                 comment: "Layering data. Cepheus files are basically dependencies. This can be a git repo, object-storage or whatever. Just make sure the data is fed into 'output'"
@@ -150,7 +145,6 @@ layers:
                     echo_yellow "====> Generating bootstrap_prereqs.sh..."
                     source $WORK_DIR/cepheus-public-staging/bootstrap/common/bootstrap_prereqs.sh $WORK_DIR/cepheus-files-staging $WORK_DIR/cepheus-public-staging
                     ls $WORK_DIR/cepheus-files-staging
-                # layer: 6
             -   name: "Layering Cookbooks"
                 output: ""
                 comment: "Layer cookbooks specifically for this environment or generically..."
@@ -168,7 +162,6 @@ layers:
 
                     # Override ceph-chef - Useful if debugging or custom version
                     cp -rp $WORK_DIR/ceph-chef-public-staging/* $WORK_DIR/cepheus-public-staging/cookbooks/ceph-chef/
-                # layer: 7
 
 # Info to setup development environment as well
 development:

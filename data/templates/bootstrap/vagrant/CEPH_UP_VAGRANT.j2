@@ -31,7 +31,7 @@ source $REPO_ROOT/bootstrap/common/base_colors.sh
 # Copy over the Vagrantfile_cepheus to Vagrantfile
 # There are two Vagrantfile* files. One for building the build environment (Vagrant_build_env) and one for
 # building the CEPHEUS cluster (Vagrantfile_cepheus) for testing.
-cp $REPO_ROOT/bootstrap/vms/vagrant/Vagrantfile_cepheus $REPO_ROOT/bootstrap/vms/vagrant/Vagrantfile
+cp $REPO_ROOT/bootstrap/vagrant/Vagrantfile_cepheus $REPO_ROOT/bootstrap/vagrant/Vagrantfile
 
 export CHEF_KNIFE_DEBUG=${CHEF_KNIFE_DEBUG:-""}
 export CHEF_CLIENT_DEBUG=${CHEF_CLIENT_DEBUG:-""}
@@ -62,14 +62,14 @@ if [[ $BOOTSTRAP_TYPE == "vagrant" ]]; then
   # Test that Vagrant is really installed and of an appropriate version.
   if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
     echo_yellow "====> Checking VirtualBox and Vagrant..."
-    source $REPO_ROOT/bootstrap/vms/vagrant/vagrant_test.sh
+    source $REPO_ROOT/bootstrap/vagrant/vagrant_test.sh
   fi
 fi
 
 # Create VMs in Vagrant and start them.
 # VM only tests inside vagrant_create script
 echo_yellow "====> Clean up old VMs and Starting new local Vagrant cluster..."
-$REPO_ROOT/bootstrap/vms/vagrant/vagrant_create.sh
+$REPO_ROOT/bootstrap/vagrant/vagrant_create.sh
 
 # IMPORTANT: Inside vagrant_create.sh in the configure_network function the ADDING of OSD drives
 # occurs! This is important because it needes to be done while the VMs are off. Since adding network
@@ -78,11 +78,11 @@ $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create.sh
 if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
     # Reset shared folders and virtualbox guest addons since addons are required for shared folders.
     # This is placed here for automatic build in Vagrant option.
-    $REPO_ROOT/bootstrap/vms/vagrant/vagrant_create_shared_folders_in_vms.sh
+    # $REPO_ROOT/bootstrap/vagrant/vagrant_create_shared_folders_in_vms.sh
 
     # Install and configure Chef on all Vagrant hosts.
     echo_yellow "====> Installing and configuring Chef on all nodes using the all in one script."
-    $REPO_ROOT/bootstrap/vms/vagrant/vagrant_configure_chef_aio.sh
+    $REPO_ROOT/bootstrap/vagrant/vagrant_configure_chef_aio.sh
 else
     echo
     echo_green "====> Cepheus VMs have been created - Complete <===="
@@ -90,7 +90,7 @@ else
 fi
 
 # Just making sure in vagrant directory
-cd $REPO_ROOT/bootstrap/vms/vagrant
+cd $REPO_ROOT/bootstrap/vagrant
 # Create ssh config file from vagrant info
 vagrant ssh-config > vagrant.ssh.config
 
@@ -135,10 +135,10 @@ rm -f tmp_authorized_keys
 echo
 echo_green "==================================================================================="
 echo_green "*NB: Do the following before trying to access Cepheus' Vagrant Cluster:"
-echo_light_red "  cd $REPO_ROOT/bootstrap/vms/vagrant"
+echo_light_red "  cd $REPO_ROOT/bootstrap/vagrant"
 echo_green "All Vagrant commands must originate from that directory."
 echo
-echo_green "You can access the vms using the following:"
+echo_green "You can access Vagrant using the following:"
 
 {% for item in inventory.nodes %}
     echo_yellow "  vagrant ssh {{ item.name }}"

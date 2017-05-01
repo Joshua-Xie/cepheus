@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-source vagrant_base.sh
+source $REPO_ROOT/bootstrap/vagrant/vagrant_base.sh
 
 # IMPORTANT: This file is currently called in vbox_functions in the function called config_networks
 # It's done there for now because it already has the VMs down for network adapters so it made since

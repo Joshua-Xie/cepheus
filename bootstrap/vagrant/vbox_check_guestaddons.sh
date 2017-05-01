@@ -23,7 +23,8 @@ echo "Checking guest - $vbox_sf"
 # If exit code == 1 then rebuild VBoxGuestAdditions kernel
 if [[ $vbox_sf -eq 1 ]]; then
     echo "Fixing guest addons..."
-    sudo yum -y install kernel-devel-`uname -r`
+    # sudo yum -y install kernel-devel-`uname -r`
+    sudo yum -y install kernel-devel
     vba=$(sudo find /opt -name vboxadd | grep init)
     sudo $vba setup
     #sudo /opt/VBoxGuestAdditions-`lsmod | grep -io vboxguest | xargs modinfo | grep -iw version | awk '{print $2}'`/init/vboxadd setup

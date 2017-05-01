@@ -27,3 +27,8 @@ ansible osd -m shell -b -a "chef-client -o 'recipe[ceph-chef::finish]'"
 
 echo_yellow "====> Ceph - RGW Finish..."
 ansible rgw -m shell -b -a "chef-client -o 'recipe[ceph-chef::finish]'"
+
+{% if ceph.name != "hammer" %}
+echo_yellow "====> Adding {{ primary_user.name }} to Ceph Group"
+ansible "all!{{ bootstrap.name }}" -m shell -b -a "usermod -a -G ceph {{ primary_user.name }}"
+{% endif %}

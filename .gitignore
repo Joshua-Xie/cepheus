@@ -32,17 +32,17 @@
 /data/private/*.sh
 
 # Vagrant related
-/bootstrap/vms/vagrant/vagrant.ssh.config
-/bootstrap/vms/vagrant/tmp_authorized_keys
-/bootstrap/vms/vagrant/CEPH_UP_VAGRANT
+/bootstrap/vagrant/vagrant.ssh.config
+/bootstrap/vagrant/tmp_authorized_keys
+/bootstrap/vagrant/CEPH_UP_VAGRANT
 
 # Created build file for any environment
 build.yaml
 
 # Environment
 /bootstrap/data/environment/
-/bootstrap/vms/environment_config.yaml
-/bootstrap/vms/build_environment_config.yaml
+/bootstrap/vagrant/environment_config.yaml
+/bootstrap/vagrant/build_environment_config.yaml
 environment_config.yaml
 build_environment_config.yaml
 

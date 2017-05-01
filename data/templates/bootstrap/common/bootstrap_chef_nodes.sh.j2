@@ -15,13 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Test
-DATE=`date`
-PARENT="$(ps -o args= $PPID)"
-NAME=`basename "$0"`
-if [[ -d /home/vagrant ]]; then
-    echo "$NAME - called by - $PARENT on $DATE" >> /home/vagrant/debug.txt
-fi
 
 REPO_ROOT=$1
 REPO_ROOT=${REPO_ROOT:-"{{ cache.repo }}"}

@@ -18,13 +18,6 @@
 
 # This script bootstraps Chef on the bootstrap node.
 # NOTE: This file gets generated in the data center specific folder like dc1 or dc2. That's where it should be launched
-# Test
-DATE=`date`
-PARENT="$(ps -o args= $PPID)"
-NAME=`basename "$0"`
-if [[ -d /home/vagrant ]]; then
-    echo "$NAME - called by - $PARENT on $DATE" >> /home/vagrant/debug.txt
-fi
 
 TMP_REPO_ROOT=$1
 REPO_ROOT=${TMP_REPO_ROOT:-"{{ cache.repo }}"}

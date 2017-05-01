@@ -32,9 +32,9 @@ require 'yaml'
 Vagrant.require_version ">= 1.7.4"
 
 if ENV['REPO_ROOT'].nil?
-    $path = File.dirname(__FILE__) + "/.."
+    $path = File.dirname(__FILE__) + ""
 else
-    $path = "#{ENV['REPO_ROOT']}/bootstrap/vms"
+    $path = "#{ENV['REPO_ROOT']}/bootstrap/vagrant"
 end
 environment = YAML.load_file("#{$path}/environment_config.yaml")
 servers = YAML.load_file("#{$path}/servers_config.yaml")
@@ -125,6 +125,7 @@ unless $https_proxy_server.nil? or $https_proxy_server.empty?
 end
 
 # After other yum updates you may also need to re-install the kernel-devel-* so it's in the
+# kernel-devel-`uname -r` - old way
 # Only need this for Vagrant
 if $lsb_name == 'centos' or $lsb_name == 'rhel'
   $repos_script = <<-EOH
@@ -146,79 +147,79 @@ end
 # NOTE: Now build *ALL* of the environment related files that drive the bash scripts and Chef...
 
 # Last value in adapters_string array is net_mask
-$dns_servers = "export CEPH_CHEF_DNS=( #{environment['vagrant']['dns'].first} #{environment['vagrant']['dns'].last} )"
+# $dns_servers = "export CEPH_CHEF_DNS=( #{environment['vagrant']['dns'].first} #{environment['vagrant']['dns'].last} )"
 $adapters_string = "export CEPH_CHEF_ADAPTERS=( #{environment['vagrant']['front_end_adapter_ip']} #{environment['vagrant']['back_end_adapter_ip']} #{environment['vagrant']['net_mask'][0]} )"
-$bootstrap_name = "export CEPH_CHEF_BOOTSTRAP="
-$host_file_entries = ""
+# $bootstrap_name = "export CEPH_CHEF_BOOTSTRAP="
+# $host_file_entries = ""
 
-$hosts_string = "export CEPH_CHEF_HOSTS=( "
-$osd_hosts_string = "export CEPH_OSD_HOSTS=( "
-$mon_hosts_string = "export CEPH_MON_HOSTS=( "
-$mds_hosts_string = "export CEPH_MDS_HOSTS=( "
-$rgw_hosts_string = "export CEPH_RGW_HOSTS=( "
-$admin_hosts_string = "export CEPH_ADMIN_HOSTS=( "
-$adc_hosts_string = "export CEPH_ADC_HOSTS=( "
+# $hosts_string = "export CEPH_CHEF_HOSTS=( "
+# $osd_hosts_string = "export CEPH_OSD_HOSTS=( "
+# $mon_hosts_string = "export CEPH_MON_HOSTS=( "
+# $mds_hosts_string = "export CEPH_MDS_HOSTS=( "
+# $rgw_hosts_string = "export CEPH_RGW_HOSTS=( "
+# $admin_hosts_string = "export CEPH_ADMIN_HOSTS=( "
+# $adc_hosts_string = "export CEPH_ADC_HOSTS=( "
 
 # admin_hosts also contain the ceph-rest-api node
 
 # Build hosts File
-servers.each do |server|
-  $hosts_string += "#{server['name']} "
-  # Build the entries dynamically to go into hosts file for Chef
-  $host_file_entries += "#{server['front_end_ip']}\t#{server['name']}\t#{server['name']}.#{$domain}\n"
-end
-$hosts_string  += ")"
+# servers.each do |server|
+#   $hosts_string += "#{server['name']} "
+#   # Build the entries dynamically to go into hosts file for Chef
+#   $host_file_entries += "#{server['front_end_ip']}\t#{server['name']}\t#{server['name']}.#{$domain}\n"
+# end
+# $hosts_string  += ")"
 
 # Build osd hosts File
-servers.each do |server|
-  if server['roles'].include? 'osd'
-    $osd_hosts_string += "#{server['name']} "
-  end
-end
-$osd_hosts_string  += ")\n"
-$osd_hosts_string += "export CEPH_OSD_DRIVES="
-$osd_hosts_string += "#{$osd_drives}"
-$osd_hosts_string += "\n"
+# servers.each do |server|
+#   if server['roles'].include? 'osd'
+#     $osd_hosts_string += "#{server['name']} "
+#   end
+# end
+# $osd_hosts_string  += ")\n"
+# $osd_hosts_string += "export CEPH_OSD_DRIVES="
+# $osd_hosts_string += "#{$osd_drives}"
+# $osd_hosts_string += "\n"
 
 # Build mon hosts File
-servers.each do |server|
-  if server['roles'].include? 'mon'
-    $mon_hosts_string += "#{server['name']} "
-  end
-end
-$mon_hosts_string  += ")\n"
+# servers.each do |server|
+#   if server['roles'].include? 'mon'
+#     $mon_hosts_string += "#{server['name']} "
+#   end
+# end
+# $mon_hosts_string  += ")\n"
 
 # Build mds hosts File
-servers.each do |server|
-  if server['roles'].include? 'mds'
-    $mds_hosts_string += "#{server['name']} "
-  end
-end
-$mds_hosts_string  += ")\n"
+# servers.each do |server|
+#   if server['roles'].include? 'mds'
+#     $mds_hosts_string += "#{server['name']} "
+#   end
+# end
+# $mds_hosts_string  += ")\n"
 
 # Build rgw hosts File
-servers.each do |server|
-  if server['roles'].include? 'rgw'
-    $rgw_hosts_string += "#{server['name']} "
-  end
-end
-$rgw_hosts_string  += ")\n"
+# servers.each do |server|
+#   if server['roles'].include? 'rgw'
+#     $rgw_hosts_string += "#{server['name']} "
+#   end
+# end
+# $rgw_hosts_string  += ")\n"
 
 # Build admin hosts File
-servers.each do |server|
-  if server['roles'].include? 'admin'
-    $admin_hosts_string += "#{server['name']} "
-  end
-end
-$admin_hosts_string  += ")\n"
+# servers.each do |server|
+#   if server['roles'].include? 'admin'
+#     $admin_hosts_string += "#{server['name']} "
+#   end
+# end
+# $admin_hosts_string  += ")\n"
 
-# Build adc hosts File
-servers.each do |server|
-  if server['roles'].include? 'adc'
-    $adc_hosts_string += "#{server['name']} "
-  end
-end
-$adc_hosts_string  += ")\n"
+# # Build adc hosts File
+# servers.each do |server|
+#   if server['roles'].include? 'adc'
+#     $adc_hosts_string += "#{server['name']} "
+#   end
+# end
+# $adc_hosts_string  += ")\n"
 
 # End of environment related file builds.
 
@@ -231,9 +232,9 @@ Vagrant.configure("2") do |config|
         $bootstrap_node = 0
         if server['name'].include? 'bootstrap'
             $bootstrap_node = i
-            $bootstrap_name += server['name']
+            # $bootstrap_name += server['name']
             # Can only be one bootstrap node
-            $bootstrap_node_name = server['name']
+            # $bootstrap_node_name = server['name']
         end
 
         # NOTE: May want to add two other exports to this file for external OSD drive mounts for VMs
@@ -273,17 +274,14 @@ Vagrant.configure("2") do |config|
           s.inline = $repos_script
         end
 
-        # The network.sh file contains network helper functions that are needed on each host to setup the
+        # The vbox_network.sh file contains network helper functions that are needed on each host to setup the
         # network interfaces correctly for consistent interface naming.
-        machine.vm.provision "file", source: "../network.sh", destination: "network.sh"
+        machine.vm.provision "file", source: "vbox_network.sh", destination: "vbox_network.sh"
         # This file will be used to check and update the vbox guest addition
-        machine.vm.provision "file", source: "../vbox_check_guestaddons.sh", destination: "vbox_check_guestaddons.sh"
-
-        # This file will be used in the event vagrant chokes on ssh. You can then use vbox-ssh 'vmname'
-        # machine.vm.provision "file", source: "../cepheus.pub", destination: ".ssh/cepheus.pub"
+        machine.vm.provision "file", source: "vbox_check_guestaddons.sh", destination: "vbox_check_guestaddons.sh"
 
         # This file will be appended to /etc/hosts later...
-        machine.vm.provision "file", source: "../ceph_chef_host_file.env", destination: "ceph_chef_host_file"
+        # machine.vm.provision "file", source: "#{ENV['REPO_ROOT']}/bootstrap/common/hosts", destination: "ceph_chef_host_file"
 
         # This creates an export file that gets sourced during the network interface update phase after the VMs have
         # been created. This is because as of this writing, the fedora plugin seemed to have a bug in the networking.
@@ -302,10 +300,10 @@ Vagrant.configure("2") do |config|
         # machine.vm.synced_folder(ENV['BOOTSTRAP_CACHE_DIR'], "/ceph-files") unless ENV['BOOTSTRAP_CACHE_DIR'].nil?
         # machine.vm.synced_folder ".", "/vagrant", disabled: true
 
-        machine.vm.provision "vboxfs-add-user", type: "shell" do |s|
-          s.privileged = true
-          s.inline = "usermod -a -G vboxsf vagrant"
-        end
+        # machine.vm.provision "vboxfs-add-user", type: "shell" do |s|
+        #   s.privileged = true
+        #   s.inline = "usermod -a -G vboxsf vagrant"
+        # end
 
         machine.vm.provision "vbox-chg-permissions", type: "shell" do |s|
           s.privileged = true
@@ -317,10 +315,10 @@ Vagrant.configure("2") do |config|
         #   s.inline = "cat .ssh/cepheus.pub >> .ssh/authorized_keys"
         # end
 
-        machine.vm.provision "append-hosts", type: "shell" do |s|
-          s.privileged = true
-          s.inline = "cat ceph_chef_host_file >> /etc/hosts"
-        end
+        # machine.vm.provision "append-hosts", type: "shell" do |s|
+        #   s.privileged = true
+        #   s.inline = "cat ceph_chef_host_file >> /etc/hosts"
+        # end
 
         machine.vm.provider :virtualbox do |vb|
           vb.name = "#{server['name']}"
@@ -341,32 +339,32 @@ Vagrant.configure("2") do |config|
         if i == (servers.length - 1)
             #$hosts_string += ")"
             # Check bootstrap name. If for some reason it's not set then set to default value
-            if $bootstrap_node_name.empty?
-              # Default it if not found earlier
-              $bootstrap_node_name = "ceph-bootstrap"
-            end
+            # if $bootstrap_node_name.empty?
+            #   # Default it if not found earlier
+            #   $bootstrap_node_name = "ceph-bootstrap"
+            # end
+            #
+            # if $bootstrap_name == "export CEPH_CHEF_BOOTSTRAP="
+            #     $bootstrap_name += $bootstrap_node_name
+            #     $bootstrap_name += "\n"
+            #     $bootstrap_name += "export CEPH_CHEF_BOOTSTRAP_IP=#{servers[0]['front_end_ip']}"
+            # end
 
-            if $bootstrap_name == "export CEPH_CHEF_BOOTSTRAP="
-                $bootstrap_name += $bootstrap_node_name
-                $bootstrap_name += "\n"
-                $bootstrap_name += "export CEPH_CHEF_BOOTSTRAP_IP=#{servers[0]['front_end_ip']}"
-            end
-
-            $bootstrap_name += "\n"
+            # $bootstrap_name += "\n"
 
             # Now create files to be sourced after this vagrant run is over...
-            File.open("#{$path}/ceph_chef_host_file.env", "w") { |file| file.write($host_file_entries) }
-            File.open("#{$path}/ceph_chef_hosts.env", "w") { |file| file.write($hosts_string) }
+            # File.open("#{$path}/ceph_chef_host_file.env", "w") { |file| file.write($host_file_entries) }
+            # File.open("#{$path}/ceph_chef_hosts.env", "w") { |file| file.write($hosts_string) }
             File.open("#{$path}/ceph_chef_adapters.env", "w") { |file| file.write($adapters_string) }
-            File.open("#{$path}/ceph_chef_dns.env", "w") { |file| file.write($dns_servers) }
-            File.open("#{$path}/ceph_chef_bootstrap.env", "w") { |file| file.write($bootstrap_name) }
-            File.open("#{$path}/ceph_chef_proxy.env", "w") { |file| file.write($proxy_string) }
-            File.open("#{$path}/ceph_chef_osd_hosts.env", "w") { |file| file.write($osd_hosts_string) }
-            File.open("#{$path}/ceph_chef_mon_hosts.env", "w") { |file| file.write($mon_hosts_string) }
-            File.open("#{$path}/ceph_chef_mds_hosts.env", "w") { |file| file.write($mds_hosts_string) }
-            File.open("#{$path}/ceph_chef_rgw_hosts.env", "w") { |file| file.write($rgw_hosts_string) }
-            File.open("#{$path}/ceph_chef_admin_hosts.env", "w") { |file| file.write($admin_hosts_string) }
-            File.open("#{$path}/ceph_chef_adc_hosts.env", "w") { |file| file.write($adc_hosts_string) }
+            # File.open("#{$path}/ceph_chef_dns.env", "w") { |file| file.write($dns_servers) }
+            # File.open("#{$path}/ceph_chef_bootstrap.env", "w") { |file| file.write($bootstrap_name) }
+            # File.open("#{$path}/ceph_chef_proxy.env", "w") { |file| file.write($proxy_string) }
+            # File.open("#{$path}/ceph_chef_osd_hosts.env", "w") { |file| file.write($osd_hosts_string) }
+            # File.open("#{$path}/ceph_chef_mon_hosts.env", "w") { |file| file.write($mon_hosts_string) }
+            # File.open("#{$path}/ceph_chef_mds_hosts.env", "w") { |file| file.write($mds_hosts_string) }
+            # File.open("#{$path}/ceph_chef_rgw_hosts.env", "w") { |file| file.write($rgw_hosts_string) }
+            # File.open("#{$path}/ceph_chef_admin_hosts.env", "w") { |file| file.write($admin_hosts_string) }
+            # File.open("#{$path}/ceph_chef_adc_hosts.env", "w") { |file| file.write($adc_hosts_string) }
         end
 
       end # config.vm.define

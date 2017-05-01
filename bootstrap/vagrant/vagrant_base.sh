@@ -34,7 +34,7 @@ source $REPO_ROOT/bootstrap/common/base_colors.sh
 # soon change to be like the bare metal build process.
 
 source $REPO_ROOT/environments/ceph_chef_bootstrap.env
-source $REPO_ROOT/bootstrap/vms/ceph_chef_adapters.env
+source $REPO_ROOT/bootstrap/vagrant/ceph_chef_adapters.env
 source $REPO_ROOT/environments/ceph_chef_proxy.env
 source $REPO_ROOT/environments/ceph_chef_osd_hosts.env
 source $REPO_ROOT/environments/ceph_chef_mon_hosts.env
@@ -43,10 +43,9 @@ source $REPO_ROOT/environments/ceph_chef_mds_hosts.env
 source $REPO_ROOT/environments/ceph_chef_admin_hosts.env
 source $REPO_ROOT/environments/ceph_chef_adc_hosts.env
 
-# source $REPO_ROOT/environments/ceph_chef_dns.env
 source $REPO_ROOT/environments/ceph_chef_hosts.env
 
-source $REPO_ROOT/bootstrap/vms/vbox_functions.sh
+source $REPO_ROOT/bootstrap/vagrant/vbox_functions.sh
 
 FAILED_ENVVAR_CHECK=0
 REQUIRED_VARS=( BOOTSTRAP_CHEF_ENV BOOTSTRAP_DOMAIN REPO_ROOT CEPH_CHEF_BOOTSTRAP CEPH_CHEF_HOSTS CEPH_OSD_HOSTS CEPH_OSD_DRIVES CEPH_MON_HOSTS CEPH_RGW_HOSTS )
@@ -83,7 +82,7 @@ do_on_node() {
   vagrant ssh $NODE -c "$COMMAND"
 }
 
-cd $REPO_ROOT/bootstrap/vms/vagrant
+cd $REPO_ROOT/bootstrap/vagrant
 
 # use Chef Server embedded knife instead of the one in /usr/bin
 KNIFE=/opt/opscode/embedded/bin/knife
