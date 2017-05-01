@@ -241,8 +241,7 @@ function config_networks {
 
     source $REPO_ROOT/environments/ceph_chef_hosts.env
     source $REPO_ROOT/environments/ceph_chef_bootstrap.env
-
-    source $REPO_ROOT/bootstrap/vms/ceph_chef_adapters.env
+    source $REPO_ROOT/bootstrap/vagrant/ceph_chef_adapters.env
 
     echo "Gracefully shutting down VMs to install adapters. Please wait..."
     shutdown_vms
@@ -256,7 +255,7 @@ function config_networks {
 
     # IMPORTANT
     # Create OSD drives and attach them
-    source $REPO_ROOT/bootstrap/vms/vbox_attach_osd_drives.sh
+    source $REPO_ROOT/bootstrap/vagrant/vbox_attach_osd_drives.sh
 
     # start
     echo "Restarting VMs. Please wait..."

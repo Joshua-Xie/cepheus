@@ -32,9 +32,9 @@ require 'yaml'
 Vagrant.require_version ">= 1.7.4"
 
 if ENV['REPO_ROOT'].nil?
-    $path = File.dirname(__FILE__) + "/.."
+    $path = File.dirname(__FILE__) + ""
 else
-    $path = "#{ENV['REPO_ROOT']}/bootstrap/vms"
+    $path = "#{ENV['REPO_ROOT']}/bootstrap/vagrant"
 end
 environment = YAML.load_file("#{$path}/environment_config.yaml")
 servers = YAML.load_file("#{$path}/servers_config.yaml")
@@ -147,7 +147,7 @@ end
 # NOTE: Now build *ALL* of the environment related files that drive the bash scripts and Chef...
 
 # Last value in adapters_string array is net_mask
-$dns_servers = "export CEPH_CHEF_DNS=( #{environment['vagrant']['dns'].first} #{environment['vagrant']['dns'].last} )"
+# $dns_servers = "export CEPH_CHEF_DNS=( #{environment['vagrant']['dns'].first} #{environment['vagrant']['dns'].last} )"
 $adapters_string = "export CEPH_CHEF_ADAPTERS=( #{environment['vagrant']['front_end_adapter_ip']} #{environment['vagrant']['back_end_adapter_ip']} #{environment['vagrant']['net_mask'][0]} )"
 # $bootstrap_name = "export CEPH_CHEF_BOOTSTRAP="
 # $host_file_entries = ""
@@ -274,11 +274,11 @@ Vagrant.configure("2") do |config|
           s.inline = $repos_script
         end
 
-        # The network.sh file contains network helper functions that are needed on each host to setup the
+        # The vbox_network.sh file contains network helper functions that are needed on each host to setup the
         # network interfaces correctly for consistent interface naming.
-        machine.vm.provision "file", source: "../network.sh", destination: "network.sh"
+        machine.vm.provision "file", source: "vbox_network.sh", destination: "vbox_network.sh"
         # This file will be used to check and update the vbox guest addition
-        machine.vm.provision "file", source: "../vbox_check_guestaddons.sh", destination: "vbox_check_guestaddons.sh"
+        machine.vm.provision "file", source: "vbox_check_guestaddons.sh", destination: "vbox_check_guestaddons.sh"
 
         # This file will be appended to /etc/hosts later...
         # machine.vm.provision "file", source: "#{ENV['REPO_ROOT']}/bootstrap/common/hosts", destination: "ceph_chef_host_file"

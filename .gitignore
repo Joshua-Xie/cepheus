@@ -77,7 +77,7 @@ bin/*
 *.iso
 
 # SSH key pair - regenerated on each build
-bootstrap/vms/cepheus
-bootstrap/vms/cepheus.pub
+bootstrap/vagrant/cepheus
+bootstrap/vagrant/cepheus.pub
 certs/*.pem
 certs/*.crt
