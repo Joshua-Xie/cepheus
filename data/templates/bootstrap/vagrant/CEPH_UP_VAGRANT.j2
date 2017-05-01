@@ -163,9 +163,9 @@ else
 
     # No sourcing...
     cd $REPO_ROOT/bootstrap/vagrant
-    {% for item in build.init.bootstrap.commands %}
-    vagrant ssh {{ bootstrap.name }} "{{ item }}"
-    {% endfor %}
+    {%- for item in build.init.bootstrap.commands %}
+    vagrant ssh {{ bootstrap.name }} -c "{{ item }}"
+    {%- endfor %}
 
     echo
     echo
