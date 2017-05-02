@@ -191,18 +191,18 @@ download_file {{ cache.cookbook }}/{{ item.name }}-{{ item.version }}.tar.gz htt
 echo_orange "====> Downloading GEM dependencies..."
 # REQUIRED for ceph-chef cookbook - must be installed before doing 'sudo chef-client' on any node
 {%- for item in ceph_chef.gems %}
-download_file {{ cache.gem }}/{{ item.name }}-{{ item.version }}.gem https://rubygems.org/downloads/{{ item.name }}-{{ item.version }}.gem
+download_file {{ cache.gem }}/{{ item.name }}-{{ item.version }}.gem http://rubygems.org/downloads/{{ item.name }}-{{ item.version }}.gem
 {%- endfor %}
 
 # Pull needed gems for fpm
 GEMS=( {{ gems|join(' ') }} )
 # mkdir -p $REPO_ROOT_FILES/gems
 for GEM in ${GEMS[@]}; do
-  download_file {{ cache.gem }}/$GEM.gem https://rubygems.global.ssl.fastly.net/gems/$GEM.gem
+  download_file {{ cache.gem }}/$GEM.gem http://rubygems.global.ssl.fastly.net/gems/$GEM.gem
 done
 
 # Pull knife-acl gem. This is ONLY needed if using data bags where the data bag is created with a recipe!
-download_file {{ cache.gem }}/knife-acl-{{ chef_repo.knife_acl_version }}.gem https://rubygems.global.ssl.fastly.net/gems/knife-acl-{{ chef_repo.knife_acl_version }}.gem
+download_file {{ cache.gem }}/knife-acl-{{ chef_repo.knife_acl_version }}.gem http://rubygems.global.ssl.fastly.net/gems/knife-acl-{{ chef_repo.knife_acl_version }}.gem
 
 echo
 echo_green "====> Completed bootstrap_prereqs.sh - Complete <===="
