@@ -26,8 +26,8 @@ BYPASS=$1
 BYPASS=${BYPASS:-0}
 
 # Force a new clone
-REPO_ROOT={{ cache.repo }}
-REPO_ROOT_FILES={{ cache.base }}
+export REPO_ROOT={{ cache.repo }}
+export REPO_ROOT_FILES={{ cache.base }}
 
 WORK_DIR={{ build.work_dir }}
 DATE=$(date +%Y-%m-%d_%H%M%S)
@@ -145,8 +145,8 @@ echo_yellow "====> Building update..."
 # Build new {{ cache.repo }} environment and replace existing version
 
 # Force this to be original value
-REPO_ROOT_FILES={{ cache.base }}
-REPO_ROOT={{ cache.repo }}
+export REPO_ROOT_FILES={{ cache.base }}
+export REPO_ROOT={{ cache.repo }}
 
 # Remove '.git' and other dot files for clean up
 set +e
@@ -273,12 +273,11 @@ echo_yellow "====> Cleaning up and setting links..."
 # Remove tmp working directory
 rm -rf $WORK_DIR
 
-# Put a hard link to this file (after ran through template_engine) in home directory of primary user.
-cd $HOME
-if [[ -f cepheus_update.sh ]]; then
-    rm -f cepheus_update.sh
+# Put a hard link to this file (after ran through template_engine) in the usr/local/bin so it can be executed easily.
+if [[ -f /usr/local/bin/cepheus_update ]]; then
+    sudo rm -f /usr/local/bin/cepheus_update
 fi
-ln {{ cache.repo }}/bootstrap/common/cepheus_update.sh cepheus_update.sh
+sudo ln {{ cache.repo }}/bootstrap/common/cepheus_update.sh /usr/local/bin/cepheus_update
 
 echo
 echo_green "====================================="
