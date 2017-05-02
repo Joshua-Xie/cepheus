@@ -19,7 +19,7 @@
 
 # Creates the REPO_ROOT env var for everything else to use...
 # If already set before this it will use it.
-REPO_ROOT=${REPO_ROOT:-$(git rev-parse --show-toplevel)}
+REPO_ROOT=${REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null)}
 # Just in the event it needs to run not being in a git repo directory...
 export REPO_ROOT=${REPO_ROOT:-"{{ cache.repo }}"}
 

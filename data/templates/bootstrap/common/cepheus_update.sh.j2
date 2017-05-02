@@ -42,6 +42,9 @@ GROUP={{ primary_user.name }}
 
 KNIFE=/opt/opscode/embedded/bin/knife
 
+# Var of the cepheus_update script
+CEPHEUS_UPDATE=/usr/local/bin/cepheus_update
+
 # NB: Clear if exists
 if [[ -d $WORK_DIR ]]; then
   rm -rf $WORK_DIR
@@ -82,7 +85,9 @@ if [[ $BYPASS -eq 0 ]]; then
     echo
 
     # NB: Force a rebuild of scripts etc from the yaml data files just in case they were updated.
+    set +e
     source {{ cache.repo }}/CEPH_UP -f -x -z {{ cache.repo }}
+    set -e
 fi
 
 echo
@@ -98,7 +103,7 @@ fi
 
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
 {% if primary_user.backup.enable %}
-if [[ -d "/opt/opscode/" && -f "/home/{{ primary_user.name }}/cepheus_update.sh" ]]; then
+if [[ -d "/opt/opscode/" && -f $CEPHEUS_UPDATE ]]; then
     if [[ -d $REPO_ROOT ]]; then
         {% if primary_user.backup.remote.enable %}
         # Call the backup and rsync script
@@ -274,10 +279,10 @@ echo_yellow "====> Cleaning up and setting links..."
 rm -rf $WORK_DIR
 
 # Put a hard link to this file (after ran through template_engine) in the usr/local/bin so it can be executed easily.
-if [[ -f /usr/local/bin/cepheus_update ]]; then
-    sudo rm -f /usr/local/bin/cepheus_update
+if [[ -f $CEPHEUS_UPDATE ]]; then
+    sudo rm -f $CEPHEUS_UPDATE
 fi
-sudo ln {{ cache.repo }}/bootstrap/common/cepheus_update.sh /usr/local/bin/cepheus_update
+sudo ln {{ cache.repo }}/bootstrap/common/cepheus_update.sh $CEPHEUS_UPDATE
 
 echo
 echo_green "====================================="
