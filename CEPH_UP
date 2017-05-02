@@ -309,7 +309,7 @@ TMP_REPO_ROOT=$REPO_ROOT
 if [[ $BOOTSTRAP_INIT -eq 0 ]]; then
     if [[ $BUILD_ENVIRONMENT == "vagrant" && $BUILD_UPDATE -ne 0 ]]; then
         cd $REPO_ROOT/bootstrap/vagrant
-        ./CEPH_UP_VAGRANT
+        ./CEPH_UP_VAGRANT 0
         echo
         echo_green "====> CEPH_UP - Completed! <===="
         echo
