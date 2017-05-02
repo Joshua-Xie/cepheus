@@ -180,14 +180,6 @@ if [[ -f /home/{{ primary_user.name }}/.ssh/id_rsa.tmp ]]; then
     mv /home/{{ primary_user.name }}/.ssh/id_rsa.tmp /home/{{ primary_user.name }}/.ssh/id_rsa
 fi
 
-# NB: TODO: Need to move required chef data and bootstrap all of the other nodes IF NOT pxe_boot enabled. This
-# must assume that the ssh-key represented in the yaml data files are already in place on each node so ansible can
-# move the data and bootstrap the chef-client on each of the nodes.
-
-# Tar up {{ cache.base }} so we can copy to all of the other nodes.
-echo_yellow "====> Compressing {{ cache.base }}..."
-tar -zcf /home/{{ primary_user.name }}{{ cache.base }}.tar.gz {{ cache.base }}
-
 # Set the REPO_ROOT to the correct path so bootstrap_chef_nodes.sh will be able to use correct one.
 export REPO_ROOT={{ cache.repo }}
 export REPO_ROOT_FILES={{ cache.base }}

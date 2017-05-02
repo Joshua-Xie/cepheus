@@ -29,6 +29,14 @@ $REPO_ROOT/bootstrap/common/base_colors.sh
 
 set -e
 
+# NB: TODO: Need to move required chef data and bootstrap all of the other nodes IF NOT pxe_boot enabled. This
+# must assume that the ssh-key represented in the yaml data files are already in place on each node so ansible can
+# move the data and bootstrap the chef-client on each of the nodes.
+
+# Tar up {{ cache.base }} so we can copy to all of the other nodes.
+echo_yellow "====> Compressing {{ cache.base }}..."
+tar -zcf /home/{{ primary_user.name }}{{ cache.base }}.tar.gz {{ cache.base }}
+
 # Disable known_host check
 export ANSIBLE_HOST_KEY_CHECKING=False
 
