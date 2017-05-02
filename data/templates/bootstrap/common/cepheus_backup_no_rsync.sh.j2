@@ -30,8 +30,8 @@ if [[ -z $DATE ]]; then
 fi
 
 if [[ -z $VERSION ]]; then
-    if [[ -f $HOME/cepheus/cookbooks/cepheus/metadata.rb ]]; then
-        VERSION=$(grep version $HOME/cepheus/cookbooks/cepheus/metadata.rb | awk '{print $2}' | sed "s/'//g")
+    if [[ -f {{ build.base }}/cookbooks/cepheus/metadata.rb ]]; then
+        VERSION=$(grep version {{ build.base }}/cookbooks/cepheus/metadata.rb | awk '{print $2}' | sed "s/'//g")
     else
         VERSION="0.0.0"
     fi
@@ -42,20 +42,20 @@ CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 
 echo_light_red "====> Backing up Chef Server..."
 
-mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER
-mkdir -p $HOME/cepheus-backups/chef-server/$CLUSTER
+mkdir -p {{ backup.cepheus }}
+mkdir -p {{ backup.chef }}
 # back up Chef server assets per Chef documentation at
 # https://docs.chef.io/server_backup_restore.html
 
 CHEF_PG_DUMPALL=/opt/opscode/embedded/bin/pg_dumpall
-CHEF_SERVER_BACKUP_PATH=$HOME/cepheus-backups/chef-server/$CLUSTER
+CHEF_SERVER_BACKUP_PATH={{ backup.chef }}
 
 PG_BACKUP_TMP=/tmp/chef-pgsql-$VERSION-$DATE.sql.bz2
 sudo -E -u opscode-pgsql $CHEF_PG_DUMPALL -c | bzip2 > $PG_BACKUP_TMP
 mv $PG_BACKUP_TMP $CHEF_SERVER_BACKUP_PATH
 
-sudo tar cjf $CHEF_SERVER_BACKUP_PATH/etc-opscode-$VERSION-$DATE.tar.bz2 /etc/opscode
-sudo tar cjf $CHEF_SERVER_BACKUP_PATH/var-opt-opscode-$VERSION-$DATE.tar.bz2 /var/opt/opscode
+sudo tar cjf $CHEF_SERVER_BACKUP_PATH/etc-opscode-$VERSION-$DATE.tar.bz2 /etc/opscode 2>/dev/null
+sudo tar cjf $CHEF_SERVER_BACKUP_PATH/var-opt-opscode-$VERSION-$DATE.tar.bz2 /var/opt/opscode 2>/dev/null
 
 logger -t CepheusBackup "Cepheus Chef Server backed up - $VERSION-$DATE"
 
@@ -65,37 +65,37 @@ logger -t CepheusBackup "Cepheus Chef Server backed up - $VERSION-$DATE"
 if [[ -d $REPO_ROOT ]]; then
     if [[ $(ls -A {{ cache.repo }}) ]]; then
         echo_light_red "====> Backing up $REPO_ROOT..."
-        mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
-        cp -r $REPO_ROOT/* $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
-        tar -cjf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE-$CLUSTER.tar.bz2 $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
-        sudo rm -rf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-host-$VERSION-$DATE
+        mkdir -p {{ backup.cepheus }}/ceph-host-$VERSION-$DATE
+        cp -r $REPO_ROOT/* {{ backup.cepheus }}/ceph-host-$VERSION-$DATE
+        tar -cjf {{ backup.cepheus }}/ceph-host-$VERSION-$DATE-$CLUSTER.tar.bz2 {{ backup.cepheus }}/ceph-host-$VERSION-$DATE 2>/dev/null
+        sudo rm -rf {{ backup.cepheus }}/ceph-host-$VERSION-$DATE
     fi
 fi
 
-if [[ -d $HOME/cepheus ]]; then
-    if [[ $(ls -A $HOME/cepheus) ]]; then
-        echo_light_red "====> Backing up $HOME/cepheus..."
-        mkdir -p $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
-        cp -r $HOME/cepheus/* $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
-        tar -cjf $HOME/cepheus-backups/cepheus/$CLUSTER/ceph-cepheus-$VERSION-$DATE-$CLUSTER.tar.bz2 $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
-        sudo rm -rf $HOME/cepheus-backups/cepheus/$CLUSTER/cepheus-$VERSION-$DATE
+if [[ -d {{ build.base }} ]]; then
+    if [[ $(ls -A {{ build.base }}) ]]; then
+        echo_light_red "====> Backing up {{ build.base }}..."
+        mkdir -p {{ backup.cepheus }}/cepheus-$VERSION-$DATE
+        cp -r {{ build.base }}/* {{ backup.cepheus }}/cepheus-$VERSION-$DATE
+        tar -cjf {{ backup.cepheus }}/ceph-cepheus-$VERSION-$DATE-$CLUSTER.tar.bz2 {{ backup.cepheus }}/cepheus-$VERSION-$DATE 2>/dev/null
+        sudo rm -rf {{ backup.cepheus }}/cepheus-$VERSION-$DATE
     fi
 fi
 
-sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus-backups/cepheus/
+sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ backup.base }}/cepheus/
 
 # Backup supporting files - These are the same for ALL clusters.
 if [[ -d {{ cache.base }} ]]; then
     if [[ $(ls -A $REPO_ROOT_FILES) ]]; then
         echo_light_red "====> Backing up $REPO_ROOT_FILES..."
-        mkdir -p $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
-        cp -r $REPO_ROOT_FILES/* $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
-        tar -cjf $HOME/cepheus-backups/cepheus-files/cepheus-files-$VERSION-$DATE.tar.bz2 $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
-        sudo rm -rf $HOME/cepheus-backups/cepheus-files/$VERSION-$DATE
+        mkdir -p {{ backup.files }}/$VERSION-$DATE
+        cp -r $REPO_ROOT_FILES/* {{ backup.files }}/$VERSION-$DATE
+        tar -cjf {{ backup.files }}/cepheus-files-$VERSION-$DATE.tar.bz2 {{ backup.files }}/$VERSION-$DATE 2>/dev/null
+        sudo rm -rf {{ backup.files }}/$VERSION-$DATE
     fi
 fi
 
-sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} $HOME/cepheus-backups/cepheus-files
+sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ backup.files }}
 
 echo
 echo_green "====> cepheus_backup_no_rsync.sh - Complete <===="

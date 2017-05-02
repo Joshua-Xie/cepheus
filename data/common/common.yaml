@@ -23,6 +23,7 @@ organization:
 
 build:
     # Where the clone of https://github.com/cepheus-io/cepheus-build is located
+    base: "$HOME/cepheus"
     cepheus: cepheus-build
     # Working directory where layering occurs.
     work_dir: /tmp/cepheus
@@ -38,6 +39,13 @@ build:
         # DO NOT remove the gate file!
         bootstrap_gate_file: CEPHEUS_CEPH_BOOTSTRAPPING
         bootstrap_gate_message: ">>>> IMPORANT - DO NOT delete this file manually! Cepheus will do it once it's done <<<<"
+
+backup:
+    # Used for defining where and how backups are done
+    base: "$HOME/cepheus-backups"
+    cepheus: "$HOME/cepheus-backups/cepheus/$CLUSTER"
+    files: "$HOME/cepheus-backups/cepheus-files"
+    chef: "$HOME/cepheus-backups/chef-server/$CLUSTER"
 
 # NB: Chef client/server data that is OS specific is found in 'rhel.yaml', 'centos.yaml' and 'ubuntu.yaml'
 # NB: Basic Chef info is found in the envrionment.yaml file.
