@@ -85,9 +85,7 @@ if [[ $BYPASS -eq 0 ]]; then
     echo
 
     # NB: Force a rebuild of scripts etc from the yaml data files just in case they were updated.
-    set +e
-    source {{ cache.repo }}/CEPH_UP -f -x -z {{ cache.repo }}
-    set -e
+    # source {{ cache.repo }}/CEPH_UP -f -x -z {{ cache.repo }}
 fi
 
 echo
