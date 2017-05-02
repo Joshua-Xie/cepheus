@@ -141,6 +141,7 @@ layers:
                     cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
                     # Need to generate 'build.yaml' from all of the other data files before calling bootstrap_prereqs.sh...
+                    # CEPH_UP being called to generate files...
                     cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
                     echo
                     echo_yellow "====> Generating bootstrap_prereqs.sh..."

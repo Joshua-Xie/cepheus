@@ -67,17 +67,22 @@ export LINUX_ENVIRONMENT=$(uname | tr '[:upper:]' '[:lower:]')
 export BUILD_LOCATION=public
 export BUILD_DATA_CENTER=local
 
+# This will let it know that no options were passed in the cli
+export NO_OPTS=0
+
 while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
     case $opt in
         b)
             # (required first) MUST call this first. It will bootstrap Chef Server, client and support items.
             # NB: It will prompt you, as a reminder, and ask if your nodes all have the same ssh key of the primary_user!
             export BOOTSTRAP_INIT=1
+            export NO_OPTS=1
             ;;
         c)
             # (optional) NB: Use this option if you want to change the default REPO_ROOT_FILES variable. It *MUST* be a
             # valid root directory!
             export REPO_ROOT_FILES=$OPTARG
+            export NO_OPTS=1
 
             # NB: ./CEPH_UP -f /ceph-files
             ;;
@@ -85,6 +90,7 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
             # (optional) NB: Use this option if you want to change the default 'data center' from `local` to something
             # like `data_center_nyc`. It MUST represent a sub-folder in `private` or `public`!
             export BUILD_DATA_CENTER=$OPTARG
+            export NO_OPTS=1
 
             # NB: ./CEPH_UP -d data_center_nyc
             ;;
@@ -92,12 +98,14 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
             # (optional) NB: Use this option if you want to change the default environment from `vagrant` to something
             # like `production`. Can be used with -l option to change from `public` to `private`
             export BUILD_ENVIRONMENT=$OPTARG
+            export NO_OPTS=1
 
             # NB: ./CEPH_UP -e production
             ;;
         f)
             # (optional) Force templates to get regenerated.
             export FORCE=1
+            export NO_OPTS=1
 
             # NB: ./CEPH_UP -f
             ;;
@@ -106,10 +114,12 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
             # prerequisites and download them again.
             export BOOTSTRAP_GET_PREREQS_ONLY=1
             export BOOTSTRAP_GET_PREREQS=1
+            export NO_OPTS=1
             ;;
         l)
             # (optional) NB: Use this option if you want to change from the default `public` to `private` for 'location'.
             export BUILD_LOCATION=private
+            export NO_OPTS=1
             ;;
         n)
             # (optional) NB: Use this option if you need to test/debug ceph-chef. It will skip downloading the current
@@ -122,6 +132,7 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
             # If nothing is passed in with -d option the CEPH_DEV_MODE is empty and debug ceph-chef is used.
             export CEPH_DEV_MODE=$OPTARG
             export CHEF_CEPHEUS_DEBUG=1
+            export NO_OPTS=1
 
             # NB: Requires at least 1 argument '0' or '1'
             # Example: ./CEPH_UP -n 0
@@ -129,42 +140,51 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
         o)
             # (optional) NB: Use this option if you want to change from the default OS of `centos` to `rhel` or `ubuntu`
             export BUILD_OS=$OPTARG
+            export NO_OPTS=1
             ;;
         p)
             # (optional) Specify if you want to call 'bootstrap_prereqs.sh'
             export BOOTSTRAP_GET_PREREQS=1
+            export NO_OPTS=1
             ;;
         r)
             # (optional) -r to remove the prerequisites. Cleaning up.
             # It does not exit like -g but is called before gathering prerequisites.
             # Use it with -g -r and it will clean up and gather updated prerequisites and exit based on versions in build.yaml
             export BOOTSTRAP_REMOVE_PREREQS=1
+            export NO_OPTS=1
             ;;
         s)
             # (optional) Used to skip building local Vagrant VMs build and jump right to building out Ceph. Used during
             # development to help save some time.
             BOOTSTRAP_SKIP_VMS=1
+            export NO_OPTS=1
             ;;
         t)
             BOOTSTRAP_TYPE=$OPTARG
+            export NO_OPTS=1
             ;;
         u)
             # Update the cluster.
             export BUILD_UPDATE=0
+            export NO_OPTS=1
             ;;
         v)
             # (optional) Builds the local Vagrant VMs only - skips building the Ceph portion. Used during development
             # to help save some time.
             export BUILD_VMS_ONLY=1
+            export NO_OPTS=1
             ;;
         x)
             # (optional) Causes the logo portion *NOT* to show
             export BUILD_SHOW_LOGO=0
+            export NO_OPTS=1
             ;;
         y)
             # (optional) Only used if your environment requires a proxy to access the outside world.
             export BOOTSTRAP_HTTP_PROXY=$OPTARG
             export BOOTSTRAP_HTTPS_PROXY=$OPTARG
+            export NO_OPTS=1
             ;;
         z)
             # Only run everything through the template_engine
@@ -173,6 +193,7 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
             if [[ ! -z $OPTARG ]]; then
                 export REPO_ROOT=$OPTARG
             fi
+            export NO_OPTS=1
             ;;
     esac
 done
@@ -198,6 +219,18 @@ else
     echo
     echo_green "====> CEPH_UP being called..."
     echo
+fi
+
+# NB: If no options were passed then simulate -b -v which is the automated vagrant build
+if [[ $NO_OPTS -eq 0 ]]; then
+    export BUILD_VMS_ONLY=1
+    export BOOTSTRAP_INIT=1
+    echo
+    echo_purple "====> NO options were passed into CEPH_UP so emulating options '-b -v' for Vagrant..."
+    echo_purple "====> Ctrl-C now to exit or in 3 seconds build will start..."
+    echo
+    # Wait 3 seconds just to show the message...
+    sleep 3
 fi
 
 # NB: ./CEPH_UP -v -b will set the BOOTSTRAP_GET_PREREQS=1 to download prereqs such as chef server etc. You can also pass '-p' on the command line.
@@ -239,7 +272,14 @@ if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 || $BUIL
     # Add all other data files to the final build.yaml
     BUILD_DATA=data/data_files.sh
     echo_yellow "====> Generating $REPO_ROOT/$BUILD_DATA..."
-    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
+
+    # Create a tmp data file because we data very early in the process.
+    cp $REPO_ROOT/data/common/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/tmp.yaml
+    sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/tmp.yaml
+
+    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/tmp.yaml -i $REPO_ROOT/data/templates/$BUILD_DATA.j2 -o $REPO_ROOT/$BUILD_DATA
+    # Remove the tmp data file
+    rm -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/tmp.yaml
     sudo chmod +x $REPO_ROOT/$BUILD_DATA
 
     ## Execution phase of scripts - after being built above!

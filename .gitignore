@@ -38,6 +38,7 @@
 
 # Created build file for any environment
 build.yaml
+tmp.yaml
 
 # Environment
 /bootstrap/data/environment/
