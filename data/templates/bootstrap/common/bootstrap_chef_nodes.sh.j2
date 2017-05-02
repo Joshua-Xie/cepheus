@@ -24,8 +24,8 @@ if [ -n "$CEPH_CHEF_HTTP_PROXY" ]; then
     KNIFE_HTTP_PROXY_PARAM="--bootstrap-proxy \$http_proxy"
 fi
 
-$REPO_ROOT/bootstrap/common/base.sh
-$REPO_ROOT/bootstrap/common/base_colors.sh
+source $REPO_ROOT/bootstrap/common/base.sh
+source $REPO_ROOT/bootstrap/common/base_colors.sh
 
 set -e
 

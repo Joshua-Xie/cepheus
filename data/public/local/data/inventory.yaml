@@ -65,7 +65,7 @@ inventory:
                   cidr: 24
                 - profile: cluster
                   device: enp0s8 #*device2_1U
-                  ip: 10.121.2.3
+                  ip: 10.121.2.2
                   mac: "08:00:27:3E:CB:B0"
                   # TORs - Gateway
                   gateway: "10.121.2.2"
