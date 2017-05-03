@@ -42,3 +42,8 @@ for i in ${CEPH_OSD_HOSTS[@]}; do
     $KNIFE node run_list add $i 'role[ceph-osd-crushmap-set]'
     do_on_node $i "sudo chef-client -o 'role[ceph-osd-crushmap-set]'"
 done
+
+# Step 4
+# Make sure the crushmap 'alg straw2' is enabled
+echo_yellow "====> Ceph OSD Step 4 - Crushmap Alg Update..."
+do_on_node ${CEPH_MON_HOSTS[@]:0:1} "sudo /opt/cepheus/scripts/ceph_set_crushmap_alg.sh"
