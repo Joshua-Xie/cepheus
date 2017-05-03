@@ -42,9 +42,15 @@ CEPH_CHEF_BOOTSTRAP={{ bootstrap.name }}
 
 echo_light_red "====> Backing up Chef Server..."
 
-# NB: Change to template driven...
-mkdir -p {{ backup.cepheus }}/{dc1,dc2}
-mkdir -p {{ backup.chef }}/{dc1,dc2}
+# Create the base
+mkdir -p {{ backup.cepheus }}
+mkdir -p {{ backup.chef }}
+
+# Create any rsync remote dir.
+{% for item in rsync.hosts %}
+mkdir -p {{ backup.cepheus }}/{{ item }}
+{% endfor %}
+
 # back up Chef server assets per Chef documentation at
 # https://docs.chef.io/server_backup_restore.html
 
@@ -63,7 +69,9 @@ logger -t CepheusBackup "Cepheus Chef Server backed up - $VERSION-$DATE"
 
 echo_light_red "====> Rsync Chef Server Backups..."
 
-rsync -avz $CHEF_SERVER_BACKUP_PATH/. {{ primary_user.name }}@{{ primary_user.backup.remote.host }}:$CHEF_SERVER_BACKUP_PATH/.
+{% for item in rsync.hosts %}
+rsync -avz $CHEF_SERVER_BACKUP_PATH/. {{ primary_user.name }}@{{ item }}:$CHEF_SERVER_BACKUP_PATH/.
+{% endfor %}
 
 logger -t CepheusBackup "Cepheus Chef Server backup rsync to $REMOTE_CLUSTER for $VERSION-$DATE"
 
@@ -105,8 +113,10 @@ fi
 
 sudo chown -R {{ primary_user.name }}:{{ primary_user.name }} {{ backup.files }}
 
-echo_light_red "====> Rsync cepheus to {{ primary_user.backup.remote.host }}..."
-rsync -avz {{ backup.cepheus }}/. {{ primary_user.name }}@{{ primary_user.backup.remote.host }}:{{ backup.cepheus }}/.
+{% for item in rsync.hosts %}
+echo_light_red "====> Rsync cepheus to {{ item }}..."
+rsync -avz {{ backup.cepheus }}/. {{ primary_user.name }}@{{ item }}:{{ backup.cepheus }}/.
+{% endfor %}
 
 echo
 echo_green "====> cepheus_backup_rsync.sh - Complete <===="

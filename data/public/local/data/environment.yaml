@@ -17,6 +17,12 @@ data_center: &data_center local
 # Can only be `public` or `private`.
 location: public
 
+# This is used for backups and relates to backup in common.yaml. It's here because the remote hosts are environment specific.
+rsync:
+    hosts:
+        # Should be the remote host where to rsync the backups to.
+        -   ceph-vm3
+
 # NICs - Each hardware vendor *may* have different device names. Define them here for the given environment
 # Supermicro
 ## Non-Storage nodes - Assumes 2 devices (could be any size 10Gb, 20Gb, 40Gb) in this scenario
@@ -251,15 +257,6 @@ primary_user:
         # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
         # you change your ssh key but use the same name later if you don't already have one!
         passphrase: "cepheus"
-    # Backup is used for Cepheus backups. The default method is 'rsync' and the 'remote' section refers to a remote
-    # 'cluster' and/or 'host' that the rsync process will use to sync this given environment (cluster) to.
-    backup:
-        enable: true
-        remote:
-            enable: false
-            method: rsync
-            # This is usually the bootstrap node on a remote cluster that you are pushing the backup to for HA
-            host: ceph-vm3
     sudo: true
     # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
     # required for ceph commands

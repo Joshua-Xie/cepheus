@@ -100,10 +100,10 @@ if [[ -d /etc/ansible ]]; then
 fi
 
 # If opscode does not exist then Chef has not been installed yet and this is a fresh build.
-{% if primary_user.backup.enable %}
+{% if backup.enable %}
 if [[ -d "/opt/opscode/" && -f $CEPHEUS_UPDATE ]]; then
     if [[ -d $REPO_ROOT ]]; then
-        {% if primary_user.backup.remote.enable %}
+        {% if backup.remote.enable %}
         # Call the backup and rsync script
         source $REPO_ROOT/bootstrap/common/cepheus_backup_rsync.sh $DATE $VERSION
         {% else %}
