@@ -4,6 +4,9 @@
 *.key
 *.key.*
 
+# No logs
+*.log
+
 # Template built files - these should match the build.yaml files section except with leading '/'
 /bootstrap/common/*
 !/bootstrap/common/README.md
