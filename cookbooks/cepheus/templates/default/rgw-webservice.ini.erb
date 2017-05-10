@@ -1,0 +1,11 @@
+[uwsgi]
+module = rgw_webservice
+
+master = true
+processes = 5
+
+socket = rgw_webservice.sock
+chmod-socket = 660
+vacuum = true
+
+die-on-term = true

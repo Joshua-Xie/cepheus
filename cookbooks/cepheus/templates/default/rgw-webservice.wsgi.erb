@@ -1,6 +1,4 @@
-#
-# Author:: Chris Jones <chris.jones@lambdastack.io>
-# Cookbook Name:: cepheus
+#!/usr/bin/env python
 #
 # Copyright 2017, LambdaStack
 #
@@ -17,4 +15,8 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
+import sys
+
+sys.path.insert(0, '/usr/local/lib/rgw_webservice')
+
+from rgw_webservice import app as application

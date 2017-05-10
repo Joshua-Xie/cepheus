@@ -12,6 +12,7 @@
     "recipe[ceph-chef::radosgw]",
     "recipe[ceph-chef::radosgw_start]",
     "recipe[cepheus::ceph-scripts]",
+    "recipe[cepheus::ceph-radosgw-webservice]",
     "role[monitoring]"
   ]
 }
