@@ -18,3 +18,10 @@
 #
 
 include_recipe 'cepheus::ceph-conf'
+
+package 'uwsgi'
+package 'uwsgi-plugin-python'
+package 'python-flask'
+package 'nginx'
+
+# Start and enable uwsgi and nginx TODO

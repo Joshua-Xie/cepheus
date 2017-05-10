@@ -82,11 +82,21 @@ ceph_chef: # (required file - cookbook - for build)
 # If `inline` is true then substitute the name and verison inline else use url as specified
 # NB: If there is a python dependency then use the example below and create one or more using the syntax below.
 # It will automatically download if present.
-# python: # (required files for build and runtime)
-    # -   name: PyYAML
-    #     version: 3.12
-    #     inline: true
-    #     url: http://pyyaml.org/download/pyyaml/
+python:
+    -   name: Flask
+        # Make sure to include '.' if there is a file suffix
+        suffix: .tar.gz
+        version: 0.12.1
+        # If inline is true then build url + name/version else just url
+        inline: false
+        url: https://github.com/pallets/flask/archive/0.12.1.tar.gz
+    -   name: uwsgi
+        # Make sure to include '.' if there is a file suffix
+        suffix: .tar.gz
+        version: 2.0.15
+        # If inline is true then build url + name/version else just url
+        inline: false
+        url: https://github.com/unbit/uwsgi/archive/2.0.15.tar.gz
 
 # Cache directories in the format of base/{cookbook,gem...}
 cache:

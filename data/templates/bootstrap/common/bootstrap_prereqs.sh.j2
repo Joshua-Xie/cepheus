@@ -178,7 +178,7 @@ fi
 echo_orange "====> Downloading Python based dependencies..."
 # NB: If this section is empty it means that no python 'pip like' dependency was asked for so the template_engine skipped it.
 {%- for item in python %}
-download_file /python/{{ item.name }}-{{ item.verion }}.tar.gz {{ item.url }}{%- if item.inline %}{{ item.name }}-{{ item.version }}.tar.gz{%- endif %}
+download_file /python/{{ item.name }}-{{ item.verion }}{{ item.suffix }} {{ item.url }}{%- if item.inline %}{{ item.name }}-{{ item.version }}{{ item.suffix }}{%- endif %}
 {%- endfor %}
 
 # Cookbooks
