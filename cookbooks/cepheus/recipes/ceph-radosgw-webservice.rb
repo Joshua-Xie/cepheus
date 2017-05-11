@@ -72,14 +72,14 @@ end
 
 # Setup the uwsgi ini
 template '/etc/rgw_webservice.ini' do
-    source 'rgw_webservice.ini.erb'
+    source 'rgw-webservice.ini.erb'
     owner 'root'
     group 'root'
 end
 
 # Add Unit file for service
 template '/etc/systemd/system/rgw_webservice.service' do
-    source 'rgw_webservice.service.erb'
+    source 'rgw-webservice.service.erb'
     owner 'root'
     group 'root'
 end
