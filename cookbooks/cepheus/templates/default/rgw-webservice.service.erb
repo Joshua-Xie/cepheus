@@ -3,7 +3,7 @@ Description=uWSGI instance to serve RGW Admin Web Service
 After=network.target
 
 [Service]
-User=nginx
+User=root
 Group=nginx
 WorkingDirectory=/usr/local/lib/rgw_webservice
 Environment="PATH=/usr/local/bin"

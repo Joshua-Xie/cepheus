@@ -58,9 +58,9 @@ end
 # Add nginx directory for app
 
 # Link app to lib directory file
-# link '' do
-#     to '/usr/local/lib/rgw_webservice/rgw_webservice.wsgi'
-# end
+link '/usr/local/bin/rgw_webservice' do
+    to '/usr/local/lib/rgw_webservice/rgw_webservice.wsgi'
+end
 
 # Setup the NGINX config file. Since this is the only service using nginx we can just modify the nginx.conf directly.
 template '/etc/nginx/nginx.conf' do
