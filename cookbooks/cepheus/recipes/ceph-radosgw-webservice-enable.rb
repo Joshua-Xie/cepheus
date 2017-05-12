@@ -21,3 +21,8 @@ execute 'rgw-webservice-enable' do
     command 'sudo systemctl enable rgw_webservice'
     ignore_failure true
 end
+
+execute 'rgw-webservice-nginx-enable' do
+    command 'sudo systemctl enable nginx'
+    ignore_failure true
+end

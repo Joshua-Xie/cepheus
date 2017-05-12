@@ -21,3 +21,8 @@ execute 'rgw-webservice-start' do
     command 'sudo systemctl start rgw_webservice'
     ignore_failure true
 end
+
+execute 'rgw-webservice-nginx-start' do
+    command 'sudo systemctl start nginx'
+    ignore_failure true
+end
