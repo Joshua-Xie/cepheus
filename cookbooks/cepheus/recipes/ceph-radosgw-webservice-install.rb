@@ -35,21 +35,28 @@ package 'nginx' do
 end
 
 directory '/usr/local/lib/rgw_webservice' do
-    owner 'root'
-    group 'root'
+    owner 'nginx'
+    group 'nginx'
+    mode 00755
+end
+
+directory '/var/log/rgw_webservice' do
+    owner 'nginx'
+    group 'nginx'
     mode 00755
 end
 
 file '/usr/local/lib/rgw_webservice/__init__.py' do
     action :touch
-    owner 'root'
-    group 'root'
+    owner 'nginx'
+    group 'nginx'
     mode 00644
 end
 
 cookbook_file '/usr/local/lib/rgw_webservice/rgw_webservice' do
     source 'rgw_webservice.py'
-    owner 'root'
+    owner 'nginx'
+    group 'nginx'
     mode 00755
 end
 
@@ -60,6 +67,8 @@ end
 # Link app to lib directory file
 link '/usr/local/bin/rgw_webservice' do
     to '/usr/local/lib/rgw_webservice/rgw_webservice.wsgi'
+    user 'nginx'
+    group 'nginx'
 end
 
 # Setup the NGINX config file. Since this is the only service using nginx we can just modify the nginx.conf directly.

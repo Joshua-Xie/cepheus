@@ -35,10 +35,9 @@ http {
     # for more information.
     include /etc/nginx/conf.d/*.conf;
 
+    # NB: Let server_name default to host name
     server {
         listen       8444 default_server;
-        listen       [::]:8444 default_server;
-        server_name  _;
 
         location / {
             include uwsgi_params;

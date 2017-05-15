@@ -1,11 +1,17 @@
 [uwsgi]
-module = /usr/local/bin/rgw_webservice
+uid = nginx
+gid = nginx
+
+wsgi-file = /usr/local/bin/rgw_webservice/rgw_webservice
+callable = app
+plugin = python
 
 master = true
 processes = 5
 
 socket = /usr/local/lib/rgw_webservice/rgw_webservice.sock
-chmod-socket = 660
-vacuum = true
+chmod-socket = 777
+chown-socket = nginx
 
+vacuum = true
 die-on-term = true

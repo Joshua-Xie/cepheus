@@ -16,12 +16,25 @@
 # limitations under the License.
 #
 
+import logging
+import logging.handlers
 import flask
 import json
 import os
 from flask import request
 
+# NB: Setup Logging
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+# handler = logging.handlers.SysLogHandler(address = '/dev/log')
+handler = logging.handlers.TimedRotatingFileHandler('/var/log/rgw_webservice/rgw_webservice.log', when='midnight', backupCount=5)
+formatter = logging.Formatter('%(module)s.%(funcName)s: %(message)s')
+handler.setFormatter(formatter)
+log.addHandler(handler)
+
 app = flask.Flask(__name__)
+
+# NB: Use flask.jsonify in the methods/functions that return json and not globally
 
 class RGWWebServiceAPI(object):
     def __init__(self):
@@ -29,11 +42,12 @@ class RGWWebServiceAPI(object):
         pass
 
     def create_user(self, user, display_name):
-        print "User: %s, %s" % (user, display_name)
-        # Return dict
+        log.debug("User: %s, %s" % (user, display_name))
+        return 'create_user'
 
 
 def flaskify(func, *args, **kwargs):
+    result = ''
     """
     Wraps Flask response generation so that the underlying worker
     functions can be invoked without a Flask application context.
@@ -48,12 +62,12 @@ def flaskify(func, *args, **kwargs):
         result = func(*args, **kwargs)
 
         # result must be a dictionary or jsonify will likely explode
-        if not type(result) == dict:
-            raise Exception('func passed to flaskify must return dict')
+        # if not type(result) == dict:
+        #     raise Exception('func passed to flaskify must return dict')
     except Exception, e:
-        print e.message
+        log.error(e.message)
 
-    return flask.jsonify(result)
+    return result
 
 
 @app.route('/')
@@ -61,16 +75,15 @@ def help():
     return flask.render_template('rgw_webservice_help.html')
 
 
-@app.route('/v1/user/create/<user>/<display_name>', methods=['GET'])
+@app.route('/v1/user/create/<user>/<display_name>', methods=['PUT'])
 def rgw_create_user(user, display_name):
     api = RGWWebServiceAPI()
 
-    # Remove after debug
-    print 'API Created...'
-
     # Getting parameters
     # user = request.args.get('user')
-    # flask.jsonify(api.create_user(user, display_name))
+    # Json example
+    # flask.jsonify(data_dict)
+
     return flaskify(api.create_user, user, display_name)
 
 
