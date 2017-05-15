@@ -28,9 +28,9 @@ class RGWWebServiceAPI(object):
         # Setup admin user info here
         pass
 
-    def create_user(user, display_name):
+    def create_user(self, user, display_name):
         print "User: %s, %s" % (user, display_name)
-        pass
+        # Return dict
 
 
 def flaskify(func, *args, **kwargs):
@@ -46,11 +46,12 @@ def flaskify(func, *args, **kwargs):
     """
     try:
         result = func(*args, **kwargs)
+
         # result must be a dictionary or jsonify will likely explode
         if not type(result) == dict:
             raise Exception('func passed to flaskify must return dict')
-    except Exception:
-        pass
+    except Exception, e:
+        print e.message
 
     return flask.jsonify(result)
 
@@ -60,11 +61,16 @@ def help():
     return flask.render_template('rgw_webservice_help.html')
 
 
-@app.route('/v1/user/create/<user>/<display_name>', methods=['PUT'])
+@app.route('/v1/user/create/<user>/<display_name>', methods=['GET'])
 def rgw_create_user(user, display_name):
     api = RGWWebServiceAPI()
+
+    # Remove after debug
+    print 'API Created...'
+
     # Getting parameters
     # user = request.args.get('user')
+    # flask.jsonify(api.create_user(user, display_name))
     return flaskify(api.create_user, user, display_name)
 
 
