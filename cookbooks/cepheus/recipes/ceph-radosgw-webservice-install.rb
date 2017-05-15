@@ -40,6 +40,12 @@ directory '/usr/local/lib/rgw_webservice' do
     mode 00755
 end
 
+directory '/usr/local/lib/rgw_webservice/templates' do
+    owner 'nginx'
+    group 'nginx'
+    mode 00755
+end
+
 directory '/var/log/rgw_webservice' do
     owner 'nginx'
     group 'nginx'
@@ -91,4 +97,11 @@ template '/etc/systemd/system/rgw_webservice.service' do
     source 'rgw-webservice.service.erb'
     owner 'root'
     group 'root'
+end
+
+# Add help file
+template '/usr/local/lib/rgw_webservice/templates/rgw_webservice_help.html' do
+    source 'rgw-webservice-help.html.erb'
+    owner 'nginx'
+    group 'nginx'
 end

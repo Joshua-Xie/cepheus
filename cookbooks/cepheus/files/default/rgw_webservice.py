@@ -41,8 +41,16 @@ class RGWWebServiceAPI(object):
         # Setup admin user info here
         pass
 
-    def create_user(self, user, display_name):
+    def user_create(self, user, display_name, region=None, zone=None):
         log.debug("User: %s, %s" % (user, display_name))
+        radosgw-admin user create --display-name="#{user['name']}" --uid="#{user['uid']}" "#{max_buckets}" --access-key="#{access_key}" --secret="#{secret_key}"
+        if region is None and zone is None:
+            cmd = ["radosgw-admin", "user", "info", "--uid=%s" % user]
+        else:
+            cmd = ["sudo radosgw-admin", "user", "info", "--uid=%s" % user, "-n client.radosgw.%s-%s" % (region, zone)]
+
+        user_dict = radosgw_admin(cmd)
+
         return 'create_user'
 
 
@@ -60,10 +68,6 @@ def flaskify(func, *args, **kwargs):
     """
     try:
         result = func(*args, **kwargs)
-
-        # result must be a dictionary or jsonify will likely explode
-        # if not type(result) == dict:
-        #     raise Exception('func passed to flaskify must return dict')
     except Exception, e:
         log.error(e.message)
 
@@ -75,8 +79,8 @@ def help():
     return flask.render_template('rgw_webservice_help.html')
 
 
-@app.route('/v1/user/create/<user>/<display_name>', methods=['PUT'])
-def rgw_create_user(user, display_name):
+@app.route('/v1/users/create/<user>/<display_name>', methods=['PUT'])
+def rgw_users_create(user, display_name):
     api = RGWWebServiceAPI()
 
     # Getting parameters
@@ -84,7 +88,13 @@ def rgw_create_user(user, display_name):
     # Json example
     # flask.jsonify(data_dict)
 
-    return flaskify(api.create_user, user, display_name)
+    return flaskify(api.user_create, user, display_name)
+
+
+@app.route('/v1/users/get/<user>', methods=['GET'])
+def rgw_users_get(user):
+    api = RGWWebServiceAPI()
+    return flaskify(api.user_get, user)
 
 
 if __name__ == '__main__':
