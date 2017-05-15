@@ -18,9 +18,10 @@
 
 import logging
 import logging.handlers
-import flask
+import subprocess
 import json
 import os
+import flask
 from flask import request
 
 # NB: Setup Logging
@@ -41,17 +42,36 @@ class RGWWebServiceAPI(object):
         # Setup admin user info here
         pass
 
-    def user_create(self, user, display_name, region=None, zone=None):
+    def user_create(self, user, display_name, region=None, zone=None, access_key=None, secret_key=None):
         log.debug("User: %s, %s" % (user, display_name))
-        radosgw-admin user create --display-name="#{user['name']}" --uid="#{user['uid']}" "#{max_buckets}" --access-key="#{access_key}" --secret="#{secret_key}"
-        if region is None and zone is None:
-            cmd = ["radosgw-admin", "user", "info", "--uid=%s" % user]
-        else:
-            cmd = ["sudo radosgw-admin", "user", "info", "--uid=%s" % user, "-n client.radosgw.%s-%s" % (region, zone)]
 
-        user_dict = radosgw_admin(cmd)
+        cmd = ["radosgw-admin2", "--user", "%s" % user, "--display-name", "'%s'" % display_name, "--actions", "create", "user"]
 
-        return 'create_user'
+        if region is not None and zone is not None:
+            cmd.append("--region")
+            cmd.append("%s" % region)
+            cmd.append("--zone")
+            cmd.append("%s" % zone)
+
+        if access_key is not None:
+            cmd.append("--access")
+            cmd.append("%s" % access_key)
+
+        if secret_key is not None:
+            cmd.append("--secret")
+            cmd.append("%s" % secret_key)
+
+        return call(cmd)
+
+
+def call(cmd):
+    process = subprocess.Popen(cmd, env=os.environ.copy(), stdout=subprocess.PIPE)
+    json_output, err = process.communicate()
+    if err:
+        log.error(err)
+        return None
+
+    return json.loads(json_output)
 
 
 def flaskify(func, *args, **kwargs):
