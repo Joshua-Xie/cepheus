@@ -1,6 +1,6 @@
 [uwsgi]
-uid = nginx
-gid = nginx
+uid = radosgw
+gid = radosgw
 
 wsgi-file = /usr/local/lib/rgw_webservice/rgw_webservice
 callable = app
@@ -11,7 +11,7 @@ processes = 5
 
 socket = /usr/local/lib/rgw_webservice/rgw_webservice.sock
 chmod-socket = 777
-chown-socket = nginx
+chown-socket = radosgw
 
 vacuum = true
 die-on-term = true

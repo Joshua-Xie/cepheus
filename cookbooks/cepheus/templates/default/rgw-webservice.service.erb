@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=root
-Group=nginx
+Group=radosgw
 WorkingDirectory=/usr/local/lib/rgw_webservice
 Environment="PATH=/usr/local/bin"
 ExecStart=/usr/sbin/uwsgi --ini /etc/rgw_webservice.ini

@@ -122,5 +122,15 @@ execute "change_owner_group_rgw_s3_api" do
   command "chown radosgw:radosgw /usr/local/bin/rgw_s3_api.*"
 end
 
+execute "add_radosgw_to_nginx" do
+  command "usermod -a -G nginx radosgw"
+  ignore_failure true
+end
+
+execute "add_nginx_to_radosgw" do
+  command "usermod -a -G radosgw nginx"
+  ignore_failure true
+end
+
 # NB: Make sure the permissions of groups are set before the services are started later...
 include_recipe 'cepheus::user-groups'
