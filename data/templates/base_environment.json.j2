@@ -255,6 +255,7 @@
         "roles": ["{{ primary_user.roles|join('","') }}"],
         "comment": "{{ primary_user.comment }}",
         "group": "{{ primary_user.group }}",
+        "group_create": {% if primary_user.group_create == True %}true{% else %}false{% endif %},
         "sudo": {%- if primary_user.sudo == True %}true{% else %}false{%- endif %}
       },
 
@@ -264,6 +265,7 @@
             {
             "name": "{{ user.name }}",
             "group": "{{ user.group }}",
+            "group_create": {% if user.group_create == True %}true{% else %}false{% endif %},
             "comment": "{{ user.comment }}",
             "passwd": "{{ user.passwd }}",
             "passwd_type": "{{ user.passwd_type }}",

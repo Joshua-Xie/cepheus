@@ -95,25 +95,25 @@ execute 'set-scripts-perm' do
 end
 
 # Default to bootstrap role
-node_role = 'bootstrap'
+node_roles = []
 if is_adc_node
-    node_role = 'adc'
+    node_roles << 'adc'
 end
 if is_radosgw_node
-    node_role = 'rgw'
+    node_roles << 'rgw'
 end
 if is_mon_node
-    node_role = 'mon'
+    node_roles << 'mon'
 end
 if is_osd_node
-    node_role = 'osd'
+    node_roles << 'osd'
 end
 
 # Create user(s) if not already existing
 node['cepheus']['users'].each do | user_value |
     create_user = false
     user_value['roles'].each do | user_role |
-        if user_role == "all" || user_role == node_role
+        if user_role == "all" || node_roles.include?(user_role)
             create_user = true
         end
 
@@ -126,6 +126,14 @@ node['cepheus']['users'].each do | user_value |
                 system user_value['system']
                 ignore_failure true
             end
+
+            if user_value['group_create']
+                group user_value['name'] do
+                    members user_value['name']
+                    ignore_failure true
+                end
+            end
+
             # Go ahead break the inner loop after creating user
             break
         end
