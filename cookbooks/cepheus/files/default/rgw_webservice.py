@@ -43,7 +43,7 @@ class RGWWebServiceAPI(object):
         pass
 
     def user_create(self, user, display_name, region=None, zone=None, access_key=None, secret_key=None, email=None, zone_region_prefix="client.radosgw"):
-        cmd = ["/usr/bin/radosgw-admin", "user", "create", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--display-name", "%s" % display_name]
+        cmd = ["/usr/bin/radosgw-admin", "user", "create", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--display-name", "\"%s\"" % display_name]
         if region is not None and zone is not None:
             cmd.append("-n")
             # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
@@ -86,6 +86,42 @@ class RGWWebServiceAPI(object):
             cmd.append("%s" % secret)
         else:
             cmd.append("--gen-secret")
+
+        if region is not None and zone is not None:
+            cmd.append("-n")
+            # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
+            cmd.append("%s.%s-%s" % (zone_region_prefix, region, zone))
+
+        return call(cmd)
+
+    def user_quota_enable(self, user, region=None, zone=None, zone_region_prefix="client.radosgw"):
+        cmd = ["/usr/bin/radosgw-admin", "quota", "enable", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--quota-scope", "user"]
+
+        if region is not None and zone is not None:
+            cmd.append("-n")
+            # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
+            cmd.append("%s.%s-%s" % (zone_region_prefix, region, zone))
+
+        return call(cmd)
+
+    def user_quota_disable(self, user, region=None, zone=None, zone_region_prefix="client.radosgw"):
+        cmd = ["/usr/bin/radosgw-admin", "quota", "disable", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--quota-scope", "user"]
+
+        if region is not None and zone is not None:
+            cmd.append("-n")
+            # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
+            cmd.append("%s.%s-%s" % (zone_region_prefix, region, zone))
+
+        return call(cmd)
+
+    def user_quota_set(self, user, num, scope="user", qtype="size", region=None, zone=None, zone_region_prefix="client.radosgw"):
+        cmd = ["/usr/bin/radosgw-admin", "quota", "set", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--quota-scope", "%s" % scope]
+
+        if qtype == "objects":
+            cmd.append("--max-objects")
+        else:
+            cmd.append("--max-size")
+        cmd.append("%s" % num]
 
         if region is not None and zone is not None:
             cmd.append("-n")
@@ -163,6 +199,7 @@ def rgw_users_get(user):
 
     return flaskify(api.user_get, user, region=region, zone=zone)
 
+
 @app.route('/v1/users/keys/add/<user>', methods=['PUT'])
 def rgw_users_keys_add(user):
     api = RGWWebServiceAPI()
@@ -177,6 +214,51 @@ def rgw_users_keys_add(user):
     # flask.jsonify(data_dict)
 
     return flaskify(api.user_keys_add, user, access_key=access_key, secret_key=secret_key, region=region, zone=zone)
+
+
+@app.route('/v1/users/quota/enable/<user>', methods=['PUT'])
+def rgw_users_quota_enable(user):
+    api = RGWWebServiceAPI()
+
+    # Getting parameters
+    region = request.args.get('region')
+    zone = request.args.get('zone')
+
+    # Json example
+    # flask.jsonify(data_dict)
+
+    return flaskify(api.user_quota_enable, user, region=region, zone=zone)
+
+
+@app.route('/v1/users/quota/disable/<user>', methods=['PUT'])
+def rgw_users_quota_disable(user):
+    api = RGWWebServiceAPI()
+
+    # Getting parameters
+    region = request.args.get('region')
+    zone = request.args.get('zone')
+
+    # Json example
+    # flask.jsonify(data_dict)
+
+    return flaskify(api.user_quota_disable, user, region=region, zone=zone)
+
+
+# NB: scope can be 'user' or 'bucket'
+# NB: qtype can be 'objects' or 'size'
+@app.route('/v1/users/quota/set/<user>/<scope>/<qtype>', methods=['PUT'])
+def rgw_users_quota_set(user, scope, qtype):
+    api = RGWWebServiceAPI()
+
+    # Getting parameters
+    num = request.args.get('num')
+    region = request.args.get('region')
+    zone = request.args.get('zone')
+
+    # Json example
+    # flask.jsonify(data_dict)
+
+    return flaskify(api.user_quota_set, user, num, scope, qtype, region=region, zone=zone)
 
 
 if __name__ == '__main__':
