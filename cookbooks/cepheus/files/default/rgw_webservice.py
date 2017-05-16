@@ -42,14 +42,16 @@ class RGWWebServiceAPI(object):
         # Setup admin user info here
         pass
 
-    def user_create(self, user, display_name, region=None, zone=None, access_key=None, secret_key=None, zone_region_prefix="client.radosgw"):
-        log.debug("User: %s, %s" % (user, display_name))
-
+    def user_create(self, user, display_name, region=None, zone=None, access_key=None, secret_key=None, email=None, zone_region_prefix="client.radosgw"):
         cmd = ["/usr/bin/radosgw-admin", "user", "create", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--display-name", "%s" % display_name]
         if region is not None and zone is not None:
             cmd.append("-n")
             # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
             cmd.append("%s.%s-%s" % (zone_region_prefix, region, zone))
+
+        if email is not None:
+            cmd.append("--email")
+            cmd.append("%s" % email)
 
         if access_key is not None:
             cmd.append("--access-key")
@@ -61,6 +63,37 @@ class RGWWebServiceAPI(object):
             cmd.append("%s" % secret_key)
 
         return call(cmd)
+
+    def user_get(self, user, region=None, zone=None, zone_region_prefix="client.radosgw"):
+        cmd = ["/usr/bin/radosgw-admin", "user", "info", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user]
+        if region is not None and zone is not None:
+            cmd.append("-n")
+            # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
+            cmd.append("%s.%s-%s" % (zone_region_prefix, region, zone))
+
+        return call(cmd)
+
+    def user_keys_add(self, user, access_key=None, secret_key=None, region=None, zone=None, zone_region_prefix="client.radosgw"):
+        cmd = ["/usr/bin/radosgw-admin", "key", "create", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--key-type", "s3"]
+        if access_key is not None:
+            cmd.append("--access_key")
+            cmd.append("%s" % access_key)
+        else:
+            cmd.append("--gen-access-key")
+
+        if secret_key is not None:
+            cmd.append("--secret")
+            cmd.append("%s" % secret)
+        else:
+            cmd.append("--gen-secret")
+
+        if region is not None and zone is not None:
+            cmd.append("-n")
+            # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
+            cmd.append("%s.%s-%s" % (zone_region_prefix, region, zone))
+
+        return call(cmd)
+
 
 # NB: Expects JSON returned
 def call(cmd):
@@ -101,22 +134,49 @@ def help():
     return flask.render_template('rgw_webservice_help.html')
 
 
-@app.route('/v1/users/create/<user>/<display_name>', methods=['PUT'])
-def rgw_users_create(user, display_name):
+@app.route('/v1/users/create/<user>', methods=['PUT'])
+def rgw_users_create(user):
     api = RGWWebServiceAPI()
 
     # Getting parameters
-    # user = request.args.get('user')
+    # NB: Display Name is required
+    display_name = request.args.get('display_name')
+    region = request.args.get('region')
+    zone = request.args.get('zone')
+    access_key = request.args.get('access_key')
+    secret_key = request.args.get('secret_key')
+    email = request.args.get('email')
+
     # Json example
     # flask.jsonify(data_dict)
 
-    return flaskify(api.user_create, user, display_name)
+    return flaskify(api.user_create, user, display_name, region=region, zone=zone, access_key=access_key, secret_key=secret_key, email=email)
 
 
 @app.route('/v1/users/get/<user>', methods=['GET'])
 def rgw_users_get(user):
     api = RGWWebServiceAPI()
-    return flaskify(api.user_get, user)
+
+    # Getting parameters
+    region = request.args.get('region')
+    zone = request.args.get('zone')
+
+    return flaskify(api.user_get, user, region=region, zone=zone)
+
+@app.route('/v1/users/keys/add/<user>', methods=['PUT'])
+def rgw_users_keys_add(user):
+    api = RGWWebServiceAPI()
+
+    # Getting parameters
+    access_key = request.args.get('access_key')
+    secret_key = request.args.get('secret_key')
+    region = request.args.get('region')
+    zone = request.args.get('zone')
+
+    # Json example
+    # flask.jsonify(data_dict)
+
+    return flaskify(api.user_keys_add, user, access_key=access_key, secret_key=secret_key, region=region, zone=zone)
 
 
 if __name__ == '__main__':
