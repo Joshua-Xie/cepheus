@@ -35,34 +35,34 @@ package 'nginx' do
 end
 
 directory '/usr/local/lib/rgw_webservice' do
-    owner 'nginx'
-    group 'nginx'
+    owner 'radosgw'
+    group 'radosgw'
     mode 00755
 end
 
 directory '/usr/local/lib/rgw_webservice/templates' do
-    owner 'nginx'
-    group 'nginx'
+    owner 'radosgw'
+    group 'radosgw'
     mode 00755
 end
 
 directory '/var/log/rgw_webservice' do
-    owner 'nginx'
-    group 'nginx'
+    owner 'radosgw'
+    group 'radosgw'
     mode 00755
 end
 
 file '/usr/local/lib/rgw_webservice/__init__.py' do
     action :touch
-    owner 'nginx'
-    group 'nginx'
+    owner 'radosgw'
+    group 'radosgw'
     mode 00644
 end
 
 cookbook_file '/usr/local/lib/rgw_webservice/rgw_webservice' do
     source 'rgw_webservice.py'
-    owner 'nginx'
-    group 'nginx'
+    owner 'radosgw'
+    group 'radosgw'
     mode 00755
 end
 
@@ -73,8 +73,8 @@ end
 # Link app to lib directory file
 link '/usr/local/bin/rgw_webservice' do
     to '/usr/local/lib/rgw_webservice/rgw_webservice.wsgi'
-    user 'nginx'
-    group 'nginx'
+    user 'radosgw'
+    group 'radosgw'
 end
 
 # Setup the NGINX config file. Since this is the only service using nginx we can just modify the nginx.conf directly.
@@ -102,8 +102,8 @@ end
 # Add help file
 template '/usr/local/lib/rgw_webservice/templates/rgw_webservice_help.html' do
     source 'rgw-webservice-help.html.erb'
-    owner 'nginx'
-    group 'nginx'
+    owner 'radosgw'
+    group 'radosgw'
 end
 
 # NB: So rgw_webservice process can read ceph.conf
@@ -113,3 +113,14 @@ if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
       ignore_failure true
     end
 end
+
+# NB: This will change owner and group of radosgw-admin2 and rgw_s3_api.py that ceph-chef installed.
+execute "change_owner_group_radosgw" do
+  command "chown radosgw:radosgw /usr/local/bin/radosgw-admin2"
+end
+execute "change_owner_group_rgw_s3_api" do
+  command "chown radosgw:radosgw /usr/local/bin/rgw_s3_api.*"
+end
+
+# NB: Make sure the permissions of groups are set before the services are started later...
+include_recipe 'cepheus::user-groups'

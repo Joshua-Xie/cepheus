@@ -183,12 +183,50 @@ root:
 
 # The users listed here will be created on all nodes in the cluster if they do not already exist
 # To create encrypted pwd: python -c 'import crypt; print(crypt.crypt("password", "$6$Salt"))'
+# NB: 'group' is the primary group used when creating the account
+# NB: 'groups' is a collection of addition groups the account will belong to. If no 'groups' then leave it blank.
 users:
     -   name: operations
         group: wheel
-        comment: "Operations user"
+        comment: "Operations User"
         passwd: $6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/
         passwd_type: "--iscrypted"
+        shell: "/bin/bash"
+        sys: false
+        sudo: true
+        # NB: Roles represent the Chef roles except for 'all' which means every node
+        roles:
+            -   all
+        key:
+            # 'enable' does not apply to initial keys for vagrant but only adding keys once on the node.
+            enable: false
+            # NB: If 'public_key' starts with 'ssh-rsa' then it's assumed the key is content and not a file. EXCEPT for PXE_BOOT - must be content
+            # NB: 'cepheus' keys were created with 'ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/cepheus -C "Cepheus example"'
+            public: |
+                ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCTHWJoLm/RpQZf5MmR+hgZ229GqppcxZzDpTVvcw1gYe8mLCNEH2jQZbgpLLJxgycdPLhc7Dcf8tvL3fK+Ron7Ph98WRmmJvz81iCKqEGkgS8r0GBQ2qexn1pEcAO6zLT9Yr2ZET35coPsIQYWGA1ER+7/S1irWhX/A4a6nh2dj3JNS3ewlxTnJaSdUUyhA1nE7lCrYQ53SELgX8gVuE54yN6pXnBL0u+GITEfn1oSvQ10gA+HEV6nAcmfE6T0wji0nTmXHmTSNpzzSjEyvF/blIc9fsXf6YyhpzBmZ3/72+OgLAIEFKAnRydH8YO5or3S85hxfNe8cO0gZDVU9WdP Cepheus example
+            private: cepheus
+            # 'key_path' represents where the keys are located on *your* machine
+            # Put or create keys in a directory that is *NOT* user specific but generic so it works with anyones build such as '$HOME/.ssh' or
+            # something like '/keys'
+            path: $HOME/.ssh
+            # NB: Key management should be done elsewhere. Cepheus will check for existing file and take it. If one is not found then
+            # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
+            # you change your ssh key but use the same name later if you don't already have one!
+            passphrase: "cepheus"
+        ceph_group: true
+    -   name: radosgw
+        group: wheel
+        groups:
+            -   nginx
+        comment: "RADOSGW User"
+        passwd: $6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/
+        passwd_type: "--iscrypted"
+        shell: ""
+        sys: true
+        sudo: false
+        # NB: Roles represent the Chef roles except for 'all' which means every node
+        roles:
+            -   rgw
         key:
             # 'enable' does not apply to initial keys for vagrant but only adding keys once on the node.
             enable: false
@@ -208,9 +246,15 @@ users:
         ceph_group: true
     -   name: vagrant
         group: wheel
-        comment: "Vagrant user"
+        comment: "Vagrant User"
         passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
         passwd_type: "--iscrypted"
+        shell: "/bin/bash"
+        sys: false
+        sudo: true
+        # NB: Roles represent the Chef roles except for 'all' which means every node
+        roles:
+            -   all
         key:
             # 'enable' does not apply to initial keys for vagrant but only adding keys once on the node.
             enable: false
@@ -227,8 +271,6 @@ users:
             # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
             # you change your ssh key but use the same name later if you don't already have one!
             passphrase: "cepheus"
-        sudo: true
-        shell: /bin/bash
         # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
         # required for ceph commands
         ceph_group: true
@@ -238,9 +280,11 @@ users:
 primary_user:
     name: vagrant
     group: wheel
-    comment: "Vagrant user"
+    comment: "Vagrant User"
     passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
     passwd_type: "--iscrypted"
+    shell: "/bin/bash"
+    sys: false
     key:
         # 'enable' does not apply to initial keys for vagrant but only adding keys once on the node.
         enable: false

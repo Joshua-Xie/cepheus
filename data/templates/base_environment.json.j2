@@ -250,8 +250,11 @@
         "public_key": "{{ primary_user.public_key }}",
         "private_key": "{{ primary_user.private_key }}",
         "shell": "{{ primary_user.shell }}",
+        "sys": {% if primary_user.shell == True %}true{% else %}false{% endif %},
+        "groups": ["{{ user.groups|join('","') }}"],
+        "roles": ["{{ user.roles|join('","') }}"],
         "comment": "{{ primary_user.comment }}",
-        "groups": "{{ primary_user.group }}",
+        "group": "{{ primary_user.group }}",
         "sudo": {%- if primary_user.sudo == True %}true{% else %}false{%- endif %}
       },
 
@@ -259,9 +262,19 @@
       "users": [
           {%- for user in users %}
             {
-            "name": "{{ user.name }}", "group": "{{ user.group }}", "comment": "{{ user.comment }}", "passwd": "{{ user.passwd }}",
-            "passwd_type": "{{ user.passwd_type }}", "key": "{{ user.key }}", "private_key": "{{ user.private_key }}",
-            "sudo": {% if user.sudo == True %}true{% else %}false{% endif %}, "ceph_group": {% if user.ceph_group == True %}true{% else %}false{% endif %}
+            "name": "{{ user.name }}",
+            "group": "{{ user.group }}",
+            "comment": "{{ user.comment }}",
+            "passwd": "{{ user.passwd }}",
+            "passwd_type": "{{ user.passwd_type }}",
+            "key": "{{ user.key }}",
+            "private_key": "{{ user.private_key }}",
+            "shell": "{{ user.shell }}",
+            "sys": {% if user.sys == True %}true{% else %}false{% endif %},
+            "groups": ["{{ user.groups|join('","') }}"],
+            "roles": ["{{ user.roles|join('","') }}"],
+            "sudo": {% if user.sudo == True %}true{% else %}false{% endif %},
+            "ceph_group": {% if user.ceph_group == True %}true{% else %}false{% endif %}
             }{%- if not loop.last %},{% endif %}
           {%- endfor %}
       ],

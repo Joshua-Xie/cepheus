@@ -94,14 +94,43 @@ execute 'set-scripts-perm' do
     command "sudo chmod +x /opt/cepheus/scripts/*.sh"
 end
 
+# Default to bootstrap role
+node_role = 'bootstrap'
+if is_adc_node
+    node_role = 'adc'
+end
+if is_radosgw_node
+    node_role = 'rgw'
+end
+if is_mon_node
+    node_role = 'mon'
+end
+if is_osd_node
+    node_role = 'osd'
+end
+
 # Create user(s) if not already existing
 node['cepheus']['users'].each do | user_value |
-    user user_value['name'] do
-        comment user_value['comment']
-        shell user_value['shell']
-        password user_value['passwd']
-        ignore_failure true
+    create_user = false
+    user_value['roles'].each do | user_role |
+        if user_role == "all" || user_role == node_role
+            create_user = true
+        end
+
+        if create_user
+            user user_value['name'] do
+                comment user_value['comment']
+                group user_value['group']
+                shell user_value['shell']
+                password user_value['passwd']
+                system user_value['system']
+                ignore_failure true
+            end
+            # Go ahead break the inner loop after creating user
+            break
+        end
     end
+    # NB: Additional groups can not be added until everything has been setup to make sure the valid group exists!
 end
 
 template "/etc/profile.d/cepheus.sh" do

@@ -43,7 +43,7 @@ class RGWWebServiceAPI(object):
         pass
 
     def user_create(self, user, display_name, region=None, zone=None, access_key=None, secret_key=None, email=None, zone_region_prefix="client.radosgw"):
-        cmd = ["/usr/bin/radosgw-admin", "user", "create", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--display-name", "\"%s\"" % display_name]
+        cmd = ["/usr/bin/radosgw-admin", "user", "create", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--display-name", "%s" % display_name]
         if region is not None and zone is not None:
             cmd.append("-n")
             # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
@@ -121,7 +121,7 @@ class RGWWebServiceAPI(object):
             cmd.append("--max-objects")
         else:
             cmd.append("--max-size")
-        cmd.append("%s" % num]
+        cmd.append("%s" % num)
 
         if region is not None and zone is not None:
             cmd.append("-n")

@@ -271,6 +271,9 @@ ansible 'all:!{{ bootstrap.name }}' -m copy -a "src=$REPO_ROOT_FILES/gems/{{ ite
 set -e
 ##################
 
+echo_yellow "====> Executing FINAL Chef Role..."
+ansible 'all:!{{ bootstrap.name }}' -m shell -b -a "chef-client -o 'role[final]'"
+
 echo_yellow "====> Cleaning up and setting links..."
 
 # Remove tmp working directory

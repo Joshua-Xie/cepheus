@@ -1,0 +1,8 @@
+{
+  "name": "final",
+  "json_class": "Chef::Role",
+  "description": "Final Role To Be Called",
+  "run_list": [
+    "recipe[cepheus::user-groups]"
+  ]
+}
