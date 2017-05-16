@@ -105,3 +105,11 @@ template '/usr/local/lib/rgw_webservice/templates/rgw_webservice_help.html' do
     owner 'nginx'
     group 'nginx'
 end
+
+# NB: So rgw_webservice process can read ceph.conf
+if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
+    execute "add_user_to_ceph" do
+      command "usermod -a -G ceph nginx"
+      ignore_failure true
+    end
+end

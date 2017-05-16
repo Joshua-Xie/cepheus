@@ -42,36 +42,38 @@ class RGWWebServiceAPI(object):
         # Setup admin user info here
         pass
 
-    def user_create(self, user, display_name, region=None, zone=None, access_key=None, secret_key=None):
+    def user_create(self, user, display_name, region=None, zone=None, access_key=None, secret_key=None, zone_region_prefix="client.radosgw"):
         log.debug("User: %s, %s" % (user, display_name))
 
-        cmd = ["radosgw-admin2", "--user", "%s" % user, "--display-name", "'%s'" % display_name, "--actions", "create", "user"]
-
+        cmd = ["/usr/bin/radosgw-admin", "user", "create", "--conf", "/etc/ceph/ceph.conf", "--uid", "%s" % user, "--display-name", "%s" % display_name]
         if region is not None and zone is not None:
-            cmd.append("--region")
-            cmd.append("%s" % region)
-            cmd.append("--zone")
-            cmd.append("%s" % zone)
+            cmd.append("-n")
+            # NB: This should match '[client.radosgw...]' or something similar found in ceph.conf for the RGW section
+            cmd.append("%s.%s-%s" % (zone_region_prefix, region, zone))
 
         if access_key is not None:
-            cmd.append("--access")
+            cmd.append("--access-key")
             cmd.append("%s" % access_key)
 
         if secret_key is not None:
+            # Newer versions of radosgw-admin support --secret-key too
             cmd.append("--secret")
             cmd.append("%s" % secret_key)
 
         return call(cmd)
 
-
+# NB: Expects JSON returned
 def call(cmd):
+    # log.debug(' '.join([str(x) for x in cmd]))
     process = subprocess.Popen(cmd, env=os.environ.copy(), stdout=subprocess.PIPE)
     json_output, err = process.communicate()
     if err:
         log.error(err)
         return None
 
-    return json.loads(json_output)
+    # log.debug(json_output)
+
+    return json_output
 
 
 def flaskify(func, *args, **kwargs):
@@ -89,7 +91,7 @@ def flaskify(func, *args, **kwargs):
     try:
         result = func(*args, **kwargs)
     except Exception, e:
-        log.error(e.message)
+        log.error(e)
 
     return result
 
