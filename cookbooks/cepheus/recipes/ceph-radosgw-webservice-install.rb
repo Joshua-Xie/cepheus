@@ -132,5 +132,10 @@ execute "add_nginx_to_radosgw" do
   ignore_failure true
 end
 
+execute "add_ceph_to_radosgw" do
+  command "usermod -a -G radosgw ceph"
+  ignore_failure true
+end
+
 # NB: Make sure the permissions of groups are set before the services are started later...
 include_recipe 'cepheus::user-groups'
