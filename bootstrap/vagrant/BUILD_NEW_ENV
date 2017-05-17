@@ -87,12 +87,12 @@ while getopts bc:d:e:g:p:v opt; do
     d)
         # (required) Data center label. This allows you the flexability to have different data centers which of course
         # will have different data. This value is used to complete the PATH of where to find the yaml data files.
-        # For example, `nyc1` or `wdc1`. This value is on of the same values found in your `build.yaml` file.
+        # For example, `nyc1` or `wdc1`. This value is on of the same values found in your `manifest.yaml` file.
         dc=$OPTARG
         ;;
     e)
         # (required) Environment that must match the Chef environment file. For example, `vagrant` or `production`.
-        # This value is one of the values found in your `build.yaml` file. The final file will be <whatever>.json
+        # This value is one of the values found in your `manifest.yaml` file. The final file will be <whatever>.json
         # that will be located in the 'environment' directory which is used by Chef to build and manage your cluster.
         env=$OPTARG
         ;;

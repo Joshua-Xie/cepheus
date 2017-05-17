@@ -150,7 +150,7 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
         r)
             # (optional) -r to remove the prerequisites. Cleaning up.
             # It does not exit like -g but is called before gathering prerequisites.
-            # Use it with -g -r and it will clean up and gather updated prerequisites and exit based on versions in build.yaml
+            # Use it with -g -r and it will clean up and gather updated prerequisites and exit based on versions in manifest.yaml
             export BOOTSTRAP_REMOVE_PREREQS=1
             export NO_OPTS=1
             ;;
@@ -247,8 +247,8 @@ fi
 
 echo_yellow "====> Check for generated files..."
 FOUND_BUILD_FILES=0
-# If the first and last file are found then most likely 'build.yaml' is complete along with environments file.
-if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml && -f $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json ]]; then
+# If the first and last file are found then most likely 'manifest.yaml' is complete along with environments file.
+if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml && -f $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json ]]; then
     echo_orange "====> Found generated files cache..."
     FOUND_BUILD_FILES=1
 fi
@@ -259,8 +259,8 @@ if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 || $BUIL
         echo_orange "====> Forcing the regeneration of files..."
     fi
 
-    # Create *initial* build.yaml from common.yaml
-    cp $REPO_ROOT/data/common/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+    # Create *initial* manifest.yaml from common.yaml
+    cp $REPO_ROOT/data/common/common.yaml $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml
 
     # Build bootstrapping environment based on yaml data
     BUILD=data/build.sh
@@ -269,7 +269,7 @@ if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 || $BUIL
     $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/common/common.yaml -i $REPO_ROOT/data/templates/$BUILD.j2 -o $REPO_ROOT/$BUILD
     sudo chmod +x $REPO_ROOT/$BUILD
 
-    # Add all other data files to the final build.yaml
+    # Add all other data files to the final manifest.yaml
     BUILD_DATA=data/data_files.sh
     echo_yellow "====> Generating $REPO_ROOT/$BUILD_DATA..."
 
@@ -298,7 +298,7 @@ if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 || $BUIL
     # Build the init and update scripts
     BUILD_INIT_UPDATE=data/build_init_update.sh
     echo_yellow "====> Generating $REPO_ROOT/$BUILD_INIT_UPDATE..."
-    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/$BUILD_INIT_UPDATE.j2 -o $REPO_ROOT/$BUILD_INIT_UPDATE
+    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/data/templates/$BUILD_INIT_UPDATE.j2 -o $REPO_ROOT/$BUILD_INIT_UPDATE
     sudo chmod +x $REPO_ROOT/$BUILD_INIT_UPDATE
 
     echo_yellow "====> Executing $REPO_ROOT/$BUILD_INIT_UPDATE..."
@@ -306,7 +306,7 @@ if [[ $FORCE -eq 1 || $FOUND_BUILD_FILES -eq 0 || $BOOTSTRAP_INIT -eq 1 || $BUIL
 
     # Build environments file for Chef
     echo_yellow "====> Generating $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json..."
-    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
+    $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/data/templates/base_environment.json.j2 -o $REPO_ROOT/environments/$BUILD_ENVIRONMENT.json
 else
     echo
     echo_orange "====> Using found generated files cache - No files will be generated <===="

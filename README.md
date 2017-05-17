@@ -81,7 +81,7 @@ Most Enterprise environments for storage are not allowed direct access to the ou
 
 The choice is yours on how to pull in files but you will need someway. Some enterprises will temporarily allow access to the outside long enough to pull everything in and then close it back. This works for the initial build but getting updates will be a challenge. Just keep this in mind because there are many ways to solve it.
 
-The `/data/build.yaml` contains a list of GEMs, RPMs or DEBs and tarballs that are required for the build environment. Those items can be compressed to be moved onto the bootserver if not using the PXE Boot method. The PXE Boot method bundles up everything in the custom ISO.
+The `/data/manifest.yaml` contains a list of GEMs, RPMs or DEBs and tarballs that are required for the build environment. Those items can be compressed to be moved onto the bootserver if not using the PXE Boot method. The PXE Boot method bundles up everything in the custom ISO.
 
 ## Building - Cepheus Repo (Simplest)
 This process is similar to the Vagrant Local Build seen below except that all nodes are actual bare-metal and all of the nodes used by Cepheus has already been built by another process. This is common in Enterprises where a different group is responsible for building out all base nodes according to enterprise specs. In this case the build group will provide the hardware information needed in the `Base Requirements` section above such as NIC MAC addresses, IPs and maybe `operations` like user and ssh keys. It's very important to have SSH Keys for the primary user that will do all Ceph operations (not Ceph user in Jewel and later) but an operations like user account. Ansible needs this to orchestrate commands to all of the nodes.

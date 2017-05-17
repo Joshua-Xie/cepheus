@@ -31,7 +31,7 @@ source $REPO_ROOT/bootstrap/common/base_colors.sh
 # Builds the bootstrapping environment based on the templates and data found in this directory.
 
 # NB: Output directories for this process already exists
-# NB: The `build.yaml` will get created by combining all of the required yamls.
+# NB: The `manifest.yaml` will get created by combining all of the required yamls.
 
 ## ALL data files *MUST* be processed before anything else can be processed!
 
@@ -39,9 +39,9 @@ source $REPO_ROOT/bootstrap/common/base_colors.sh
 {%- for item in build_init_update_files %}
 
 echo_yellow "====> Generating {{ item }}..."
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Two passes on output for embedded templates...
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {%- endfor %}

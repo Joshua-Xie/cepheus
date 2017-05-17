@@ -1,7 +1,7 @@
 ---
 # Environment data file
 
-# IMPORTANT: Whatever data is here will be appended to the overall `build.yaml` that will be located `public` or
+# IMPORTANT: Whatever data is here will be appended to the overall `manifest.yaml` that will be located `public` or
 # `private` based on the value passed to the intial ./CEPH_UP script
 
 # Things specific to the environment of which you're building. The default is 'vagrant' for a 'local' build.
@@ -37,7 +37,7 @@ rsync:
 ## Make sure to check the NIC device names of your hardware and update them here.
 
 ## NB: Important - The following device variables are defined here in the environment.yaml file ONLY.
-## Other data files can reference `*device1_1U` etc since the final file 'build.yaml' will have these defined in it.
+## Other data files can reference `*device1_1U` etc since the final file 'manifest.yaml' will have these defined in it.
 #
 # Vagrant
 device1_1U: &device1_1U enp0s8
@@ -53,7 +53,7 @@ proxy:
     https: ""
 
 # These can be any data files you want. A normal example is putting your rack data into a separate yaml for each rack
-# and then add them here to be included in the final build of `build.yaml` which everything will eventually derive from.
+# and then add them here to be included in the final build of `manifest.yaml` which everything will eventually derive from.
 data_files:
     - "ceph.yaml"
     - "openstack.yaml"
@@ -146,7 +146,7 @@ layers:
                     # NB: Data is required before generating files from templates
                     cp -rp $WORK_DIR/cepheus-data-staging/* $WORK_DIR/cepheus-public-staging/
 
-                    # Need to generate 'build.yaml' from all of the other data files before calling bootstrap_prereqs.sh...
+                    # Need to generate 'manifest.yaml' from all of the other data files before calling bootstrap_prereqs.sh...
                     # CEPH_UP being called to generate files...
                     cd $WORK_DIR/cepheus-public-staging && ./CEPH_UP -x -z $WORK_DIR/cepheus-public-staging
                     echo

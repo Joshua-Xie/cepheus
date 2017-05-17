@@ -7,7 +7,7 @@
 # No logs
 *.log
 
-# Template built files - these should match the build.yaml files section except with leading '/'
+# Template built files - these should match the manifest.yaml files section except with leading '/'
 /bootstrap/common/*
 !/bootstrap/common/README.md
 
@@ -40,7 +40,8 @@
 /bootstrap/vagrant/CEPH_UP_VAGRANT
 
 # Created build file for any environment
-build.yaml
+manifest.yaml
+manifest.yaml
 tmp.yaml
 
 # Environment

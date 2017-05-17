@@ -12,7 +12,7 @@ These items should live in a private repo somewhere such as Enterprise Github or
 
 We have provided an example repo called https://github.com/cepheus-io/cepheus-private that shows you how to do it. Cepheus uses Layering Techniques along with powerful template features to make this possible and very easy to manage.
 
-The final data file that gets built is called `build.yaml`. It does not get saved (in .gitignore) in a repo. The data files:
+The final data file that gets built is called `manifest.yaml`. It does not get saved (in .gitignore) in a repo. The data files:
 
 >/data/common/common.yaml
 >

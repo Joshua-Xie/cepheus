@@ -6,7 +6,7 @@
 # NB: This file contains NO OS specific items but instead points to where it's located with the 'envrionment' section
 # below. Portions that are common across all OS and public/private versions will be found here.
 
-# IMPORTANT: Whatever data is here will be appended to the overall `build.yaml` that will be located `public` or
+# IMPORTANT: Whatever data is here will be appended to the overall `manifest.yaml` that will be located `public` or
 # `private` based on the value passed to the intial ./CEPH_UP script
 
 # IMPORTANT: No section below can exist in other yaml files be used in the files being appended. For example,
@@ -15,7 +15,7 @@
 # 'method' can only be `repo` or `pxe`. If `pxe` then the 'pxe_boot' section of the given OS yaml is used.
 method: repo
 
-version: 1.1.3
+version: 1.1.4
 
 organization:
     name: LambdaStack
@@ -236,7 +236,7 @@ build_update_files:
         echo: "====> Updating /etc/hosts..."
         sudo: true
 
-# Other yaml files are appended here during the build process to make a new `build.yaml` file.
+# Other yaml files are appended here during the build process to make a new `manifest.yaml` file.
 
 
 # NB: Colors section is long and injected where needed instead of sourcing a file for the data.

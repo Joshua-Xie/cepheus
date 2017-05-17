@@ -31,9 +31,9 @@ source $REPO_ROOT/bootstrap/common/base_colors.sh
 # Builds the bootstrapping environment based on the templates and data found in this directory.
 
 # NB: Output directories for this process already exists
-# NB: The `build.yaml` will get created by combining all of the required yamls.
+# NB: The `manifest.yaml` will get created by combining all of the required yamls.
 
-sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/environment.yaml >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml
 
 # Build from other data files listed in the environment.yaml.
 # Pass the data files through the template engine first.
@@ -54,9 +54,9 @@ if [[ -f $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} ]]; 
     fi
     set -e
     if [[ ! -z $J2 ]]; then
-        $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
+        $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
     fi
-    sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+    sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml
 else
     # Double check to make sure template there are no 'template' residuals remaining
 
@@ -71,10 +71,10 @@ else
     set -e
     if [[ ! -z $J2 ]]; then
         # Go ahead and move the output to the 'data' folder to be used since it's modified...
-        $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/common/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
-        sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/common/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+        $REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/data/common/{{ item }} -o $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/{{ item }}
+        sed '/---/d' $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/data/common/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml
     else
-        sed '/---/d' $REPO_ROOT/data/common/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml
+        sed '/---/d' $REPO_ROOT/data/common/{{ item }} >> $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml
     fi
 fi
 
@@ -85,9 +85,9 @@ echo_yellow "====> Environment_files being processed..."
 {%- for item in environment_files %}
 
 echo_yellow "====> Generating {{ item }}..."
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Run through template_engine twice
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {%- endfor %}
@@ -97,9 +97,9 @@ echo_yellow "====> Cookbooks_files being processed..."
 {%- for item in cookbooks_files %}
 
 echo_yellow "====> Generating {{ item }}..."
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/data/templates/{{ item }}.j2 -o $REPO_ROOT/{{ item }}
 # NB: Run through template_engine twice
-$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/build.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
+$REPO_ROOT/data/templates/template_engine -d $REPO_ROOT/data/$BUILD_LOCATION/$BUILD_DATA_CENTER/manifest.yaml -i $REPO_ROOT/{{ item }} -o $REPO_ROOT/{{ item }}
 sudo chmod +x $REPO_ROOT/{{ item }}
 
 {%- endfor %}
