@@ -109,32 +109,32 @@ end
 # NB: So rgw_webservice process can read ceph.conf
 if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
     execute "add_user_to_ceph" do
-      command "usermod -a -G ceph nginx"
-      ignore_failure true
+        command "usermod -a -G ceph nginx"
+        ignore_failure true
+    end
+    # Add this so that the rgw_webservice (running as radosgw) called processes (radosgw-admin) can access ceph.conf
+    execute "add_radosgw_to_ceph" do
+        command "usermod -a -G ceph radosgw"
+        ignore_failure true
+    end
+    # Add this so that the rgw_webservice (running as radosgw) called processes (radosgw-admin) can access ceph.conf
+    execute "add_ceph_to_radosgw" do
+        command "usermod -a -G radosgw ceph"
+        ignore_failure true
     end
 end
 
 # NB: This will change owner and group of radosgw-admin2 and rgw_s3_api.py that ceph-chef installed.
 execute "change_owner_group_radosgw" do
-  command "chown radosgw:radosgw /usr/local/bin/radosgw-admin2"
+    command "chown radosgw:radosgw /usr/local/bin/radosgw-admin2"
 end
 execute "change_owner_group_rgw_s3_api" do
-  command "chown radosgw:radosgw /usr/local/bin/rgw_s3_api.*"
-end
-
-execute "add_radosgw_to_nginx" do
-  command "usermod -a -G nginx radosgw"
-  ignore_failure true
+    command "chown radosgw:radosgw /usr/local/bin/rgw_s3_api.*"
 end
 
 execute "add_nginx_to_radosgw" do
-  command "usermod -a -G radosgw nginx"
-  ignore_failure true
-end
-
-execute "add_ceph_to_radosgw" do
-  command "usermod -a -G radosgw ceph"
-  ignore_failure true
+    command "usermod -a -G radosgw nginx"
+    ignore_failure true
 end
 
 # NB: Make sure the permissions of groups are set before the services are started later...
