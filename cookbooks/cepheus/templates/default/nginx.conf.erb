@@ -37,7 +37,7 @@ http {
 
     # NB: Let server_name default to host name
     server {
-        listen       8444 default_server;
+        listen       <%= node['cepheus']['ceph']['radosgw']['rgw_webservice']['port'] %> default_server;
 
         location / {
             include uwsgi_params;

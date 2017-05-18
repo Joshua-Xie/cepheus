@@ -456,6 +456,10 @@
             "ops": {%- if ceph.radosgw.logs.ops.enable == True %} true, {% else %} false, {%- endif %}
             "usage": {%- if ceph.radosgw.logs.usage.enable == True %} true {% else %} false {%- endif %}
           },
+          "rgw_webservice": {
+            "port": {{ ceph.radosgw.rgw_webservice.port }},
+            "user": "{{ ceph.radosgw.rgw_webservice.user }}"
+          },
           "gc": {
             "max_objects": {{ ceph.radosgw.gc.max_objects }},
             "obj_min_wait": {{ ceph.radosgw.gc.obj_min_wait }},

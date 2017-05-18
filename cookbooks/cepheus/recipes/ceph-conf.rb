@@ -119,6 +119,7 @@ node.default['ceph']['radosgw']['gc']['processor_period'] = node['cepheus']['cep
 # NB: If you add more attributes to 'cepheus' data then 'ceph-chef' may not have the same data so a more precise way of transfering
 # the data over besides assignment like below will be required!
 node.default['ceph']['radosgw']['users'] = node['cepheus']['ceph']['radosgw']['users']
+node.default['ceph']['radosgw']['rgw_webservice']['user'] = node['cepheus']['ceph']['radosgw']['rgw_webservice']['user']
 
 node.default['ceph']['restapi']['url'] = node['cepheus']['ceph']['restapi']['url']
 node.default['ceph']['restapi']['ip'] = node['cepheus']['ceph']['restapi']['ip']

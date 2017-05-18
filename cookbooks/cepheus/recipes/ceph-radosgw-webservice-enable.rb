@@ -17,10 +17,12 @@
 # limitations under the License.
 #
 
-execute 'rgw-webservice-enable' do
-    command 'sudo systemctl enable rgw_webservice'
-    ignore_failure true
-end
+# execute 'rgw-webservice-enable' do
+#     command 'sudo systemctl enable rgw_webservice'
+#     ignore_failure true
+# end
+
+include_recipe 'ceph-chef::ceph-radosgw-webservice-enable'
 
 execute 'rgw-webservice-nginx-enable' do
     command 'sudo systemctl enable nginx'
