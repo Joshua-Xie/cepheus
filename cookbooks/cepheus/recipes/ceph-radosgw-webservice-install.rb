@@ -17,39 +17,41 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
+if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
+    include_recipe 'cepheus::ceph-conf'
 
-# This recipe installs everything needed for the RGW Admin Web Service...
+    # This recipe installs everything needed for the RGW Admin Web Service...
 
-package 'nginx' do
-    action :upgrade
-end
+    package 'nginx' do
+        action :upgrade
+    end
 
-include_recipe 'ceph-chef::ceph-radosgw-webservice-install'
+    include_recipe 'ceph-chef::ceph-radosgw-webservice-install'
 
-# NB: May want to add a config file to hold admin user and keys etc.
+    # NB: May want to add a config file to hold admin user and keys etc.
 
-# Add nginx directory for app
-# Setup the NGINX config file. Since this is the only service using nginx we can just modify the nginx.conf directly.
-template '/etc/nginx/nginx.conf' do
-    source 'nginx.conf.erb'
-    owner 'root'
-    group 'root'
-    # notifies :reload, "service[nginx]", :immediately
-end
+    # Add nginx directory for app
+    # Setup the NGINX config file. Since this is the only service using nginx we can just modify the nginx.conf directly.
+    template '/etc/nginx/nginx.conf' do
+        source 'nginx.conf.erb'
+        owner 'root'
+        group 'root'
+        # notifies :reload, "service[nginx]", :immediately
+    end
 
-# NB: So rgw_webservice process can read ceph.conf
-if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
-    execute "add_user_to_ceph" do
-        command "usermod -a -G ceph nginx"
+    # NB: So rgw_webservice process can read ceph.conf
+    if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
+        execute "add_user_to_ceph" do
+            command "usermod -a -G ceph nginx"
+            ignore_failure true
+        end
+    end
+
+    execute "add_nginx_to_radosgw" do
+        command "usermod -a -G #{node['cepheus']['ceph']['radosgw']['rgw_webservice']['user']} nginx"
         ignore_failure true
     end
-end
 
-execute "add_nginx_to_radosgw" do
-    command "usermod -a -G #{node['cepheus']['ceph']['radosgw']['rgw_webservice']['user']} nginx"
-    ignore_failure true
+    # NB: Make sure the permissions of groups are set before the services are started later...
+    include_recipe 'cepheus::user-groups'
 end
-
-# NB: Make sure the permissions of groups are set before the services are started later...
-include_recipe 'cepheus::user-groups'

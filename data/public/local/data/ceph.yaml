@@ -171,6 +171,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
         # Make sure the 'hosts' or 'dns' can find this domain
         default_url: ceph-vm1.example.com
         rgw_webservice:
+            enable: true
             port: 8444
             user: radosgw
         debug:

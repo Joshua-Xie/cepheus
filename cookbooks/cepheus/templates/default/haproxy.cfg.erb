@@ -91,3 +91,29 @@ backend <%="#{vip['backend_label']}"%>
 <% end %>
 <% end -%>
 <% end -%>
+
+<% if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable'] %>
+frontend rgw_webservice
+    bind 0.0.0.0:<%= node['cepheus']['ceph']['radosgw']['rgw_webservice']['port'] %>
+    balance roundrobin
+    option httplog
+    acl h_xff_exists req.hdr(X-Forward-For) -m found
+    http-request add-header X-Forward-For %[src] unless h_xff_exists
+
+    # You can change 'rgw', 'region' and 'zone' in the acl lines below to be anything and add more options too...
+    acl virt-region-rgw hdr(x-virt-region) -i region
+    acl virt-zone-rgw hdr(x-virt-zone) -i zone
+
+    # The 'region' and 'zone' info here can be anything that helps you break out your cluster...
+    use_backend rgw-webservice-region-zone  if virt-region-rgw virt-zone-rgw
+
+# Usually only need one 'backend' but you can have more depending on how you use regions and zones.
+backend rgw-webservice-region-zone
+    option httpchk GET /
+    # option httpchk HEAD / HTTP/1.1
+    http-check expect status 200
+    http-request set-query region=abc&zone=def&%[query]
+    <% @backend_nodes.each do | backend_node | -%>
+      <%= "server #{backend_node['name']} #{backend_node['ip']}:#{node['cepheus']['ceph']['radosgw']['rgw_webservice']['port']} check fall 3 rise 2" %>
+    <% end %>
+<% end %>

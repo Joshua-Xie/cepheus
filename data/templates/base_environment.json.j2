@@ -457,6 +457,7 @@
             "usage": {%- if ceph.radosgw.logs.usage.enable == True %} true {% else %} false {%- endif %}
           },
           "rgw_webservice": {
+            "enable": {%- if ceph.radosgw.rgw_webservice.enable == True %} true, {% else %} false, {%- endif %}
             "port": {{ ceph.radosgw.rgw_webservice.port }},
             "user": "{{ ceph.radosgw.rgw_webservice.user }}"
           },

@@ -17,9 +17,11 @@
 # limitations under the License.
 #
 
-include_recipe 'ceph-chef::ceph-radosgw-webservice-stop'
+if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
+    include_recipe 'ceph-chef::ceph-radosgw-webservice-stop'
 
-execute 'rgw-webservice-nginx-stop' do
-    command 'sudo systemctl stop nginx'
-    ignore_failure true
+    execute 'rgw-webservice-nginx-stop' do
+        command 'sudo systemctl stop nginx'
+        ignore_failure true
+    end
 end
