@@ -57,10 +57,16 @@ adc:
             - name: Spine2
               label: bgp_peer2
               ip: 10.121.16.9
+    rgw_webservice:
+        vip:
+            port: 8488
+            # May want to bind to IP 0.0.0.0 in some clusters depending setup
+            ip: 10.121.16.21
     vip:
         prefix: 10.121.16.16
         netmask: 255.255.255.240
         cidr: 28
+        # Keepalived need the vips too (some of rgw_webservice data is duplicated :()
         vips:
             # backend_port represents the port of the backend instance which overrides the default backend/server/port below. ONLY applies to Federated.
             # IMPORTANT: NON RGW VIPS MUST be first for template to work without re-working it!
@@ -77,7 +83,7 @@ adc:
               ssl_files:
                   - wildcard.s3.api.example.com.pem
               url: api.example.com
-              backend_port: 8488
+              backend_port: 8444
               region: *data_center
               # Updated the haproxy config file
               haproxy: false

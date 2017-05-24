@@ -99,7 +99,7 @@ backend <%="#{vip['backend_label']}"%>
 
 <% if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable'] %>
 frontend rgw-webservice
-    bind 0.0.0.0:<%= node['cepheus']['ceph']['radosgw']['rgw_webservice']['port'] %> # ssl crt /etc/ssl/private/whatever.pem
+    bind <%= node['cepheus']['adc']['rgw_webservice']['vip']['ip'] %>:<%= node['cepheus']['adc']['rgw_webservice']['vip']['port'] %> # ssl crt /etc/ssl/private/whatever.pem
     balance roundrobin
     option httplog
     acl h_xff_exists req.hdr(X-Forward-For) -m found
