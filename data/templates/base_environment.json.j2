@@ -95,7 +95,7 @@
           },
           "rgw_webservice": {
             "port": {{ adc.rgw_webservice.vip.port }},
-            "ip": {{ adc.rgw_webservice.vip.ip }}
+            "ip": "{{ adc.rgw_webservice.vip.ip }}"
           }
         },
         {#- backend_port is used in the backend section below for Federated only. #}
