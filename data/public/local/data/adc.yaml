@@ -64,6 +64,23 @@ adc:
         vips:
             # backend_port represents the port of the backend instance which overrides the default backend/server/port below. ONLY applies to Federated.
             # IMPORTANT: NON RGW VIPS MUST be first for template to work without re-working it!
+            # API for rgw_webservice
+            - name: rgw_webservice
+              ip: 10.121.16.21
+              interface: *device1_1U
+              type: api
+              backend_label: rgw-webservice
+              ssl: false
+              # NOTE: Change this wildcard cert later
+              cert: wildcard.s3.api.example.com.pem
+              # Since using a wildcard the ssl_files can be just one file. However, the recipe will build from the ssl_files if more are present
+              ssl_files:
+                  - wildcard.s3.api.example.com.pem
+              url: api.example.com
+              backend_port: 8488
+              region: *data_center
+              # Updated the haproxy config file
+              haproxy: false
             # WWW is the Web UI for the cluster
             - name: www
               ip: 10.121.16.20
@@ -79,6 +96,8 @@ adc:
               url: www.example.com
               backend_port: 8088
               region: *data_center
+              # Updated the haproxy config file
+              haproxy: true
             # API is the RESTful api for the cluster
             - name: api
               ip: 10.121.16.19
@@ -94,6 +113,8 @@ adc:
               url: api.example.com
               backend_port: 8089
               region: *data_center
+              # Updated the haproxy config file
+              haproxy: true
             - name: dev
               ip: 10.121.16.18
               interface: *device1_1U
@@ -108,6 +129,8 @@ adc:
               backend_port: 8080
               # NOTE: region and zone are here as well as in the ceph-federated section for easier ceph.conf rgw manipulation. The other is used for something else but the data is the same.
               region: *data_center
+              # Updated the haproxy config file
+              haproxy: true
               rgw_thread_pool: 100
               handles: 5
               threads: 100
@@ -124,6 +147,8 @@ adc:
               url: s3.vagrant.prod.example.com
               backend_port: 8081
               region: *data_center
+              # Updated the haproxy config file
+              haproxy: true
               rgw_thread_pool: 100
               handles: 5
               threads: 100

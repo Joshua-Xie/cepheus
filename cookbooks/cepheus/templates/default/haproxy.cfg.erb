@@ -38,6 +38,7 @@ listen stats <%= @public_ip %>:<%= node['cepheus']['adc']['stats']['port'] %>
 <% end -%>
 
 <% node['cepheus']['adc']['vips'].each do | vip | %>
+<% if vip['haproxy'] %>
 frontend radosgw-http-<%="#{vip['name']}"%>
   bind <%="#{vip['ip']}:#{node['cepheus']['adc']['vip']['port']['non_ssl']}"%>
   option httplog
@@ -57,7 +58,7 @@ frontend radosgw-https-<%="#{vip['name']}"%>
   default_backend <%="#{vip['backend_label']}"%>
   <% end %>
 <% end %>
-
+<% end %>
 <% end -%>
 
 # NOTE: For Federated RGW, each vip name represents an instance for RGW running on the node. For example, if there are
@@ -65,6 +66,7 @@ frontend radosgw-https-<%="#{vip['name']}"%>
 
 <% if node['cepheus']['ceph']['pools']['radosgw']['federated']['enable'] %>
 <% node['cepheus']['adc']['vips'].each do | vip | %>
+<% if vip['haproxy'] %>
 backend <%="#{vip['backend_label']}"%>-<%="#{vip['name']}"%>
   balance <%= node['cepheus']['adc']['connections']['balance'] %>
   http-request set-header X-Forwarded-Port %[dst_port]
@@ -76,10 +78,12 @@ backend <%="#{vip['backend_label']}"%>-<%="#{vip['name']}"%>
   <%= "server #{backend_node['name']} #{backend_node['ip']}:#{backend_node['port']} weight #{backend_node['weight']} #{backend_node['options']}" %>
   <% end -%>
 <% end -%>
-
 <% end %>
+<% end %>
+
 <% else %>
 <% node['cepheus']['adc']['vips'].each do | vip | %>
+<% if vip['haproxy'] %>
 backend <%="#{vip['backend_label']}"%>
   balance <%= node['cepheus']['adc']['connections']['balance'] %>
   http-request set-header X-Forwarded-Port %[dst_port]
@@ -89,12 +93,13 @@ backend <%="#{vip['backend_label']}"%>
 <% @backend_nodes.each do | backend_node | -%>
   <%= "server #{backend_node['name']} #{backend_node['ip']}:#{backend_node['port']} weight #{backend_node['weight']} #{backend_node['options']}" %>
 <% end %>
+<% end %>
 <% end -%>
 <% end -%>
 
 <% if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable'] %>
-frontend rgw_webservice
-    bind 0.0.0.0:<%= node['cepheus']['ceph']['radosgw']['rgw_webservice']['port'] %>
+frontend rgw-webservice
+    bind 0.0.0.0:<%= node['cepheus']['ceph']['radosgw']['rgw_webservice']['port'] %> # ssl crt /etc/ssl/private/whatever.pem
     balance roundrobin
     option httplog
     acl h_xff_exists req.hdr(X-Forward-For) -m found
@@ -112,8 +117,9 @@ backend rgw-webservice-region-zone
     option httpchk GET /
     # option httpchk HEAD / HTTP/1.1
     http-check expect status 200
-    http-request set-query region=abc&zone=def&%[query]
+    # Enable the next line if you want to inject additional url query params...
+    # http-request set-query region=abc&zone=def&%[query]
     <% @backend_nodes.each do | backend_node | -%>
-      <%= "server #{backend_node['name']} #{backend_node['ip']}:#{node['cepheus']['ceph']['radosgw']['rgw_webservice']['port']} check fall 3 rise 2" %>
+    <%= "server #{backend_node['name']} #{backend_node['ip']}:#{node['cepheus']['ceph']['radosgw']['rgw_webservice']['port']} check fall 3 rise 2" %>
     <% end %>
 <% end %>
