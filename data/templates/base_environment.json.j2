@@ -125,13 +125,13 @@
             {%- set rowloop = loop %}
             {%- if vip.type == "rgw" %}
               {%- for item in adc.backend.servers %}
-                {"name": "{{ item.name }}", "instance": "{{ vip.name }}", "type": "{{ item.type }}", "weight": "{{ item.weight }}", "port": {{ vip.backend_port }}, "options": "{{ item.options }}"}{%- if not rowloop.last %},{% elif not loop.last %},{% endif %}
+                {"name": "{{ item.name }}", "instance": "{{ vip.name }}", "type": "{{ item.type }}", "weight": "{{ item.weight }}", "port": {{ vip.backend_port }}, "ip": "{{ item.ip }}", "options": "{{ item.options }}"}{%- if not rowloop.last %},{% elif not loop.last %},{% endif %}
               {%- endfor %}
             {%- endif %}
           {%- endfor %}
           {%- else %}
           {%- for item in adc.backend.servers %}
-            {"name": "{{ item.name }}", "instance": "", "type": "{{ item.type }}", "weight": "{{ item.weight }}", "port": {{ item.port }}, "options": "{{ item.options }}"}{%- if not loop.last %},{% endif %}
+            {"name": "{{ item.name }}", "instance": "", "type": "{{ item.type }}", "weight": "{{ item.weight }}", "port": {{ item.port }}, "ip": "{{ item.ip }}", "options": "{{ item.options }}"}{%- if not loop.last %},{% endif %}
           {%- endfor %}
           {%- endif %}
           ]

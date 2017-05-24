@@ -135,14 +135,20 @@ adc:
               type: rgw
               weight: 6
               port: 8080
+              # IP of the given host for Public Interface
+              ip: 10.0.100.21
               options: "check inter 2s rise 2 fall 3"
             - name: ceph-vm2
               type: rgw
               weight: 6
               port: 8080
+              # IP of the given host for Public Interface
+              ip: 10.0.100.22
               options: "check inter 2s rise 2 fall 3"
             - name: ceph-vm3
               type: rgw
               weight: 6
               port: 8080
+              # IP of the given host for Public Interface
+              ip: 10.0.100.23
               options: "check inter 2s rise 2 fall 3"
