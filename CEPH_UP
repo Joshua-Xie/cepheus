@@ -205,19 +205,21 @@ source $REPO_ROOT/bootstrap/common/base_colors.sh
 if [[ $BUILD_SHOW_LOGO -eq 1 ]]; then
     clear
     echo -e "${GREEN}"
-    echo "            ____     "
-    echo "            \   \    "
-    echo "             >   \   "
-    echo "            /  ^  \  "
-    echo "           /__/ \__\ "
+    echo "               ____     "
+    echo "               \   \    "
+    echo "                >   \   "
+    echo "               /  ^  \  "
+    echo "              /__/ \__\ "
     echo
-    echo "        Cepheus Build"
-    echo "-----------------------------"
-    echo -e "    Bootstrapping CEPH...${NC}"
+    echo "        Cepheus Build version: ${CEPHEUS_VERSION}"
+    echo "----------------------------------------"
+    echo -e "        Bootstrapping Ceph Version: ${CEPH_VERSION} ${NC}"
     echo
 else
     echo
     echo_green "====> CEPH_UP being called..."
+    echo_green "====> Cepheus Build version: ${CEPHEUS_VERSION}"
+    echo_green "====> Ceph version: ${CEPH_VERSION}"
     echo
 fi
 

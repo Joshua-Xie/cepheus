@@ -39,6 +39,9 @@ build:
         # DO NOT remove the gate file!
         bootstrap_gate_file: CEPHEUS_CEPH_BOOTSTRAPPING
         bootstrap_gate_message: ">>>> IMPORANT - DO NOT delete this file manually! Cepheus will do it once it's done <<<<"
+        # NOTE: May want to make use the ceph.yaml only in the future by changing CEPH_UP to support a new template so
+        # that version information is known up front and echoed to the terminal.
+        version: "luminous 12.2.2"
 
 # Backup section of the Chef Server, associated data (cookbooks etc) and dependencies
 backup:
