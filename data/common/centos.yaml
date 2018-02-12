@@ -9,15 +9,15 @@
 
 os:
     type: centos
-    version: 7.1
-    name: centos-7.1
+    version: 7.4
+    name: centos-7.4
     arch: x86_64
     distro: centos-7-x86_64-minimal.iso
     breed: redhat
     # pxe_boot file extension - This will get used when creating the OS specific kickstart file using the profile name and this extension
     kickstart_ext: ks
     iso:
-        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+        url: http://mirror.cc.columbia.edu/pub/linux/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso
     device: "/dev/"
     devices:
         # Change the device name on OS/Platforms that enumerate devices differently.
@@ -32,14 +32,15 @@ os:
 
 # Unique ISO data for OS
 ISO:
-  volume_id: "CentOS-7.1 Server.x86_64"
+  volume_id: "CentOS-7.4 Server.x86_64"
 
 {% if environment == "vagrant" %}
 # Name of the VBox Storage Controller
 vagrant:
     storage_controller: "SATA Controller"
     # bento/centos-7.2+ has an ssh issue
-    box: "bento/centos-7.1"
+    #box: "bento/centos-7.1"
+    box: "centos/7"
     front_end_adapter_ip: 10.121.2.1
     back_end_adapter_ip: 10.121.2.1
 {% endif %}
@@ -53,11 +54,11 @@ chef_repo: # (required files for build)
     type: el
     os: 7
     client:
-        version: 13.0.118
-        package: chef-13.0.118-1.el7.x86_64.rpm
+        version: 13.7.16
+        package: chef-13.7.16-1.el7.x86_64.rpm
     server:
-        version: 12.15.0
-        package: chef-server-core-12.15.0-1.el7.x86_64.rpm
+        version: 12.17.15
+        package: chef-server-core-12.17.15-1.el7.x86_64.rpm
 
 adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
     bgp:
@@ -69,7 +70,7 @@ adc_repo: # (optional) Only required if allowing Cepheus to build out your softw
 pxe_boot: # (optional) Only used for the PXE Boot method
     iso:
         name: centos-7-x86_64-minimal.iso
-        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+        url: http://mirror.cc.columbia.edu/pub/linux/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso
 
 ceph_repo:
     branch: stable

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2017, LambdaStack
+# Copyright 2018, LambdaStack
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -322,8 +322,8 @@ fi
 
 # Configure and test any proxies configured.
 if [[ ! -z $BOOTSTRAP_HTTP_PROXY ]] || [[ ! -z $BOOTSTRAP_HTTPS_PROXY ]] ; then
-  echo_yellow "====> Testing configured proxies..."
-  source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
+    echo_yellow "====> Testing configured proxies..."
+    source $REPO_ROOT/bootstrap/common/bootstrap_proxy_setup.sh
 fi
 
 # Do prerequisite work prior to starting build, downloading files and

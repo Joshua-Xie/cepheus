@@ -1,10 +1,10 @@
 name 'cepheus'
-maintainer 'Chris Jones'
+maintainer 'Hans Chris Jones'
 maintainer_email 'chris.jones@lambdastack.io'
 license 'Apache v2.0'
 description 'Powerful and flexible automated build system for Ceph that includes full management end-to-end.'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '1.1.5'
+version '1.2.0'
 
 depends "chef-client", ">= 2.2.2"
 depends "cron", ">= 1.7.6"

@@ -15,7 +15,7 @@
 # 'method' can only be `repo` or `pxe`. If `pxe` then the 'pxe_boot' section of the given OS yaml is used.
 method: repo
 
-version: 1.1.6
+version: 1.2.0
 
 organization:
     name: LambdaStack
@@ -61,7 +61,7 @@ backup:
 # Change the '-' to '_' of the cookbook name (ceph-chef)
 # Part of 'prereqs' script...
 ceph_chef: # (required file - cookbook - for build)
-    version: 1.1.24
+    version: 1.1.28
     # If debug is false then it will use the supermarket version of ceph-chef else use github version
     # NB: IMPORANT - If you have a staging layer defined in 'environment.yaml' then the sequence *may* override this version!
     # NB: For the initial build out *make* sure debug is 'false'

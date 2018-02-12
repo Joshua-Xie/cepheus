@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Author:: Chris Jones <chris.jones@lambdastack.io>
+# Author:: Hans Chris Jones <chris.jones@lambdastack.io>
 #
-# Copyright 2017, LambdaStack
+# Copyright 2018, LambdaStack
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

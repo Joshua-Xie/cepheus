@@ -17,7 +17,8 @@ os:
     # pxe_boot file extension - This will get used when creating the OS specific kickstart file using the profile name and this extension
     kickstart_ext: ks
     iso:
-        url: http://mirror.es.its.nyu.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso
+        # TODO: Change the iso url below to support the actual url for your given RHEL subscription
+        url: http://mirror.cc.columbia.edu/pub/linux/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso
     device: "/dev/"
     devices:
         # Change the device name on OS/Platforms that enumerate devices differently.
@@ -66,11 +67,11 @@ chef_repo: # (required files for build)
     type: el
     os: 7
     client:
-        version: 13.0.118
-        package: chef-13.0.118-1.el7.x86_64.rpm
+        version: 13.7.16
+        package: chef-13.7.16-1.el7.x86_64.rpm
     server:
-        version: 12.15.0
-        package: chef-server-core-12.15.0-1.el7.x86_64.rpm
+        version: 12.17.15
+        package: chef-server-core-12.17.15-1.el7.x86_64.rpm
 
 adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
     bgp:

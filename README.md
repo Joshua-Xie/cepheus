@@ -445,9 +445,9 @@ This cookbook uses Test Kitchen to verify functionality. A Pull Request can't be
 6. `bundle exec kitchen test aio-ubuntu-1404`
 
 ## LICENSE
-* Author: Chris Jones <chris.jones@lambdastack.io> - Original creator of `Chef-BCS` for Bloomberg and Maintainer of `Ceph-Chef` and `Ceph-Rust` for Ceph
+* Author: Hans Chris Jones <chris.jones@lambdastack.io> - Original creator of `Chef-BCS` for Bloomberg and Maintainer of `Ceph-Chef` and `Ceph-Rust` for Ceph
 
-* Copyright 2017, lambdastack.
+* Copyright 2018, LambdaStack.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

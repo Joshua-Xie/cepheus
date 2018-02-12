@@ -4,10 +4,11 @@
 
 os:
     type: ubuntu
-    version: 16.04
-    name: ubuntu-16.04
+    version: 16.04.3
+    name: ubuntu-16.04.3
     arch: x86_64
-    distro: ubuntu-16.04-x86_64.iso
+    distro: ubuntu-16.04.3-server-amd64.iso
+    #distro: ubuntu-16.04-x86_64.iso
     breed: ubuntu
     # pxe_boot file extension - This will get used when creating the OS specific kickstart file using the profile name and this extension
     kickstart_ext: ks
@@ -33,7 +34,7 @@ ISO:
 # Name of the VBox Storage Controller
 vagrant:
     storage_controller: "SATAController"
-    box: ""
+    box: "ubuntu/trusty64"
 {% endif %}
 
 chef_repo: # (required files for build)
@@ -41,11 +42,11 @@ chef_repo: # (required files for build)
     type: unbuntu
     os: 16.04
     client:
-        version: 13.0.118
-        package: chef_13.0.118-1_amd64.deb
+        version: 13.7.16
+        package: chef_13.7.16-1_amd64.deb
     server:
-        version: 12.15.0
-        package: chef-server-core_12.15.0-1_amd64.deb
+        version: 12.17.15
+        package: chef-server-core_12.17.15-1_amd64.deb
 
 # NB: Present in all OS data files. RHEL has the full section. CentOS and Ubuntu *must* have only the stub section
 subscription:  # (required for build)
