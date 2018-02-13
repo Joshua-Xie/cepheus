@@ -76,10 +76,10 @@ fi
 
 # Create VMs in Vagrant and start them.
 # VM only tests inside vagrant_create script
-if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
+#if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
     echo_yellow "====> Clean up old VMs and Starting new local Vagrant cluster..."
     $REPO_ROOT/bootstrap/vagrant/vagrant_create.sh
-fi
+#fi
 
 # IMPORTANT: Inside vagrant_create.sh in the configure_network function the ADDING of OSD drives
 # occurs! This is important because it needs to be done while the VMs are off. Since adding network
