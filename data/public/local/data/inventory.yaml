@@ -53,7 +53,7 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: enp0s3 #*device1_1U
+                  device: *device1_1U #enp0s3
                   ip: 10.0.100.20
                   mac: "08:00:27:E3:84:01"
                   # TORs - Gateway
@@ -64,7 +64,7 @@ inventory:
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: enp0s8 #*device2_1U
+                  device: *device2_1U #enp0s8
                   ip: 10.121.2.2
                   mac: "08:00:27:3E:CB:B0"
                   # TORs - Gateway
@@ -104,7 +104,7 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: enp0s3 #*device1_1U
+                  device: *device1_1U #enp0s3
                   ip: 10.0.100.21
                   mac: "08:00:27:E3:84:01"
                   # TORs - Gateway
@@ -115,7 +115,7 @@ inventory:
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: enp0s8 #*device2_1U
+                  device: *device2_1U #enp0s8
                   ip: 10.121.2.3
                   mac: "08:00:27:3E:CB:B0"
                   # TORs - Gateway
@@ -155,7 +155,7 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: enp0s3 #*device1_1U
+                  device: *device1_1U #enp0s3
                   ip: 10.0.100.22
                   mac: "08:00:27:EB:EC:61"
                   # TORs - Gateway
@@ -166,7 +166,7 @@ inventory:
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: enp0s8 #*device2_1U
+                  device: *device2_1U #enp0s8
                   ip: 10.121.2.4
                   mac: "08:00:27:C5:9F:40"
                   # TORs - Gateway
@@ -206,7 +206,7 @@ inventory:
           interfaces:
                 # NB: The *must* always be `public` and `cluster` profile names even if they are the same thing
                 - profile: public
-                  device: enp0s3 #*device1_1U
+                  device: *device1_1U #enp0s3
                   ip: 10.0.100.23
                   mac: "08:00:27:8B:9F:3F"
                   # TORs - Gateway
@@ -217,7 +217,7 @@ inventory:
                   netmask: 255.255.255.0
                   cidr: 24
                 - profile: cluster
-                  device: enp0s8 #*device2_1U
+                  device: *device2_1U #enp0s8
                   ip: 10.121.2.5
                   mac: "08:00:27:1B:3B:E7"
                   # TORs - Gateway

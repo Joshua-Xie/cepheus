@@ -203,6 +203,7 @@ files:
     -   "bootstrap/common/ceph_osd_pgs_per_node.sh"
     -   "bootstrap/common/ceph_osd_tree_node.sh"
     -   "bootstrap/common/util_ntp_sync.sh"
+    -   "bootstrap/vagrant/vbox_network.sh"
 
 # These files represent the build init and update files.
 build_init_update_files:

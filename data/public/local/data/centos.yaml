@@ -34,7 +34,7 @@ os:
 ISO:
   volume_id: "CentOS-7.4 Server.x86_64"
 
-{% if environment == "vagrant" %}
+
 # Name of the VBox Storage Controller
 vagrant:
     storage_controller: "SATA Controller"
@@ -43,7 +43,7 @@ vagrant:
     box: "centos/7"
     front_end_adapter_ip: 10.121.2.1
     back_end_adapter_ip: 10.121.2.1
-{% endif %}
+
 
 # NB: Present in all OS data files. RHEL has the full section. CentOS and Ubuntu *must* have only the stub section
 subscription:  # (required for build)

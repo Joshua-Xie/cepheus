@@ -38,6 +38,7 @@
 /bootstrap/vagrant/vagrant.ssh.config
 /bootstrap/vagrant/tmp_authorized_keys
 /bootstrap/vagrant/CEPH_UP_VAGRANT
+/bootstrap/vagrant/vbox_network.sh
 
 # Created build file for any environment
 manifest.yaml
