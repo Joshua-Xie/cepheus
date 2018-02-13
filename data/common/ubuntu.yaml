@@ -57,11 +57,12 @@ ceph_repo:
     arch: x86_64
     revision: ""
 
-adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
+adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers where BGP is required.
     bgp:
         bird: # (required files for build)
             type: ubuntu
-            version: 1.5.0
+            version: 1.6.3
+            # NOTE: If package is empty then it will pull from the normal packaging and not the FTP site.
             package: ""
 
 # Make sure the following settings are tuned for your OS and drives

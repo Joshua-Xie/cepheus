@@ -73,12 +73,12 @@ chef_repo: # (required files for build)
         version: 12.17.15
         package: chef-server-core-12.17.15-1.el7.x86_64.rpm
 
-adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers
+adc_repo: # (optional) Only required if allowing Cepheus to build out your software load-balancers where BGP is required.
     bgp:
         bird: # (required files for build)
             type: redhat
-            version: 1.5.0
-            package: bird-1.5.0-1.x86_64.rpm
+            version: 1.6.3
+            package: bird-1.6.3-1.x86_64.rpm
 
 ceph_repo:
     branch: stable

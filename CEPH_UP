@@ -84,7 +84,7 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
             export REPO_ROOT_FILES=$OPTARG
             export NO_OPTS=1
 
-            # NB: ./CEPH_UP -f /ceph-files
+            # NB: ./CEPH_UP -c /ceph-files
             ;;
         d)
             # (optional) NB: Use this option if you want to change the default 'data center' from `local` to something

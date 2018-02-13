@@ -57,6 +57,7 @@ export CHEF_CEPHEUS_GROUP=${CHEF_CEPHEUS_GROUP:-"vagrant"}
 export BOOTSTRAP_SKIP_VMS=${BOOTSTRAP_SKIP_VMS:-0}
 # Vagrant debug flag
 export BOOTSTRAP_VAGRANT_DEBUG=${BOOTSTRAP_VAGRANT_DEBUG:-0}
+export BUILD_VMS_ONLY=${BUILD_VMS_ONLY:-1}
 
 # Force the banner to show
 export DONT_SHOW_BANNER=0
@@ -75,11 +76,13 @@ fi
 
 # Create VMs in Vagrant and start them.
 # VM only tests inside vagrant_create script
-echo_yellow "====> Clean up old VMs and Starting new local Vagrant cluster..."
-$REPO_ROOT/bootstrap/vagrant/vagrant_create.sh
+if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
+    echo_yellow "====> Clean up old VMs and Starting new local Vagrant cluster..."
+    $REPO_ROOT/bootstrap/vagrant/vagrant_create.sh
+fi
 
 # IMPORTANT: Inside vagrant_create.sh in the configure_network function the ADDING of OSD drives
-# occurs! This is important because it needes to be done while the VMs are off. Since adding network
+# occurs! This is important because it needs to be done while the VMs are off. Since adding network
 # adpaters also require the VM being off, putting them together saved time.
 
 if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
@@ -88,8 +91,9 @@ if [[ $BUILD_VMS_ONLY -eq 0 ]]; then
     # $REPO_ROOT/bootstrap/vagrant/vagrant_create_shared_folders_in_vms.sh
 
     # Install and configure Chef on all Vagrant hosts.
+    ## WIP...
     echo_yellow "====> Installing and configuring Chef on all nodes using the all in one script."
-    $REPO_ROOT/bootstrap/vagrant/vagrant_configure_chef_aio.sh
+    ##$REPO_ROOT/bootstrap/vagrant/vagrant_configure_chef_aio.sh
 else
     echo
     echo_green "====> Cepheus VMs have been created - Complete <===="

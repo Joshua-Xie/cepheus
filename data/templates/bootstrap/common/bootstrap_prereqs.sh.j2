@@ -145,12 +145,15 @@ echo_orange "====> Downloading Chef..."
 download_file /{{ cache.packages }}/{{ chef_repo.client.package }} https://packages.chef.io/files/stable/chef/{{ chef_repo.client.version }}/{{ chef_repo.type }}/{{ chef_repo.os }}/{{ chef_repo.client.package }}
 download_file /{{ cache.packages }}/{{ chef_repo.server.package }} https://packages.chef.io/files/stable/chef-server/{{ chef_repo.server.version }}/{{ chef_repo.type }}/{{ chef_repo.os }}/{{ chef_repo.server.package }}
 
+# Ubuntu version uses the standard package in the apt repo
+{%- if adc_repo.bgp.bird.package != "" %}
 # BIRD is a little different
 echo_orange "====> Downloading Bird..."
 # Bird ftp site sometimes has connection issues so...
 set +e
 ftp_file /{{ cache.packages }}/{{ adc_repo.bgp.bird.package }} ftp://bird.network.cz/pub/bird/{{ adc_repo.bgp.bird.type }}/{{ adc_repo.bgp.bird.package }}
 set -e
+{%- endif %}
 
 {# Don't want debug enabled on initial build out or ceph-chef may not get uploaded!! #}
 {%- if ceph_chef.debug %}

@@ -78,9 +78,9 @@ ceph_chef: # (required file - cookbook - for build)
     # These gems are required for the `ceph-chef`
     gems: # (required files for build)
         -   name: netaddr
-            version: 1.5.1
+            version: 2.0.1 #1.5.1
         -   name: chef-sugar
-            version: 3.4.0
+            version: 4.0.0 #3.4.0
 
 # If `inline` is true then substitute the name and verison inline else use url as specified
 # NB: If there is a python dependency then use the example below and create one or more using the syntax below.
@@ -89,17 +89,17 @@ python:
     -   name: Flask
         # Make sure to include '.' if there is a file suffix
         suffix: .tar.gz
-        version: 0.12.1
+        version: 0.12.2
         # If inline is true then build url + name/version else just url
         inline: false
-        url: https://github.com/pallets/flask/archive/0.12.1.tar.gz
+        url: https://github.com/pallets/flask/archive/0.12.2.tar.gz
     -   name: uwsgi
         # Make sure to include '.' if there is a file suffix
         suffix: .tar.gz
-        version: 2.0.15
+        version: 2.0.16
         # If inline is true then build url + name/version else just url
         inline: false
-        url: https://github.com/unbit/uwsgi/archive/2.0.15.tar.gz
+        url: https://github.com/unbit/uwsgi/archive/2.0.16.tar.gz
 
 # Cache directories in the format of base/{cookbook,gem...}
 cache:
@@ -122,56 +122,56 @@ cache:
 
 cookbooks: # (required files for build)
     - name: poise
-      version: 2.7.2
+      version: 2.8.1
     - name: chef-client
-      version: 8.0.1
+      version: 9.0.5
     - name: windows
-      version: 3.0.5
+      version: 3.4.4
     - name: ohai
-      version: 5.0.4
+      version: 5.2.1
     - name: cron
-      version: 4.1.1
-    - name: logrotate
-      version: 2.1.0
-    - name: compat_resource
-      version: 12.19.0
-    - name: ntp
-      version: 3.3.1
-    - name: yum
       version: 5.0.1
+    - name: logrotate
+      version: 2.2.0
+    - name: compat_resource
+      version: 12.19.1
+    - name: ntp
+      version: 3.5.6
+    - name: yum
+      version: 5.1.0
     - name: yum-epel
-      version: 2.1.1
+      version: 2.1.2
     - name: apt
-      version: 6.1.0
+      version: 6.1.4
     - name: apache2
-      version: 3.3.0
+      version: 5.0.1
     - name: chef_handler
-      version: 2.1.1
+      version: 3.0.2
     - name: firewall
-      version: 2.6.1
+      version: 2.6.3
     - name: chef-sugar
-      version: 3.4.0
+      version: 4.0.0
     - name: sudo
-      version: 3.4.0
+      version: 4.0.0
     - name: collectd
       version: 2.2.4
     - name: collectd_plugins
       version: 2.1.3
     - name: poise-service
-      version: 1.4.2
+      version: 1.5.2
     - name: yumgroup
       version: 0.5.0
 
 # These gems come from a different source and have a different url format that the ceph-chef gems
 gems: # (required files for build)
     - arr-pm-0.0.10
-    - backports-3.6.4
-    - cabin-0.7.1
-    - childprocess-0.5.6
-    - clamp-0.6.5
-    - ffi-1.9.8
-    - fpm-1.3.3
-    - json-1.8.2
+    - backports-3.11.1
+    - cabin-0.9.0
+    - childprocess-0.8.0
+    - clamp-1.2.1
+    - ffi-1.9.21
+    - fpm-1.9.3
+    - json-2.1.0
 
 # These are required for the build environment to function correctly.
 shell:
