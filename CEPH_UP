@@ -52,6 +52,7 @@ export BOOTSTRAP_REMOVE_PREREQS=0
 export BOOTSTRAP_HTTP_PROXY=
 export BOOTSTRAP_HTTPS_PROXY=
 export BOOTSTRAP_INIT=0
+export BOOTSTRAP_SKIP_VMS=0
 export BUILD_SHOW_LOGO=1
 export BUILD_VMS_ONLY=0
 export BUILD_ENVIRONMENT=vagrant
@@ -157,7 +158,7 @@ while getopts fbglrsxvupn:e:c:d:p:o:t:z: opt; do
         s)
             # (optional) Used to skip building local Vagrant VMs build and jump right to building out Ceph. Used during
             # development to help save some time.
-            BOOTSTRAP_SKIP_VMS=1
+            export BOOTSTRAP_SKIP_VMS=1
             export NO_OPTS=1
             ;;
         t)

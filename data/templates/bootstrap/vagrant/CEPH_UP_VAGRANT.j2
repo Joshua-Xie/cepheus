@@ -54,7 +54,7 @@ export BOOTSTRAP_TYPE=${BOOTSTRAP_TYPE:-"vagrant"}
 export CHEF_CEPHEUS_OWNER=${CHEF_CEPHEUS_OWNER:-"vagrant"}
 export CHEF_CEPHEUS_GROUP=${CHEF_CEPHEUS_GROUP:-"vagrant"}
 # Bootstrap specific variables
-#export BOOTSTRAP_SKIP_VMS=${BOOTSTRAP_SKIP_VMS:-0}
+export BOOTSTRAP_SKIP_VMS=${BOOTSTRAP_SKIP_VMS:-0}
 # Vagrant debug flag
 export BOOTSTRAP_VAGRANT_DEBUG=${BOOTSTRAP_VAGRANT_DEBUG:-0}
 export BUILD_VMS_ONLY=${BUILD_VMS_ONLY:-1}
@@ -76,10 +76,10 @@ fi
 
 # Create VMs in Vagrant and start them.
 # VM only tests inside vagrant_create script
-#if [[ $BOOTSTRAP_SKIP_VMS -ne 1 ]]; then
+if [[ $BOOTSTRAP_SKIP_VMS -eq 0 ]]; then
     echo_yellow "====> Clean up old VMs and Starting new local Vagrant cluster..."
     $REPO_ROOT/bootstrap/vagrant/vagrant_create.sh
-#fi
+fi
 
 # IMPORTANT: Inside vagrant_create.sh in the configure_network function the ADDING of OSD drives
 # occurs! This is important because it needs to be done while the VMs are off. Since adding network
