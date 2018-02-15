@@ -61,24 +61,21 @@ backup:
 # NB: Basic Chef info is found in the envrionment.yaml file.
 
 # Base Chef Cookbook for all of Ceph
-# Change the '-' to '_' of the cookbook name (ceph-chef)
+# NB: Change the '-' to '_' of the cookbook name (ceph-chef)
 # Part of 'prereqs' script...
 ceph_chef: # (required file - cookbook - for build)
     version: 1.1.28
     # If 'debug' is false then it will use the supermarket version of ceph-chef else use github version
     # NB: IMPORANT - If you have a staging layer defined in 'environment.yaml' then the sequence *may* override this version!
     # NB: For the initial build out *make* sure debug is 'false'
-    debug: true #false
-    # NB: 'local' only applies IF 'debug' is set to 'true'. By default 'local' is 'false' so if 'debug' is 'true' then
-    # the ceph-chef repo will be cloned from github. If 'debug' is 'true' and 'local' is 'false' then whatever is in the
-    # local /cookbooks/ceph-chef directory (if it exists) then it will be used instead. This allows you to test changes
-    # to ceph-chef before checking in to github to keep the repo clean.
-    local: true #false
-    git:
-        github: true
-        url: https://github.com/
-        repo: cepheus-io/ceph-chef
-        branch: master
+    debug:
+        enable: true #false
+        # NB: If 'debug' is enabled then git information below will override default ceph-chef
+        git:
+            github: true
+            url: https://github.com/
+            repo: cepheus-io/ceph-chef
+            branch: master
 
     # These gems are required for the `ceph-chef`
     gems: # (required files for build)

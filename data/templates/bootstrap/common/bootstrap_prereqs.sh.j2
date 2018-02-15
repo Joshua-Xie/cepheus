@@ -155,28 +155,25 @@ ftp_file /{{ cache.packages }}/{{ adc_repo.bgp.bird.package }} ftp://bird.networ
 set -e
 {%- endif %}
 
-{# Don't want debug enabled on initial build out or ceph-chef may not get uploaded!! #}
-{%- if ceph_chef.debug %}
+echo_orange "====> Downloading ceph-chef..."
+# NB: This will get overridden if 'debug' is enabled
+download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
+
+{%- if ceph_chef.debug.enable %}
 ## DEBUG MODE
 # Remove cached ceph-chef so it's not used - ONLY if the directories exists else skip it because that means it will be handled differently later.
-echo_light_red "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
-if [[ -d $REPO_ROOT_FILES/{{ cache.cookbook }} ]]; then
-    rm -f $REPO_ROOT_FILES/{{ cache.cookbook }}/ceph-chef-*
-fi
+#echo_light_red "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
+#if [[ -d $REPO_ROOT_FILES/{{ cache.cookbook }} ]]; then
+#    rm -f $REPO_ROOT_FILES/{{ cache.cookbook }}/ceph-chef-*
+#fi
 
-{%- if ceph_chef.local %}
-# Using the local version of ceph-chef in the cookbooks directory of cepheus...
-{% else %}
-# Clone to cookbook area
+# Clone to cookbook area. NOTE: If you want to use a debug version then make sure to update the branch and don't use master.
 if [[ -d $REPO_ROOT/cookbooks/ceph-chef ]]; then
     rm -rf $REPO_ROOT/cookbooks/ceph-chef
-    git clone -b {{ ceph_chef.git.branch }} {{ ceph_chef.git.url }}/{{ ceph_chef.git.repo }} $REPO_ROOT/cookbooks/ceph-chef
 fi
-{%- endif %}
+# NB: This will override the default ceph-chef during the staging "layering" process
+git clone -b {{ ceph_chef.debug.git.branch }} {{ ceph_chef.debug.git.url }}/{{ ceph_chef.debug.git.repo }} $REPO_ROOT/cookbooks/ceph-chef
 ##
-{% else %}
-echo_orange "====> Downloading ceph-chef..."
-download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
 {%- endif %}
 
 if [[ $CEPH_DEV_MODE -ne 0 ]]; then
