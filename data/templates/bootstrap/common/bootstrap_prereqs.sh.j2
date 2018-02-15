@@ -124,7 +124,7 @@ git_clone_or_update() {
 
 {# Using method gate instead of pxe_boot.enable since we only want common.yaml to be used as data input #}
 {% if method == "pxe" %}
-# Obtain an RHEL 7.2 image to be used for PXE booting in production.
+# Obtain an RHEL image to be used for PXE booting in production.
 echo_blue "====> Downloading ISO..."
 if [[ ! -z $COBBLER_BOOTSTRAP_ISO ]]; then
       if [[ $COBBLER_DOWNLOAD_ISO -eq 1 ]]; then
@@ -157,16 +157,23 @@ set -e
 
 {# Don't want debug enabled on initial build out or ceph-chef may not get uploaded!! #}
 {%- if ceph_chef.debug %}
-# Remove it so it's not used - ONLY if the directories exists else skip it because that means it will be handled differently later.
+## DEBUG MODE
+# Remove cached ceph-chef so it's not used - ONLY if the directories exists else skip it because that means it will be handled differently later.
 echo_light_red "====> Removing ceph-chef cache and using *debug* version of Ceph-Chef..."
 if [[ -d $REPO_ROOT_FILES/{{ cache.cookbook }} ]]; then
     rm -f $REPO_ROOT_FILES/{{ cache.cookbook }}/ceph-chef-*
 fi
+
+{%- if ceph_chef.local %}
+# Using the local version of ceph-chef in the cookbooks directory of cepheus...
+{% else %}
 # Clone to cookbook area
 if [[ -d $REPO_ROOT/cookbooks/ceph-chef ]]; then
     rm -rf $REPO_ROOT/cookbooks/ceph-chef
     git clone -b {{ ceph_chef.git.branch }} {{ ceph_chef.git.url }}/{{ ceph_chef.git.repo }} $REPO_ROOT/cookbooks/ceph-chef
 fi
+{%- endif %}
+##
 {% else %}
 echo_orange "====> Downloading ceph-chef..."
 download_file {{ cache.cookbook }}/ceph-chef-{{ ceph_chef.version }}.tar.gz http://cookbooks.opscode.com/api/v1/cookbooks/ceph-chef/versions/{{ ceph_chef.version }}/download
