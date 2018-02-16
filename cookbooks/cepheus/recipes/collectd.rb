@@ -16,62 +16,64 @@
 # limitations under the License.
 #
 
-node.default['collectd']['service']['configuration']['hostname'] = node['fqdn']
-node.default['collectd']['service']['configuration']['interval'] = 15
-node.default['collectd']['service']['configuration']['plugin_dir'] = '/usr/lib64/collectd'
-node.default['collectd']['service']['user'] = 'root'
-node.default['collectd']['service']['group'] = 'root'
-node.default['collectd-plugins']['cpu']['report_by_cpu'] = false
-node.default['collectd-plugins']['df']['f_s_type'] = 'proc', 'sysfs', 'fusectl', 'debugfs', 'securityfs', 'devtmpfs', 'devpts', 'tmpfs', 'nfs', 'vboxsf'
-node.default['collectd-plugins']['df']['mount_point'] = get_osd_mountpoints
-node.default['collectd-plugins']['df']['ignore_selected'] = true
-node.default['collectd-plugins']['df']['report_inodes'] = true
-node.default['collectd-plugins']['df']['values_percentage'] = true
-node.default['collectd-plugins']['memory']['values_percentage'] = true
-node.default['collectd-plugins']['processes']['process_total_only'] = true
-node.default['collectd-plugins']['swap']['report_by_device'] = false
-node.default['collectd-plugins']['write_graphite']['node']['id'] = node['cepheus']['collectd-plugins']['write_graphite']['node']['id']
-node.default['collectd-plugins']['write_graphite']['node']['host'] = node['cepheus']['collectd-plugins']['write_graphite']['node']['host']
-node.default['collectd-plugins']['write_graphite']['node']['port'] = node['cepheus']['collectd-plugins']['write_graphite']['node']['port']
-node.default['collectd-plugins']['write_graphite']['node']['prefix'] = node['cepheus']['collectd-plugins']['write_graphite']['node']['prefix']
+if node['cepheus']['monitoring']['enable']
+    node.default['collectd']['service']['configuration']['hostname'] = node['fqdn']
+    node.default['collectd']['service']['configuration']['interval'] = 15
+    node.default['collectd']['service']['configuration']['plugin_dir'] = '/usr/lib64/collectd'
+    node.default['collectd']['service']['user'] = 'root'
+    node.default['collectd']['service']['group'] = 'root'
+    node.default['collectd-plugins']['cpu']['report_by_cpu'] = false
+    node.default['collectd-plugins']['df']['f_s_type'] = 'proc', 'sysfs', 'fusectl', 'debugfs', 'securityfs', 'devtmpfs', 'devpts', 'tmpfs', 'nfs', 'vboxsf'
+    node.default['collectd-plugins']['df']['mount_point'] = get_osd_mountpoints
+    node.default['collectd-plugins']['df']['ignore_selected'] = true
+    node.default['collectd-plugins']['df']['report_inodes'] = true
+    node.default['collectd-plugins']['df']['values_percentage'] = true
+    node.default['collectd-plugins']['memory']['values_percentage'] = true
+    node.default['collectd-plugins']['processes']['process_total_only'] = true
+    node.default['collectd-plugins']['swap']['report_by_device'] = false
+    node.default['collectd-plugins']['write_graphite']['node']['id'] = node['cepheus']['monitoring']['collectd-plugins']['write_graphite']['node']['id']
+    node.default['collectd-plugins']['write_graphite']['node']['host'] = node['cepheus']['monitoring']['collectd-plugins']['write_graphite']['node']['host']
+    node.default['collectd-plugins']['write_graphite']['node']['port'] = node['cepheus']['monitoring']['collectd-plugins']['write_graphite']['node']['port']
+    node.default['collectd-plugins']['write_graphite']['node']['prefix'] = node['cepheus']['monitoring']['collectd-plugins']['write_graphite']['node']['prefix']
 
-include_recipe 'collectd::default'
+    include_recipe 'collectd::default'
 
-service 'collectd' do
-  provider Chef::Provider::Service::Systemd
-  action :start
-end
+    service 'collectd' do
+      provider Chef::Provider::Service::Systemd
+      action :start
+    end
 
-include_recipe 'collectd_plugins::default'
-include_recipe 'collectd_plugins::disk'
-include_recipe 'collectd_plugins::processes'
-include_recipe 'collectd_plugins::syslog'
-include_recipe 'collectd_plugins::write_graphite'
+    include_recipe 'collectd_plugins::default'
+    include_recipe 'collectd_plugins::disk'
+    include_recipe 'collectd_plugins::processes'
+    include_recipe 'collectd_plugins::syslog'
+    include_recipe 'collectd_plugins::write_graphite'
 
-%w{entropy}.each do |plugin|
-  collectd_plugin "#{plugin}" do
-    notifies :restart, 'service[collectd]', :delayed
-  end
-end
+    %w{entropy}.each do |plugin|
+      collectd_plugin "#{plugin}" do
+        notifies :restart, 'service[collectd]', :delayed
+      end
+    end
 
-package 'collectd-ceph' do
-  action :install
-end
+    package 'collectd-ceph' do
+      action :install
+    end
 
-node.default['cepheus']['collectd-plugins']['ceph']['daemons'] = get_ceph_sockets
+    node.default['cepheus']['monitoring']['collectd-plugins']['ceph']['daemons'] = get_ceph_sockets
 
-collectd_plugin_file 'ceph' do
-  plugin_name 'ceph'
-  plugin_instance_name node['cepheus']['environment']
-  source 'collectd-ceph.conf.erb'
-  notifies :restart, 'service[collectd]', :delayed
-end
+    collectd_plugin_file 'ceph' do
+      plugin_name 'ceph'
+      plugin_instance_name node['cepheus']['environment']
+      source 'collectd-ceph.conf.erb'
+      notifies :restart, 'service[collectd]', :delayed
+    end
 
-# Simple template for filtering metrics
-template '/etc/collectd.d/filter.conf' do
-  source 'collectd-filter.conf.erb'
-  owner 'root'
-  group 'root'
-  mode 0644
-  notifies :restart, 'service[collectd]', :delayed
+    # Simple template for filtering metrics
+    template '/etc/collectd.d/filter.conf' do
+      source 'collectd-filter.conf.erb'
+      owner 'root'
+      group 'root'
+      mode 0644
+      notifies :restart, 'service[collectd]', :delayed
+    end
 end

@@ -16,82 +16,84 @@
 # limitations under the License.
 #
 
-cookbook_file '/etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX' do
-  source 'RPM-GPG-KEY-ZABBIX'
-  owner 'root'
-  group 'root'
-  mode 00644
-end
+if node['cepheus']['monitoring']['enable']
+    cookbook_file '/etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX' do
+      source 'RPM-GPG-KEY-ZABBIX'
+      owner 'root'
+      group 'root'
+      mode 00644
+    end
 
-case node['platform']
-when 'ubuntu'
+    case node['platform']
+    when 'ubuntu'
 
-else
-    if node['cepheus']['os']['type'] != 'rhel' || (node['cepheus']['os']['type'] == 'rhel' && !node['cepheus']['os']['subscription']['enable'])
-      yum_repository 'zabbix' do
-        baseurl node['cepheus']['zabbix']['repository']
-        gpgkey node['cepheus']['zabbix']['repository_key']
+    else
+        if node['cepheus']['os']['type'] != 'rhel' || (node['cepheus']['os']['type'] == 'rhel' && !node['cepheus']['os']['subscription']['enable'])
+          yum_repository 'zabbix' do
+            baseurl node['cepheus']['monitoring']['zabbix']['repository']
+            gpgkey node['cepheus']['monitoring']['zabbix']['repository_key']
+          end
+        end
+    end
+
+    %w{zabbix-agent zabbix-sender}.each do |pkg|
+      package "#{pkg}" do
+        action :install
       end
     end
-end
 
-%w{zabbix-agent zabbix-sender}.each do |pkg|
-  package "#{pkg}" do
-    action :install
-  end
-end
+    template '/etc/zabbix/zabbix_agentd.conf' do
+      source 'zabbix-zabbix_agentd.conf.erb'
+      owner 'zabbix'
+      group 'root'
+      mode 00600
+      variables(
+        :zabbix_server => node['cepheus']['monitoring']['zabbix']['server'],
+        :agent_ip      => get_bond_ip,
+        :tags          => node.tags
+      )
+      notifies :restart, 'service[zabbix-agent]', :delayed
+    end
 
-template '/etc/zabbix/zabbix_agentd.conf' do
-  source 'zabbix-zabbix_agentd.conf.erb'
-  owner 'zabbix'
-  group 'root'
-  mode 00600
-  variables(
-    :zabbix_server => node['cepheus']['zabbix']['server'],
-    :agent_ip      => get_bond_ip,
-    :tags          => node.tags
-  )
-  notifies :restart, 'service[zabbix-agent]', :delayed
-end
+    %w{ ceph radosgw haproxy raid }.each do |component|
+      template "/etc/zabbix/zabbix_agentd.d/userparameter_#{component}.conf" do
+        source "zabbix-userparameter-#{component}.conf.erb"
+        owner 'zabbix'
+        group 'root'
+        mode '00600'
+        notifies :restart, 'service[zabbix-agent]', :delayed
+      end
+    end
 
-%w{ ceph radosgw haproxy raid }.each do |component|
-  template "/etc/zabbix/zabbix_agentd.d/userparameter_#{component}.conf" do
-    source "zabbix-userparameter-#{component}.conf.erb"
-    owner 'zabbix'
-    group 'root'
-    mode '00600'
-    notifies :restart, 'service[zabbix-agent]', :delayed
-  end
-end
+    execute 'systemd-reload' do
+      command 'systemctl daemon-reload'
+      action :nothing
+    end
 
-execute 'systemd-reload' do
-  command 'systemctl daemon-reload'
-  action :nothing
-end
+    directory '/etc/systemd/system/zabbix-agent.service.d' do
+      owner 'root'
+      group 'root'
+      mode 00755
+    end
 
-directory '/etc/systemd/system/zabbix-agent.service.d' do
-  owner 'root'
-  group 'root'
-  mode 00755
-end
+    cookbook_file '/usr/local/bin/raid_status.sh' do
+      source 'zabbix_scripts/raid_status.sh'
+      owner 'root'
+      group 'root'
+      mode 00755
+    end
 
-cookbook_file '/usr/local/bin/raid_status.sh' do
-  source 'zabbix_scripts/raid_status.sh'
-  owner 'root'
-  group 'root'
-  mode 00755
-end
+    cookbook_file '/etc/systemd/system/zabbix-agent.service.d/service.conf' do
+      source 'zabbix-systemd-service.conf'
+      owner 'root'
+      group 'root'
+      mode 00644
+      notifies :run, 'execute[systemd-reload]', :immediately
+    end
 
-cookbook_file '/etc/systemd/system/zabbix-agent.service.d/service.conf' do
-  source 'zabbix-systemd-service.conf'
-  owner 'root'
-  group 'root'
-  mode 00644
-  notifies :run, 'execute[systemd-reload]', :immediately
-end
-
-service 'zabbix-agent' do
-  provider Chef::Provider::Service::Systemd
-  action [:enable]
-  ignore_failure true
+    service 'zabbix-agent' do
+      provider Chef::Provider::Service::Systemd
+      action [:enable]
+      ignore_failure true
+    end
 end

@@ -612,35 +612,37 @@
       "dns": {
         "servers": ["{{ nameservers|join('", "') }}"]
       },
-      "ntp": {
-        "servers": ["{{ ntp|join('", "') }}"]
-      },
-      "collectd-plugins": {
-        "write_graphite": {
-          "node": {
-            "id": "{{ monitoring.collectd.id }}",
-            "host": "{{ monitoring.collectd.ip }}",
-            "port": {{ monitoring.collectd.port }},
-            "prefix": "{{ monitoring.collectd.prefix }}"
-          }
+        "ntp": {
+            "servers": ["{{ ntp|join('", "') }}"]
+        },
+        "monitoring": {
+            "enable": {%- if monitoring.enable == True %} true, {% else %} false, {%- endif %}
+            "collectd-plugins": {
+                "write_graphite": {
+                    "node": {
+                        "id": "{{ monitoring.collectd.id }}",
+                        "host": "{{ monitoring.collectd.ip }}",
+                        "port": {{ monitoring.collectd.port }},
+                        "prefix": "{{ monitoring.collectd.prefix }}"
+                    }
+                }
+            },
+            "zabbix": {
+                "repository": "http://repo.zabbix.com/zabbix/2.4/rhel/7/x86_64/",
+                "repository_key": "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX",
+                "server": "{{ monitoring.zabbix.server }}",
+                "ceph": {
+                    "blocked_op": {{ monitoring.zabbix.ceph.blocked_op }},
+                    "slow_osd": {{ monitoring.zabbix.ceph.slow_osd }}
+                }
+            }
+        },
+        "chef_client": {
+            "server_url": "{{ chef.server }}",
+            "cache_path": "/var/chef/cache",
+            "backup_path": "/var/chef/backup",
+            "validation_client_name": "{{ chef.validation_client_name }}",
+            "run_path": "/var/chef"
         }
-      },
-      "zabbix": {
-        "repository": "http://repo.zabbix.com/zabbix/2.4/rhel/7/x86_64/",
-        "repository_key": "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX",
-        "server": "{{ monitoring.zabbix.server }}",
-        "ceph": {
-         "blocked_op": {{ monitoring.zabbix.ceph.blocked_op }},
-         "slow_osd": {{ monitoring.zabbix.ceph.slow_osd }}
-        }
-      }
-    },
-    "chef_client": {
-      "server_url": "{{ chef.server }}",
-      "cache_path": "/var/chef/cache",
-      "backup_path": "/var/chef/backup",
-      "validation_client_name": "{{ chef.validation_client_name }}",
-      "run_path": "/var/chef"
-    }
   }
 }

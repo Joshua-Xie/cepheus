@@ -10,6 +10,9 @@ nohup.out
 ehthumbs.db
 Thumbs.db
 
+*.md
+*.txt
+
 *.iso
 files/default/loaders/*
 

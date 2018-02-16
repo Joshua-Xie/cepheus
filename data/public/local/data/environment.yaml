@@ -360,16 +360,17 @@ chef:
     validation_client_name: cepheus
 
 monitoring:
-  collectd:
-    id: graphite
-    ip: 127.0.0.1
-    port: 2013
-    prefix: "collectd."
-  zabbix:
-    server: 10.0.100.6
-    ceph:
-      blocked_op: 0
-      slow_osd: 0
+    enable: false
+    collectd:
+        id: graphite
+        ip: 127.0.0.1
+        port: 2013
+        prefix: "collectd."
+    zabbix:
+        server: 10.0.100.6
+        ceph:
+            blocked_op: 0
+            slow_osd: 0
 
 cron:
     radosgw:

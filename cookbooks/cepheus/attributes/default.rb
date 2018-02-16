@@ -20,6 +20,9 @@ default['cepheus']['state'] = "NY"
 default['cepheus']['location'] = "New York"
 default['cepheus']['organization'] = "LambdaStack"
 
+# Monitoring is somewhat unique in each organization
+default['cepheus']['monitoring']['enable'] = false
+
 case node['platform']
 when 'ubuntu'
   default['cepheus']['init_style'] = 'upstart'

@@ -3,7 +3,6 @@
   "json_class": "Chef::Role",
   "description": "Monitoring for cepheus",
   "run_list": [
-    "recipe[cepheus::collectd]",
-    "recipe[cepheus::zabbix-agent]"
+      "recipe[cepheus::monitoring]"
   ]
 }
