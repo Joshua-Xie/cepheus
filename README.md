@@ -249,7 +249,6 @@ https://supermarket.chef.io/
 ## GEMS
 The following two GEMS will need to be pulled down and loaded onto the production nodes for envrionments that can't reach the outside. The `bootstrap_prereqs.sh` does this automatically.
 
-* netaddr-1.5.1
 * chef-sugar-3.4.0
 
 ## TEMPLATES

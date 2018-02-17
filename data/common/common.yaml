@@ -79,8 +79,8 @@ ceph_chef: # (required file - cookbook - for build)
 
     # These gems are required for the `ceph-chef`
     gems: # (required files for build)
-        -   name: netaddr
-            version: 2.0.1 #1.5.1
+        #-   name: netaddr
+        #    version: 2.0.1 #1.5.1
         -   name: chef-sugar
             version: 4.0.0 #3.4.0
 
