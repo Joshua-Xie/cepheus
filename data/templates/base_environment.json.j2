@@ -7,6 +7,28 @@
   "cookbook_versions": {},
   "chef_type": "environment",
   "override_attributes": {
+    "ceph": {
+        "network": {
+          "public": {
+            "interface": "{{ network.public.interface }}",
+            "cidr": [
+              "{{ network.public.cidr|join('", "') }}"
+            ],
+            "mtu": {{ network.public.mtu }}
+          },
+          "cluster": {
+            "interface": "{{ network.cluster.interface }}",
+            "gateway_enable": {%- if network.gateway_enable == True %} true, {% else %} false, {%- endif %}
+            "cidr": [
+              "{{ network.cluster.cidr|join('", "') }}"
+            ],
+            "route": {
+              "cidr": "{{ network.cluster.route.cidr }}"
+            },
+            "mtu": {{ network.cluster.mtu }}
+          }
+        },
+    },
     "cepheus": {
       "environment": "{{ environment }}",
       "method": "{{ method }}",

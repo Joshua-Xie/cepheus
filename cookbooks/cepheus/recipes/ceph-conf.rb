@@ -36,9 +36,9 @@ node.default['ceph']['group'] = 'ceph'
 
 # Set the cidr blocks
 # Print output of data and then set...
-puts node['cepheus']['network']['public']
-node.default['ceph']['network']['public']['cidr'] = node['cepheus']['network']['public']['cidr']
-node.default['ceph']['network']['cluster']['cidr'] = node['cepheus']['network']['cluster']['cidr']
+# puts node['cepheus']['network']['public']
+#node.default['ceph']['network']['public']['cidr'] = node['cepheus']['network']['public']['cidr']
+#node.default['ceph']['network']['cluster']['cidr'] = node['cepheus']['network']['cluster']['cidr']
 
 # System tunes
 if node['cepheus']['system']['sysctl']['enable']
