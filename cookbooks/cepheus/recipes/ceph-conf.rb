@@ -22,9 +22,6 @@
 # Some values are specific variables that need to be set instead.
 
 # NOTE: This file also updates the data in the ceph-chef cookbook
-node.default['ceph']['network']['public']['cidr'] = node['cepheus']['network']['public']['cidr']
-node.default['ceph']['network']['cluster']['cidr'] = node['cepheus']['network']['cluster']['cidr']
-
 node.default['ceph']['cluster'] = node['cepheus']['ceph']['cluster']
 node.default['ceph']['version'] = node['cepheus']['ceph']['repo']['version']['name']
 node.default['ceph']['branch'] = node['cepheus']['ceph']['repo']['version']['branch']
@@ -33,9 +30,15 @@ node.default['ceph']['repo']['create'] = node['cepheus']['ceph']['repo']['create
 node.default['ceph']['mgr']['enable'] = node['cepheus']['ceph']['mgr']['enable']
 
 # NOTE: If the version is 'hammer' then change owner and group to 'root'
+node.default['ceph']['mode'] = 0o0750
 node.default['ceph']['owner'] = 'ceph'
 node.default['ceph']['group'] = 'ceph'
-node.default['ceph']['mode'] = 0o0750
+
+# Set the cidr blocks
+# Print output of data and then set...
+puts node['cepheus']['network']['public']
+node.default['ceph']['network']['public']['cidr'] = node['cepheus']['network']['public']['cidr']
+node.default['ceph']['network']['cluster']['cidr'] = node['cepheus']['network']['cluster']['cidr']
 
 # System tunes
 if node['cepheus']['system']['sysctl']['enable']
@@ -116,6 +119,3 @@ node.default['ceph']['radosgw']['rgw_webservice']['user'] = node['cepheus']['cep
 node.default['ceph']['restapi']['url'] = node['cepheus']['ceph']['restapi']['url']
 node.default['ceph']['restapi']['ip'] = node['cepheus']['ceph']['restapi']['ip']
 node.default['ceph']['restapi']['port'] = node['cepheus']['ceph']['restapi']['port']
-
-node.default['ceph']['network']['public']['cidr'] = node['cepheus']['network']['public']['cidr']
-node.default['ceph']['network']['cluster']['cidr'] = node['cepheus']['network']['cluster']['cidr']
