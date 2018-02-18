@@ -619,21 +619,6 @@
           },
         {%- endif %}
       },
-        "openstack": {
-            "keystone": {
-                "radosgw": {
-                    "enable": {%- if openstack.keystone.radosgw.enable == True %} true, {% else %} false, {%- endif %}
-                    "admin": {
-                        "token": "{{ openstack.keystone.radosgw.admin.token }}",
-                        "url": "{{ openstack.keystone.radosgw.admin.url }}",
-                        "port": {{ openstack.keystone.radosgw.admin.port }}
-                    },
-                    "accepted_roles": "{{ openstack.keystone.radosgw.accepted_roles }}",
-                    "token_cache_size": {{ openstack.keystone.radosgw.token_cache_size }},
-                    "revocation_interval": {{ openstack.keystone.radosgw.revocation_interval }}
-                }
-            }
-        },
 
         {#- NOTE: WIP - TODO: Remove CEPH section HERE and move all non ceph-chef attributes to 'cepheus' section only! #}
 

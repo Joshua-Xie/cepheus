@@ -10,9 +10,8 @@ Common Directory:
 YAML Data Files
 1. centos.yaml
 2. common.yaml
-3. openstack.yaml
-4. rhel.yaml
-5. ubuntu.yaml
+3. rhel.yaml
+4. ubuntu.yaml
 
 Other files found here are:
 1. This README.md
