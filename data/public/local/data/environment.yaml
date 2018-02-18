@@ -61,9 +61,9 @@ proxy:
 
 # These can be any data files you want. A normal example is putting your rack data into a separate yaml for each rack
 # and then add them here to be included in the final build of `manifest.yaml` which everything will eventually derive from.
+#     - "openstack.notused.yaml"
 data_files:
     - "ceph.yaml"
-    - "openstack.yaml"
     - "adc.yaml"
     - "centos.yaml"
     - "pxe_boot.yaml"
