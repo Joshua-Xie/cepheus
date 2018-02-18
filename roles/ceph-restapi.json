@@ -11,6 +11,7 @@
     "recipe[cepheus::ceph-restapi]",
     "recipe[ceph-chef::restapi_install]",
     "recipe[ceph-chef::restapi]",
+    "recipe[cepheus::user-groups]",
     "recipe[cepheus::ceph-scripts]",
     "recipe[ceph-chef::restapi_start]"
   ]

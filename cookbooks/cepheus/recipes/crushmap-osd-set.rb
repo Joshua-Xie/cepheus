@@ -17,12 +17,12 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
+#include_recipe 'cepheus::ceph-conf'
 
 # This recipe must run after the ceph-chef::osd recipe to set the crush map settings.
 
-if node['cepheus']['ceph']['osd']['devices'] && node['ceph']['osd']['crush']['update']
-  devices = node['cepheus']['ceph']['osd']['devices']
+if node['ceph']['osd']['devices'] && node['ceph']['osd']['crush']['update']
+  devices = node['ceph']['osd']['devices']
 
   devices = Hash[(0...devices.size).zip devices] unless devices.is_a? Hash
 
@@ -38,7 +38,7 @@ if node['cepheus']['ceph']['osd']['devices'] && node['ceph']['osd']['crush']['up
     # Added data_type as part of host name so that ceph osd tree can show which hosts are ssd and which are hdd. Rack does not have to reflect data_type.
     # CLEAN UP later...just for testing options........
     # Added rack to chooseleaf = host too
-    if node['cepheus']['ceph']['pools']['radosgw']['settings']['chooseleaf'] == 'host'
+    if node['ceph']['pools']['radosgw']['settings']['chooseleaf'] == 'host'
       execute "crushmap-set-#{osd_device['data']}" do
         command <<-EOH
           INFO=`df -k | grep #{osd_device['data']} | awk '{print $2,$6}' | sed -e 's/\\/var\\/lib\\/ceph\\/osd\\/ceph-//'`
@@ -64,7 +64,7 @@ if node['cepheus']['ceph']['osd']['devices'] && node['ceph']['osd']['crush']['up
 
     ruby_block "save-status-#{index}" do
       block do
-        node.normal['cepheus']['ceph']['osd']['devices'][index]['status'] = 'deployed'
+        node.normal['ceph']['osd']['devices'][index]['status'] = 'deployed'
         node.save
       end
       action :nothing

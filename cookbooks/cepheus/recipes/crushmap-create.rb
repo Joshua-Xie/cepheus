@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
+#include_recipe 'cepheus::ceph-conf'
 
 # This recipe must run after the ceph-chef::osd recipe to set the crush map settings.
 

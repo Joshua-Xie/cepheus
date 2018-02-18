@@ -28,4 +28,4 @@
 
 # Example: "mon initial members": "10.121.1.3:6789, 10.121.1.4:6789, 10.121.1.5:6789",
 
-include_recipe 'cepheus::ceph-conf'
+#include_recipe 'cepheus::ceph-conf'

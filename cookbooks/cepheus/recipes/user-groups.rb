@@ -25,16 +25,16 @@
 # The recipe also sets up security on ALL nodes AND initial Users!
 # The recipe also adds the PS1 prompt change for all nodes!
 
-include_recipe 'cepheus::ceph-conf'
+#include_recipe 'cepheus::ceph-conf'
 
 # Add groups to a given user. If that user does not exist then it fail which is ok.
 node['cepheus']['users'].each do | user_value |
-    user_value['groups'].each do | user_value_group |
-        if !user_value_group.empty?
-            execute "add_user_to_group_#{user_value['name']}_#{user_value_group}" do
-                command "usermod -a -G #{user_value['name']} #{user_value_group}"
-                ignore_failure true
-            end
-        end
+  user_value['groups'].each do | user_value_group |
+    if !user_value_group.empty?
+      execute "add_user_to_group_#{user_value['name']}_#{user_value_group}" do
+        command "usermod -a -G #{user_value['name']} #{user_value_group}"
+        ignore_failure true
+      end
     end
+  end
 end

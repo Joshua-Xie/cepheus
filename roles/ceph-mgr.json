@@ -8,6 +8,7 @@
       "recipe[cepheus::repo]",
       "recipe[ceph-chef]",
       "recipe[ceph-chef::repo]",
-      "recipe[ceph-chef::mgr]"
+      "recipe[ceph-chef::mgr]",
+      "recipe[cepheus::user-groups]"
   ]
 }

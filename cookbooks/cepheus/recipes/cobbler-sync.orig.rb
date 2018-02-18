@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
+#include_recipe 'cepheus::ceph-conf'
 
 if node['cepheus']['method'] == 'pxe'
     # NOTE: May want to move mount and import to install later...

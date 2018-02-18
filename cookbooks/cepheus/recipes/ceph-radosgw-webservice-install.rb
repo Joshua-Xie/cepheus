@@ -17,13 +17,14 @@
 # limitations under the License.
 #
 
-if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
-    include_recipe 'cepheus::ceph-conf'
+#if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
+if node['ceph']['radosgw']['rgw_webservice']['enable']
+    #include_recipe 'cepheus::ceph-conf'
 
     # This recipe installs everything needed for the RGW Admin Web Service...
 
     package 'nginx' do
-        action :upgrade
+      action :upgrade
     end
 
     include_recipe 'ceph-chef::ceph-radosgw-webservice-install'
@@ -40,16 +41,14 @@ if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
     end
 
     # NB: So rgw_webservice process can read ceph.conf
-    if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
-        execute "add_user_to_ceph" do
-            command "usermod -a -G ceph nginx"
-            ignore_failure true
-        end
+    execute "add_user_to_ceph" do
+      command "usermod -a -G ceph nginx"
+      ignore_failure true
     end
 
     execute "add_nginx_to_radosgw" do
-        command "usermod -a -G #{node['cepheus']['ceph']['radosgw']['rgw_webservice']['user']} nginx"
-        ignore_failure true
+      command "usermod -a -G #{node['ceph']['radosgw']['rgw_webservice']['user']} nginx"
+      ignore_failure true
     end
 
     # NB: Make sure the permissions of groups are set before the services are started later...

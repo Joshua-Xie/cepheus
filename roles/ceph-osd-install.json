@@ -10,6 +10,7 @@
     "recipe[ceph-chef::repo]",
     "recipe[cepheus::ceph-osd]",
     "recipe[ceph-chef::osd]",
+    "recipe[cepheus::user-groups]",
     "recipe[cepheus::ceph-scripts]",
     "role[monitoring]"
   ]

@@ -6,6 +6,9 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     cluster: ceph
     name: luminous
     version: 12.2.2
+    owner: ceph
+    group: ceph
+    mode: 0750
 
     tcmalloc: # This becomes the default after Jewel
         enable: true
@@ -190,6 +193,17 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
             processor_max_time: 1800
             processor_period: 1800
 
+        # Openstack related
+        keystone:
+            enable: false
+            admin:
+                token: ""
+                url: ""
+                port: 35357
+            accepted_roles: "admin Member _member_"
+            token_cache_size: 1000
+            revocation_interval: 1200
+
         # Quotas are in MB
         users:
             -   uid: radosgw
@@ -293,6 +307,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
         niceness: -10
 
     osd:
+        store: bluestore
         journal:
             # Production may be something like 20000
             size: 3000

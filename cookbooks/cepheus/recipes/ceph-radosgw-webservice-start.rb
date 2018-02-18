@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
+if node['ceph']['radosgw']['rgw_webservice']['enable']
     include_recipe 'ceph-chef::ceph-radosgw-webservice-start'
 
     execute 'rgw-webservice-nginx-start' do
-        command 'sudo systemctl start nginx'
-        ignore_failure true
+      command 'sudo systemctl start nginx'
+      ignore_failure true
     end
 end
