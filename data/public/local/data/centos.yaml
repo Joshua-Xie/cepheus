@@ -9,8 +9,8 @@
 
 os:
     type: centos
-    version: 7.3
-    name: centos-7.3
+    version: 7.4
+    name: centos-7.4
     arch: x86_64
     distro: centos-7-x86_64-minimal.iso
     breed: redhat
@@ -32,7 +32,7 @@ os:
 
 # Unique ISO data for OS
 ISO:
-  volume_id: "CentOS-7.3 Server.x86_64"
+  volume_id: "CentOS-7.4 Server.x86_64"
 
 
 # Name of the VBox Storage Controller
@@ -41,7 +41,7 @@ vagrant:
     # bento/centos-7.2+ has an ssh issue
     #box: "bento/centos-7.1"
     #box: "centos/7"
-    box: "bento/centos-7.3"
+    box: "bento/centos-7.4"
     front_end_adapter_ip: 10.121.2.1
     back_end_adapter_ip: 10.121.2.1
 
