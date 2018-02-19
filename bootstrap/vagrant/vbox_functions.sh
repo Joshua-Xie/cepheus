@@ -209,6 +209,7 @@ function create_network_interfaces {
         # VBoxManage modifyvm $vm --nic4 none
     done
 
+    echo "====> Creating host adapters..."
     # Create 2 interfaces
     VBoxManage hostonlyif create
     VBoxManage hostonlyif create
@@ -216,6 +217,7 @@ function create_network_interfaces {
 
     # NOTE: Later, cycle through hostonlyifs and if found with IPs below then just use those vboxnet_
 
+    echo "====> Configuring host adapters..."
     # Set the interface up and default gateway
     VBoxManage hostonlyif ipconfig vboxnet0 --ip ${CEPH_CHEF_ADAPTERS[0]} --netmask ${CEPH_CHEF_ADAPTERS[2]}
     VBoxManage hostonlyif ipconfig vboxnet1 --ip ${CEPH_CHEF_ADAPTERS[1]} --netmask ${CEPH_CHEF_ADAPTERS[2]}
@@ -223,6 +225,7 @@ function create_network_interfaces {
 
     # Since VirtualBox created the vms the default for nic1 is nat so no need to modify here
     for vm in ${CEPH_CHEF_HOSTS[@]}; do
+        echo "====> Configuring $vm host adapters..."
         VBoxManage modifyvm $vm --nic2 hostonly --hostonlyadapter2 vboxnet0
         VBoxManage modifyvm $vm --nic3 hostonly --hostonlyadapter3 vboxnet1
         # VBoxManage modifyvm $vm --nic4 hostonly --hostonlyadapter4 vboxnet2
@@ -231,6 +234,8 @@ function create_network_interfaces {
         VBoxManage modifyvm $vm --nictype3 82543GC
         # VBoxManage modifyvm $vm --nictype4 82543GC
     done
+
+    echo "====> Completed configuration of host adapters..."
 }
 
 ###################################################################
