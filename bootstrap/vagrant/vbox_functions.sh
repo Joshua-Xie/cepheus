@@ -288,6 +288,15 @@ function start_vms {
             echo "Starting $vm"
             sleep 5
         fi
+
+        set +e
+        # Sometimes VirtualBox has an issue with SSH on restart so make sure to restart again. Hate this hack!
+        VBoxManage controlvm $vm acpipowerbutton
+        sleep 3
+        VBoxManage startvm $vm --type headless
+        sleep 3
+        set -e
+
     done
 }
 
