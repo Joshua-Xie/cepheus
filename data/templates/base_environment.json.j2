@@ -22,6 +22,11 @@
             "arch": "{{ ceph_repo.arch }}"
           }
         },
+        "version": "{{ ceph.name }}",
+        "branch": "{{ ceph_repo.branch }}",
+        "revision": "{{ ceph_repo.revision }}",
+        "el_version": "el7",
+        "repo_url": "http://download.ceph.com",
         "system": {
             "sysctls": [
             {%- for item in system.sysctl.sysctls %}
