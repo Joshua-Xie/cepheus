@@ -15,7 +15,7 @@
 # 'method' can only be `repo` or `pxe`. If `pxe` then the 'pxe_boot' section of the given OS yaml is used.
 method: repo
 
-version: 1.2.0
+version: 1.2.1
 
 organization:
     name: LambdaStack
