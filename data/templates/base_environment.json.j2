@@ -95,7 +95,7 @@
           },
           "keystone": {
             "auth": {%- if ceph.radosgw.keystone.enable == True %} true, {% else %} false, {%- endif %}
-            "accepted_roles": {{ ceph.radosgw.keystone.accepted_roles }},
+            "accepted_roles": "{{ ceph.radosgw.keystone.accepted_roles }}",
             "token_cache_size": {{ ceph.radosgw.keystone.token_cache_size }},
             "revocation_interval": {{ ceph.radosgw.keystone.revocation_interval }},
             "admin": {
