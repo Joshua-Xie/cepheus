@@ -248,7 +248,7 @@ function config_networks {
 
     # If you don't give VB enough time to close things down it will corrupt
     echo "Creating network interfaces..."
-    sleep 20
+    sleep 5
 
     # Build interfaces...
     create_network_interfaces
@@ -263,7 +263,7 @@ function config_networks {
 
     # Force a pause to allow for spin up
     echo "Updating IPs on network interfaces (vbox_functions)..."
-    sleep 10
+    sleep 5
     update_network_interfaces
 
     echo "Completed IP assignments..."
@@ -272,34 +272,38 @@ function config_networks {
 }
 
 function shutdown_vms {
-    for vm in ${CEPH_CHEF_HOSTS[@]}; do
-        if [[ `is_vm_running $vm` -eq 1 ]]; then
-            VBoxManage controlvm $vm acpipowerbutton  # poweroff caused issues so use acpipowerbutton instead
-            echo "Shutting down $vm"
-            sleep 5
-        fi
-    done
+    vagrant halt
+
+    #for vm in ${CEPH_CHEF_HOSTS[@]}; do
+    #    if [[ `is_vm_running $vm` -eq 1 ]]; then
+    #        VBoxManage controlvm $vm acpipowerbutton  # poweroff caused issues so use acpipowerbutton instead
+    #        echo "Shutting down $vm"
+    #        sleep 5
+    #    fi
+    #done
 }
 
 function start_vms {
-    for vm in ${CEPH_CHEF_HOSTS[@]}; do
-        if [[ `is_vm_running $vm` -ne 1 ]]; then
-            VBoxManage startvm $vm --type headless
-            echo "Starting $vm"
-            sleep 10
-        fi
+    vagrant up
 
-        set +e
-        # Sometimes VirtualBox has an issue with SSH on restart so make sure to restart again. Hate this hack!
-        VBoxManage controlvm $vm acpipowerbutton
-        sleep 10
-        VBoxManage startvm $vm --type headless
-        set -e
+    #for vm in ${CEPH_CHEF_HOSTS[@]}; do
+    #    if [[ `is_vm_running $vm` -ne 1 ]]; then
+    #        VBoxManage startvm $vm --type headless
+    #        echo "Starting $vm"
+    #        sleep 10
+    #    fi
 
-    done
+    #    set +e
+    #    # Sometimes VirtualBox has an issue with SSH on restart so make sure to restart again. Hate this hack!
+    #    VBoxManage controlvm $vm acpipowerbutton
+    #    sleep 10
+    #    VBoxManage startvm $vm --type headless
+    #    set -e
 
-    # Sleep a little longer to give VirtualBox time to do it's thing!!
-    sleep 10
+    #done
+
+    ## Sleep a little longer to give VirtualBox time to do it's thing!!
+    #sleep 10
     echo
     echo "Leaving 'start_vms' after starting and restarting vms."
     echo

@@ -41,15 +41,13 @@ function node_update_network_interfaces {
     echo_yellow "====> $node => . vbox_network.sh && node_update_network_interfaces"
 
     vagrant ssh $node -c ". vbox_network.sh && node_update_network_interfaces"
-    if [[ $? -ne 1 ]]; then
+    if [[ $? -ne 0 ]]; then
         # Restart VM
-        VBoxManage controlvm $node acpipowerbutton
-        echo_yellow "====> $node (Vagrant ssh issue - restarting VM)..."
-        sleep 3
-        VBoxManage startvm $node --type headless
-        sleep 5
+        vagrant halt $node
+        vagrant up $node
         vagrant ssh $node -c ". vbox_network.sh && node_update_network_interfaces"
     fi
+
     echo_yellow "====> $node => . vbox_network.sh && . network_setup.sh && node_update_network_ips"
     vagrant ssh $node -c ". vbox_network.sh && . network_setup.sh && node_update_network_ips"
 }
