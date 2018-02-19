@@ -37,10 +37,11 @@ function update_network_interfaces {
 # This function calls a function by the same name on the given node to update the interfaces
 function node_update_network_interfaces {
     local node=$1
-    echo_yellow "====> $node (vagrant_create)..."
+    echo_yellow "====> $node (vagrant_create - node_update_network_interfaces)..."
+    echo_yellow "====> $node => . vbox_network.sh && node_update_network_interfaces"
 
     vagrant ssh $node -c ". vbox_network.sh && node_update_network_interfaces"
-    if [[ $? -ne 0 ]]; then
+    if [[ $? -ne 1 ]]; then
         # Restart VM
         VBoxManage controlvm $node acpipowerbutton
         echo_yellow "====> $node (Vagrant ssh issue - restarting VM)..."
@@ -49,6 +50,7 @@ function node_update_network_interfaces {
         sleep 5
         vagrant ssh $node -c ". vbox_network.sh && node_update_network_interfaces"
     fi
+    echo_yellow "====> $node => . vbox_network.sh && . network_setup.sh && node_update_network_ips"
     vagrant ssh $node -c ". vbox_network.sh && . network_setup.sh && node_update_network_ips"
 }
 

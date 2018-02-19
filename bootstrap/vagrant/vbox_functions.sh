@@ -263,7 +263,7 @@ function config_networks {
 
     # Force a pause to allow for spin up
     echo "Updating IPs on network interfaces (vbox_functions)..."
-    sleep 20
+    sleep 10
     update_network_interfaces
 
     echo "Completed IP assignments..."
@@ -292,16 +292,17 @@ function start_vms {
         set +e
         # Sometimes VirtualBox has an issue with SSH on restart so make sure to restart again. Hate this hack!
         VBoxManage controlvm $vm acpipowerbutton
-        sleep 5
+        sleep 10
         VBoxManage startvm $vm --type headless
-        sleep 15
         set -e
 
     done
 
     # Sleep a little longer to give VirtualBox time to do it's thing!!
     sleep 10
+    echo
     echo "Leaving 'start_vms' after starting and restarting vms."
+    echo
 }
 
 function delete_vm {
