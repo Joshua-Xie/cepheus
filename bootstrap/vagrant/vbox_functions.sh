@@ -286,18 +286,22 @@ function start_vms {
         if [[ `is_vm_running $vm` -ne 1 ]]; then
             VBoxManage startvm $vm --type headless
             echo "Starting $vm"
-            sleep 5
+            sleep 10
         fi
 
         set +e
         # Sometimes VirtualBox has an issue with SSH on restart so make sure to restart again. Hate this hack!
         VBoxManage controlvm $vm acpipowerbutton
-        sleep 3
+        sleep 5
         VBoxManage startvm $vm --type headless
-        sleep 3
+        sleep 15
         set -e
 
     done
+
+    # Sleep a little longer to give VirtualBox time to do it's thing!!
+    sleep 10
+    echo "Leaving 'start_vms' after starting and restarting vms."
 }
 
 function delete_vm {
