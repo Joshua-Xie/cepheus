@@ -276,7 +276,7 @@ function shutdown_vms {
         if [[ `is_vm_running $vm` -eq 1 ]]; then
             VBoxManage controlvm $vm acpipowerbutton  # poweroff caused issues so use acpipowerbutton instead
             echo "Shutting down $vm"
-            sleep 3
+            sleep 5
         fi
     done
 }
@@ -286,7 +286,7 @@ function start_vms {
         if [[ `is_vm_running $vm` -ne 1 ]]; then
             VBoxManage startvm $vm --type headless
             echo "Starting $vm"
-            sleep 3
+            sleep 5
         fi
     done
 }
