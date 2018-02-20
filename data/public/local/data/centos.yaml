@@ -42,7 +42,8 @@ vagrant:
     #box: "bento/centos-7.1"
     #box: "centos/7"
     box: "bento/centos-7.4"
-    front_end_adapter_ip: 10.121.2.1
+    # VirtualBox Adapter IPs are default values.
+    front_end_adapter_ip: 10.121.1.1
     back_end_adapter_ip: 10.121.2.1
 
 

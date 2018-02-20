@@ -206,33 +206,31 @@ function create_network_interfaces {
     for vm in ${CEPH_CHEF_HOSTS[@]}; do
         VBoxManage modifyvm $vm --nic2 none
         VBoxManage modifyvm $vm --nic3 none
-        # VBoxManage modifyvm $vm --nic4 none
     done
 
     echo "====> Creating host adapters..."
     # Create 2 interfaces
     VBoxManage hostonlyif create
     VBoxManage hostonlyif create
-    # VBoxManage hostonlyif create
+}
 
+function configure_network_interfaces {
     # NOTE: Later, cycle through hostonlyifs and if found with IPs below then just use those vboxnet_
 
     echo "====> Configuring host adapters..."
     # Set the interface up and default gateway
     VBoxManage hostonlyif ipconfig vboxnet0 --ip ${CEPH_CHEF_ADAPTERS[0]} --netmask ${CEPH_CHEF_ADAPTERS[2]}
     VBoxManage hostonlyif ipconfig vboxnet1 --ip ${CEPH_CHEF_ADAPTERS[1]} --netmask ${CEPH_CHEF_ADAPTERS[2]}
-    # VBoxManage hostonlyif ipconfig vboxnet2 --ip ${CEPH_CHEF_ADAPTERS[2]} --netmask ${CEPH_CHEF_ADAPTERS[3]}
 
     # Since VirtualBox created the vms the default for nic1 is nat so no need to modify here
     for vm in ${CEPH_CHEF_HOSTS[@]}; do
         echo "====> Configuring $vm host adapters..."
         VBoxManage modifyvm $vm --nic2 hostonly --hostonlyadapter2 vboxnet0
         VBoxManage modifyvm $vm --nic3 hostonly --hostonlyadapter3 vboxnet1
-        # VBoxManage modifyvm $vm --nic4 hostonly --hostonlyadapter4 vboxnet2
-        # Set to server nic
-        VBoxManage modifyvm $vm --nictype2 82543GC
-        VBoxManage modifyvm $vm --nictype3 82543GC
-        # VBoxManage modifyvm $vm --nictype4 82543GC
+
+        ## Set to server nic
+        #VBoxManage modifyvm $vm --nictype2 82543GC
+        #VBoxManage modifyvm $vm --nictype3 82543GC
     done
 
     echo "====> Completed configuration of host adapters..."
@@ -312,6 +310,9 @@ function start_vms {
     echo
     echo "Leaving 'start_vms' after starting and restarting vms."
     echo
+
+    # Configure network interfaces after restarting. Put here to make sure the interfaces are up after a vagrant up command!
+    configure_network_interfaces
 }
 
 function delete_vm {

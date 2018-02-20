@@ -47,10 +47,10 @@ rsync:
 #device2_1U: &device2_1U enp0s9
 #device1_2U: &device1_2U enp0s8
 #device2_2U: &device2_2U enp0s9
-device1_1U: &device1_1U eth1
-device2_1U: &device2_1U eth2
-device1_2U: &device1_2U eth1
-device2_2U: &device2_2U eth2
+device1_1U: &device1_1U enp0s8
+device2_1U: &device2_1U enp0s9
+device1_2U: &device1_2U enp0s8
+device2_2U: &device2_2U enp0s9
 #
 ## End of device variable naming
 

@@ -13,11 +13,13 @@
     {%- for interface in item.interfaces %}
     {%- if interface.profile == "public" %}
     front_end_ip: {{ interface.ip }}
+    front_end_netmask: {{ interface.netmask }}
     {%- endif %}
     {%- endfor %}
     {%- for interface in item.interfaces %}
     {%- if interface.profile == "cluster" %}
     back_end_ip: {{ interface.ip }}
+    back_end_netmask: {{ interface.netmask }}
     {%- endif %}
     {%- endfor %}
 {% endfor %}
