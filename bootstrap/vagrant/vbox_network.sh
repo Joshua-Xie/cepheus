@@ -48,11 +48,11 @@ function node_modify_network_interfaces {
     # if [[ $_device == "enp0s8" || ($_device == "--" && $_name == "Wired connection 1") ]]; then
     #    sudo nmcli c modify $_uuid connection.id 'mgt-enp0s8'
     # fi
-    if [[ $_device == "eth1" || ($_device == "--" && $_name == "Wired connection 1") ]]; then
-        sudo nmcli c modify $_uuid connection.id 'eth1'
+    if [[ $_device == "enp0s8" || ($_device == "--" && $_name == "Wired connection 1") ]]; then
+        sudo nmcli c modify $_uuid connection.id 'enp0s8'
     fi
-    if [[ $_device == "eth2" || ($_device == "--" && $_name == "Wired connection 2") ]]; then
-        sudo nmcli c modify $_uuid connection.id 'eth2'
+    if [[ $_device == "enp0s9" || ($_device == "--" && $_name == "Wired connection 2") ]]; then
+        sudo nmcli c modify $_uuid connection.id 'enp0s9'
     fi
   done
   IFS=$IFS_OLD
@@ -65,17 +65,17 @@ function node_update_network_ips {
   # sudo nmcli c mod mgt-enp0s8 ipv4.method manual
   # sudo nmcli c mod mgt-enp0s8 ipv4.dns "8.8.8.8 8.8.4.4"
 
-  sudo nmcli c mod eth1 ipv4.addresses ${CEPH_ADAPTER_IPS[0]}/${CEPH_ADAPTER_IPS[2]} ipv4.gateway ${CEPH_ADAPTER_IPS[3]}
-  sudo nmcli c mod eth1 ipv4.method manual
-  sudo nmcli c mod eth1 ipv4.dns "${CEPH_CHEF_DNS[0]} ${CEPH_CHEF_DNS[1]}"
+  sudo nmcli c mod enp0s8 ipv4.addresses ${CEPH_ADAPTER_IPS[0]}/${CEPH_ADAPTER_IPS[2]} ipv4.gateway ${CEPH_ADAPTER_IPS[3]}
+  sudo nmcli c mod enp0s8 ipv4.method manual
+  sudo nmcli c mod enp0s8 ipv4.dns "${CEPH_CHEF_DNS[0]} ${CEPH_CHEF_DNS[1]}"
 
-  sudo nmcli c mod eth2 ipv4.addresses ${CEPH_ADAPTER_IPS[1]}/${CEPH_ADAPTER_IPS[2]} ipv4.gateway ${CEPH_ADAPTER_IPS[4]}
-  sudo nmcli c mod eth2 ipv4.method manual
-  sudo nmcli c mod eth2 ipv4.dns "${CEPH_CHEF_DNS[0]} ${CEPH_CHEF_DNS[1]}"
+  sudo nmcli c mod enp0s9 ipv4.addresses ${CEPH_ADAPTER_IPS[1]}/${CEPH_ADAPTER_IPS[2]} ipv4.gateway ${CEPH_ADAPTER_IPS[4]}
+  sudo nmcli c mod enp0s9 ipv4.method manual
+  sudo nmcli c mod enp0s9 ipv4.dns "${CEPH_CHEF_DNS[0]} ${CEPH_CHEF_DNS[1]}"
 
   # sudo nmcli c up mgt-enp0s8
-  sudo nmcli c up eth1
-  sudo nmcli c up eth2
+  sudo nmcli c up enp0s8
+  sudo nmcli c up enp0s9
 }
 
 # Step 1
@@ -86,12 +86,12 @@ function node_remove_default_network_connections {
 
 # Step 2
 function node_remove_new_network_connections {
-  sudo nmcli con delete eth1
-  sudo nmcli con delete eth2
+  sudo nmcli con delete enp0s8
+  sudo nmcli con delete enp0s9
 }
 
 # Step 3
 function node_add_network_connections {
-  sudo nmcli con add type ethernet con-name eth1 ifname eth1
-  sudo nmcli con add type ethernet con-name eth2 ifname eth2
+  sudo nmcli con add type ethernet con-name enp0s8 ifname enp0s8
+  sudo nmcli con add type ethernet con-name enp0s9 ifname enp0s9
 }
