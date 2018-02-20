@@ -225,8 +225,13 @@ function configure_network_interfaces {
     # Since VirtualBox created the vms the default for nic1 is nat so no need to modify here
     for vm in ${CEPH_CHEF_HOSTS[@]}; do
         echo "====> Configuring $vm host adapters..."
-        VBoxManage modifyvm $vm --nic2 hostonly --hostonlyadapter2 vboxnet0
-        VBoxManage modifyvm $vm --nic3 hostonly --hostonlyadapter3 vboxnet1
+        if [[ ! `vboxmanage showvminfo --machinereadable $vm | grep vboxnet0` ]]; then
+            VBoxManage modifyvm $vm --nic2 hostonly --hostonlyadapter2 vboxnet0
+        fi
+
+        if [[ ! `vboxmanage showvminfo --machinereadable $vm | grep vboxnet1` ]]; then
+            VBoxManage modifyvm $vm --nic3 hostonly --hostonlyadapter3 vboxnet1
+        fi
 
         ## Set to server nic
         #VBoxManage modifyvm $vm --nictype2 82543GC
