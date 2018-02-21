@@ -5,7 +5,7 @@
 ceph: # Packages will come from enterprise repo manager OR ceph.com if access to outside world is allowed
     cluster: ceph
     name: luminous
-    version: 12.2.2
+    version: 12.2.3
     owner: ceph
     group: ceph
     mode: 0750

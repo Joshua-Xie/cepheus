@@ -525,7 +525,7 @@
             "sys": {% if user.sys == True %}true{% else %}false{% endif %},
             "groups": ["{{ user.groups|join('","') }}"],
             "roles": ["{{ user.roles|join('","') }}"],
-            "sudo": {% if user.sudo == True %}true{% else %}false{% endif %},
+            "sudo": {% if user.sudo == True %}true{% else %}false{% endif %}
             }{%- if not loop.last %},{% endif %}
           {%- endfor %}
       ],
