@@ -17,10 +17,8 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
-
 # This recipe sets up ceph osd add
-node.default['ceph']['osd']['add'] = node['cepheus']['ceph']['osd']['add']
+#node.default['ceph']['osd']['add'] = node['cepheus']['ceph']['osd']['add']
 
 # Run the lower level ceph recipe
 include_recipe 'ceph-chef::osd_add'

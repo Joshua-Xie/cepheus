@@ -17,6 +17,4 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
 include_recipe 'ceph-chef::radosgw_users'

@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
-
 # include_recipe 'ceph-chef::erasure_profiles_set'
 
 # NB: Use our version instead of ceph-chef's version!

@@ -4,8 +4,6 @@
   "description": "Ceph Object Storage Device Install",
   "run_list": [
     "role[common]",
-    "recipe[cepheus::ceph-conf]",
-    "recipe[cepheus::repo]",
     "recipe[ceph-chef]",
     "recipe[ceph-chef::repo]",
     "recipe[cepheus::ceph-osd]",

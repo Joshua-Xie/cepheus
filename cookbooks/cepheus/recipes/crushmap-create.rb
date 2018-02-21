@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
 # This recipe must run after the ceph-chef::osd recipe to set the crush map settings.
 
 if node['ceph']['osd']['crush']['update']
@@ -27,9 +25,6 @@ if node['ceph']['osd']['crush']['update']
       owner 'root'
       mode 00644
   end
-
-  # Removes the default including the default rbd pool
-  # include_recipe 'cepheus::crushmap-remove-defaults'
 
   # NOTE: The 'hdd' below is one of the rules.
   # This will override the default crushmap which is for replication instead of erasure-code. Also, added updated straw alg.

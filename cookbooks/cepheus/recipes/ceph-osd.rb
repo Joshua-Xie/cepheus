@@ -31,8 +31,6 @@
 #   ]
 # }
 
-#include_recipe 'cepheus::ceph-conf'
-
 if node['cepheus']['ceph']['tcmalloc']['enable']
   cookbook_file "/etc/sysconfig/ceph" do
     source "ceph"

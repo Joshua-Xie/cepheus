@@ -4,11 +4,8 @@
   "description": "Ceph RESTful API",
   "run_list": [
     "role[common]",
-    "recipe[cepheus::ceph-conf]",
-    "recipe[cepheus::repo]",
     "recipe[ceph-chef]",
     "recipe[ceph-chef::repo]",
-    "recipe[cepheus::ceph-restapi]",
     "recipe[ceph-chef::restapi_install]",
     "recipe[ceph-chef::restapi]",
     "recipe[cepheus::user-groups]",

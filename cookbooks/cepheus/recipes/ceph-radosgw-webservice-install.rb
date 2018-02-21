@@ -19,8 +19,6 @@
 
 #if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
 if node['ceph']['radosgw']['rgw_webservice']['enable']
-    #include_recipe 'cepheus::ceph-conf'
-
     # This recipe installs everything needed for the RGW Admin Web Service...
 
     package 'nginx' do

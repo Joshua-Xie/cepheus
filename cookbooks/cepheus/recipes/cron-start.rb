@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
 # Set cron up to push logs into the given cluster and then remove them to keep the log partitions clean. The log data
 # can then be pulled down by other log tools if desired since a log user account is created for each federated zone.
 

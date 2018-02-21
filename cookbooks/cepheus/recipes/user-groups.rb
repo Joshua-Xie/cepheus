@@ -25,16 +25,25 @@
 # The recipe also sets up security on ALL nodes AND initial Users!
 # The recipe also adds the PS1 prompt change for all nodes!
 
-#include_recipe 'cepheus::ceph-conf'
+# NB: Ceph will install the 'ceph' user and group each time a ceph component is installed. For example,
+# If ceph mon has been installed on a node then you add your base user to the ceph group so that sudo is not required
+# and then you happen to install ceph osd on the same node then the ceph group changes you made do not seem
+# to remain and thus must be added again. This is why this recipe is called after every ceph related install.
 
 # Add groups to a given user. If that user does not exist then it fail which is ok.
 node['cepheus']['users'].each do | user_value |
   user_value['groups'].each do | user_value_group |
     if !user_value_group.empty?
-      execute "add_user_to_group_#{user_value['name']}_#{user_value_group}" do
-        command "usermod -a -G #{user_value['name']} #{user_value_group}"
+      bash 'add-user-to-group' do
+        user 'root'
+        code <<-EOH
+          usermod -a -G #{user_value['name']} #{user_value_group}
+        EOH
+        only_if "id -u #{user_value['name']}"
+        only_if "grep -q #{user_value_group} /etc/group"
         ignore_failure true
       end
+
     end
   end
 end

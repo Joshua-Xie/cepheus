@@ -17,9 +17,11 @@
 # limitations under the License.
 #
 
-bash 'firewall-reload' do
-  user 'root'
-  code <<-EOH
-    firewall-cmd --reload
-  EOH
+if node['cepheus']['init_style'] != 'upstart'
+  bash 'firewall-reload' do
+    user 'root'
+    code <<-EOH
+      firewall-cmd --reload
+    EOH
+  end
 end

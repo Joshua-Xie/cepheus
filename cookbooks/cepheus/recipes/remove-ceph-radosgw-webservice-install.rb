@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
-
 # This recipe installs everything needed for the RGW Admin Web Service...
 
 package 'uwsgi' do

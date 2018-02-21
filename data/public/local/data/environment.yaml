@@ -196,6 +196,8 @@ users:
     -   name: operations
         group: wheel
         group_create: false
+        groups:
+            -   ceph
         comment: "Operations User"
         passwd: $6$Salt$3xxLPT099nzTbWkOS3CPNcar/zSLQ8BEgZdJk/AOkOb4V80sPepbraWcvrJvEEu6PswpKUw1WodWeiqRo1bw2/
         passwd_type: "--iscrypted"
@@ -221,7 +223,6 @@ users:
             # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
             # you change your ssh key but use the same name later if you don't already have one!
             passphrase: "cepheus"
-        ceph_group: true
     -   name: radosgw
         group: wheel
         group_create: true
@@ -252,10 +253,11 @@ users:
             # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
             # you change your ssh key but use the same name later if you don't already have one!
             passphrase: "cepheus"
-        ceph_group: true
     -   name: vagrant
         group: wheel
         group_create: true
+        groups:
+            -   ceph
         comment: "Vagrant User"
         passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
         passwd_type: "--iscrypted"
@@ -281,9 +283,6 @@ users:
             # it will create one using the passphrase here. You can use this to get you started but it is strongly recommended that
             # you change your ssh key but use the same name later if you don't already have one!
             passphrase: "cepheus"
-        # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
-        # required for ceph commands
-        ceph_group: true
 
 # This user will be the primary user of the given envrionment which will be `operations` in production and `vagrant` for local
 # This is can be a mirror of one of the users above. It must be present.
@@ -291,6 +290,8 @@ primary_user:
     name: vagrant
     group: wheel
     group_create: true
+    groups:
+        -   ceph
     comment: "Vagrant User"
     passwd: $6$Salt$6AyUczFy6SgV8A2wKAKfA9drpzrUsTGPJ3QjcWBbgS97BxBO.C7ZcBFALRiRkKfi9x8MK2SHet38BCQWS9LsR/
     passwd_type: "--iscrypted"
@@ -313,9 +314,6 @@ primary_user:
         # you change your ssh key but use the same name later if you don't already have one!
         passphrase: "cepheus"
     sudo: true
-    # For Jewel and later the `ceph_group` tells the recipes to add this user to the 'ceph' group so 'sudo' is not
-    # required for ceph commands
-    ceph_group: true
 
 # Data specific for the given bootstrap node. This is environment specific data.
 bootstrap:

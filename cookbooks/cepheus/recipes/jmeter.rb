@@ -18,7 +18,7 @@
 #
 
 # This is only needed *IF* we install test tools like JMeter etc that require Java.
-include_recipe 'cepheus::java'
+package 'java'
 
 # Add the bash script
 

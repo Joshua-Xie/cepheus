@@ -5,12 +5,8 @@
   "override_attributes": {},
   "run_list": [
     "role[common]",
-    "recipe[cepheus::ceph-conf]",
     "recipe[ceph-chef]",
-    "recipe[cepheus::repo]",
     "recipe[ceph-chef::repo]",
-    "recipe[cepheus::ceph-mon]",
-    "recipe[cepheus::ceph-admin]",
     "recipe[ceph-chef::mon]",
     "recipe[cepheus::user-groups]",
     "recipe[cepheus::ceph-scripts]",

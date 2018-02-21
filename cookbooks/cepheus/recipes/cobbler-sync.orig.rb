@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
 if node['cepheus']['method'] == 'pxe'
     # NOTE: May want to move mount and import to install later...
     # cobbler distro edit --name=#{node['cepheus']['pxe_boot']['os']['name']}-#{node['cepheus']['pxe_boot']['os']['arch']} --kopts="ksdevice= inst.repo=http://#{node['cepheus']['pxe_boot']['server']}/cblr/ks_mirror/#{node['cepheus']['pxe_boot']['os']['name']}"

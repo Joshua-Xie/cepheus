@@ -19,6 +19,6 @@
 
 # This is called from 'ceph-conf'
 
-node.default['ceph']['version'] = node['cepheus']['ceph']['repo']['version']['name']
-node.default['ceph']['branch'] = node['cepheus']['ceph']['repo']['version']['branch']
-node.default['ceph']['repo']['create'] = node['cepheus']['ceph']['repo']['create']
+#node.default['ceph']['version'] = node['cepheus']['ceph']['repo']['version']['name']
+#node.default['ceph']['branch'] = node['cepheus']['ceph']['repo']['version']['branch']
+#node.default['ceph']['repo']['create'] = node['cepheus']['ceph']['repo']['create']

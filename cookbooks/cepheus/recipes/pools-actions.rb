@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
-
 # This recipe processes the actions in the cepheus - ceph - pools - radosgw - pools array
 
 # We only use 'radosgw' so no need to set the activated flag like in ceph-chef pool creation schema.

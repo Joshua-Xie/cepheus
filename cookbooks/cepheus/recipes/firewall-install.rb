@@ -20,6 +20,7 @@
 if node['cepheus']['init_style'] != 'upstart'
   package 'firewalld'
 else
+  package 'ufw'
 end
 
 

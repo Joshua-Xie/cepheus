@@ -18,8 +18,6 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
 package 'gdisk'
 
 # Remove the journal partitions

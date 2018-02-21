@@ -55,35 +55,35 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
         version: 2
         crush_rule: 1
         radosgw:
-            - name: ".log"
+            - name: "default.rgw.log"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".intent-log"
+            - name: "default.rgw.intent-log"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".rgw"
+            - name: "default.rgw.data.root"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".rgw.control"
+            - name: "default.rgw.control"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".rgw.gc"
+            - name: "default.rgw.gc"
               data_percent: 0.10
               type: replicated
               profile: ""
@@ -97,56 +97,63 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".rgw.buckets"
-              data_percent: 95.90
+            - name: "default.rgw.buckets.data"
+              data_percent: 94.80
               type: erasure
               profile: cepheus
               crush_ruleset: 1
               crush_ruleset_name: hdd
 
-            - name: ".rgw.buckets.index"
-              data_percent: 2
+            - name: "default.rgw.buckets.index"
+              data_percent: 3
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".rgw.buckets.extra"
+            - name: "default.rgw.buckets.extra"
               data_percent: 1
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".users"
+            - name: "default.rgw.users.keys"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".users.uid"
+            - name: "default.rgw.users.uid"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".users.email"
+            - name: ".default.rgw.users.email"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".users.swift"
+            - name: "default.rgw.users.swift"
               data_percent: 0.10
               type: replicated
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
 
-            - name: ".usage"
+            - name: "default.rgw.usage"
+              data_percent: 0.10
+              type: replicated
+              profile: ""
+              crush_ruleset: 0
+              crush_ruleset_name: hdd_replicated
+
+            - name: "default.rgw.meta"
               data_percent: 0.10
               type: replicated
               profile: ""

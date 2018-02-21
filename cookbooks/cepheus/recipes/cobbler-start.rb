@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
 if node['cepheus']['method'] == 'pxe'
     case node['platform']
     when 'ubuntu'

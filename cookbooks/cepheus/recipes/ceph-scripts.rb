@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
 template '/opt/cepheus/scripts/restart_down_osds.sh' do
     source 'restart_down_osds.sh.erb'
     mode 00755

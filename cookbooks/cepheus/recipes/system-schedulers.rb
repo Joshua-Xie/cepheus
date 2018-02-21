@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'cepheus::ceph-conf'
-
 # Add the scheduler options
 if node['cepheus']['system']['scheduler']['device']['enable']
     node['cepheus']['system']['scheduler']['device']['devices'].each_with_index do |dev, _index|

@@ -17,8 +17,4 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
-
-#node.default['ceph']['pools']['radosgw']['remove']['names'] = node['cepheus']['ceph']['pools']['radosgw']['remove']['names']
-
 include_recipe 'ceph-chef::pools_remove'

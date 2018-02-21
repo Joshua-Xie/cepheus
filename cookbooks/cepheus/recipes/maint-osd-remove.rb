@@ -23,10 +23,8 @@
 # the device else reweight in very small increments down to 0 (can be time consuming) so that it doesn't "crush"
 # your performance (pun intended :))!
 
-include_recipe 'cepheus::ceph-conf'
-
 # This recipe sets up ceph osd removal info for the lower level osd_remove_zap recipe
-node.default['ceph']['osd']['remove'] = node['cepheus']['ceph']['osd']['remove']
+#node.default['ceph']['osd']['remove'] = node['cepheus']['ceph']['osd']['remove']
 
 # Run the lower level ceph recipe
 include_recipe 'ceph-chef::maint_osd_remove_zap'
