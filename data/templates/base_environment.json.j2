@@ -195,7 +195,7 @@
             {#- NOTE: IMPORTANT - ONLY 'buckets' (data) can be erasure coded. Others need to be replicated. #}
             "pools": [
                 {%- for item in ceph.pools.radosgw %}
-                  {"name": "{{ item.name }}", "data_percent": {{ "{:,.2f}".format(item.data_percent) }}, "type": "{{ item.type }}", "profile": "{{ item.profile }}", "crush_ruleset": {{ item.crush_ruleset }}, "crush_ruleset_name": "{{ item.crush_ruleset_name }}"}{%- if not loop.last %},{% endif %}
+                  {"name": "{{ item.name }}", "data_percent": {{ "{:,.2f}".format(item.data_percent) }}, "type": "{{ item.type }}", "profile": "{{ item.profile }}", "crush_ruleset": {{ item.crush_ruleset }}, "crush_ruleset_name": "{{ item.crush_ruleset_name }}", "pgs": {{ item.pgs }}}{%- if not loop.last %},{% endif %}
                 {%- endfor %}
             ],
             {#- If federated then the settings below apply to the federated pools else the non-federated pools. #}
@@ -218,6 +218,7 @@
           },
           "pgs": {
             "calc": {
+              "enable": {%- if ceph.pgs.calc.enable == True %} true, {% else %} false, {%- endif %}
               "total_osds": {{ ceph.pgs.calc.total_osds }},
               "target_pgs_per_osd": {{ ceph.pgs.calc.target_pgs_per_osd }},
               "min_pgs_per_pool": {{ ceph.pgs.calc.min_pgs_per_pool }},

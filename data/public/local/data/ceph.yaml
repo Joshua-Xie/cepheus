@@ -28,8 +28,14 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     pgs:
         num: 64
         calc:
+            # 'enable' is used in conjunction with 'pools' 'pgs' value if set to 'false'. Default of 'true' will use of
+            # calculation engine where as 'false' will bypass the calculation and use the value in 'pgs' for the given pool
+            enable: true
             total_osds: 12
-            target_pgs_per_osd: 200
+            # Target PGs Per OSD - 100 -- Small sort of static like environment to begin with. Can always increase later
+            # Target PGs Per OSD - 200 -- Expect to add more OSDs soon
+            # Target PGs Per OSD - 300 -- Expect to double or more the number of OSDs soon
+            target_pgs_per_osd: 100
             min_pgs_per_pool: 64
             replicated_size: 3
             erasure_size: 3
@@ -49,6 +55,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
         class: idle
         priority: 7
 
+    # NB: 'pgs' below in pools are used for manually setting pgs count when creating pools instead of using default of calculation engine
     pools:
         active:
             -   radosgw
@@ -61,6 +68,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.intent-log"
               data_percent: 0.10
@@ -68,6 +76,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.data.root"
               data_percent: 0.10
@@ -75,6 +84,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.control"
               data_percent: 0.10
@@ -82,6 +92,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.gc"
               data_percent: 0.10
@@ -89,6 +100,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: ".rgw.root"
               data_percent: 0.10
@@ -96,6 +108,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.buckets.data"
               data_percent: 94.80
@@ -103,6 +116,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: cepheus
               crush_ruleset: 1
               crush_ruleset_name: hdd
+              pgs: 512
 
             - name: "default.rgw.buckets.index"
               data_percent: 3
@@ -110,6 +124,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 64
 
             - name: "default.rgw.buckets.extra"
               data_percent: 1
@@ -117,6 +132,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 32
 
             - name: "default.rgw.users.keys"
               data_percent: 0.10
@@ -124,6 +140,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.users.uid"
               data_percent: 0.10
@@ -131,6 +148,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: ".default.rgw.users.email"
               data_percent: 0.10
@@ -138,6 +156,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.users.swift"
               data_percent: 0.10
@@ -145,6 +164,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.usage"
               data_percent: 0.10
@@ -152,6 +172,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
             - name: "default.rgw.meta"
               data_percent: 0.10
@@ -159,6 +180,7 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
               profile: ""
               crush_ruleset: 0
               crush_ruleset_name: hdd_replicated
+              pgs: 8
 
     radosgw:
         default_port: 8080
