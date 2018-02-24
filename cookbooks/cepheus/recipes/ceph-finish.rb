@@ -21,7 +21,7 @@
 # sudo ln -s /usr/lib64/librados.so.2.0.0 /usr/lib64/librados.so
 
 execute 'symlink-librados' do
-  command 'ln -s /usr/lib64/librados.so.2.0.0 /usr/lib64/librados.so'
+  command "ln -s /usr/lib64/#{node['ceph']['librados_version']} /usr/lib64/librados.so"
   ignore_failure true
 end
 

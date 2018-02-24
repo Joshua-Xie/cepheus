@@ -20,6 +20,9 @@
 
 package 'gdisk'
 
+# NOTE: Only used for filestore and not bluestore!
+# TODO: Put a gaurd in for that!
+
 # Remove the journal partitions
 journals = get_journals
 if !journals.empty?

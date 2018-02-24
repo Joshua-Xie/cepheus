@@ -28,6 +28,7 @@ node['cepheus']['ceph']['pools']['radosgw']['pools'].each do |pool|
     if action['action'] == 'create' && action['type'] == 'erasure'
       execute "pool-actions-#{pool['name']}-#{action['action']}" do
         command lazy { "ceph osd pool create #{pool['name']} #{action['pg_num']} #{action['pg_num']} erasure #{action['profile']}" }
+        user node['ceph']['owner']
         ignore_failure true
       end
       next

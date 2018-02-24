@@ -22,19 +22,3 @@ if node['cepheus']['init_style'] != 'upstart'
 else
   package 'ufw'
 end
-
-
-# Set permanent for all actions
-# node.default['firewall']['firewalld']['permanent'] = true
-
-# enable platform default firewall
-# firewall 'default' do
-#   action :install
-#   enabled_zone :public
-# end
-
-# Force the rules etc to be saved
-# firewall 'default' do
-#   action :save
-#   ignore_failure true
-# end

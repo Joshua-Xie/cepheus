@@ -41,5 +41,6 @@ if node['ceph']['osd']['crush']['update']
             ceph osd setcrushmap -i /tmp/crush-map-new
           fi
       EOH
+      user node['ceph']['owner']
   end
 end

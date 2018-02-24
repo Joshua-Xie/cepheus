@@ -23,6 +23,7 @@
 node['cepheus']['ceph']['pools']['erasure_coding']['profiles'].each do |profile|
     execute "ec-pool-action-#{profile['profile']}" do
       command lazy { "ceph osd erasure-code-profile set #{profile['profile']} technique=#{profile['technique']} ruleset-root=#{profile['ruleset_root']} ruleset-failure-domain=#{profile['ruleset_failure_domain']} k=#{profile['key_value']['k']} m=#{profile['key_value']['m']}" }
+      user node['ceph']['owner']
       not_if "ceph osd erasure-code-profile get #{profile['profile']}"
     end
 end

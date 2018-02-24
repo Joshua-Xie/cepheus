@@ -9,6 +9,8 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
     owner: ceph
     group: ceph
     mode: 0750
+    # Used by third party apps to make sure the symlink is correct for librados.so
+    librados_version: librados.so.2.0.0
 
     tcmalloc: # This becomes the default after Jewel
         enable: true

@@ -37,5 +37,6 @@ if node['ceph']['osd']['crush']['update']
             ceph osd crush remove default
           fi
       EOH
+      user node['ceph']['owner']
   end
 end

@@ -22,8 +22,8 @@
 if node['cepheus']['init_style'] != 'upstart'
     if node['cepheus']['security']['firewall']['enable']
       execute 'firewalld-start' do
-        command 'sudo systemctl start firewalld'
-        only_if "sudo systemctl status firewalld | grep dead"
+        command 'systemctl start firewalld'
+        only_if "systemctl status firewalld | grep dead"
       end
     else
       include_recipe 'cepheus::firewalld-stop'

@@ -19,8 +19,8 @@
 
 if node['cepheus']['init_style'] != 'upstart'
   execute 'firewalld-disable' do
-    command 'sudo systemctl disable firewalld'
-    only_if "sudo systemctl status firewalld | grep enable"
+    command 'systemctl disable firewalld'
+    only_if "systemctl status firewalld | grep enable"
   end
 else
 end

@@ -18,10 +18,11 @@
 # limitations under the License.
 #
 
-#include_recipe 'cepheus::ceph-conf'
 include_recipe 'ceph-chef::osd_stop_all'
 
 package 'gdisk'
+
+# NOTE: TODO: Verify zap below with new version of Ceph...
 
 if node['ceph']['osd']['devices']
   devices = node['ceph']['osd']['devices']

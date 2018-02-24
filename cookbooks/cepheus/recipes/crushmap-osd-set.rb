@@ -44,6 +44,7 @@ if node['ceph']['osd']['devices'] && node['ceph']['osd']['crush']['update']
           WEIGHT=`echo "scale=4; ${INFO% *}/1000000000.0" | bc -q`
           ceph osd crush create-or-move $OSD $WEIGHT root=#{osd_device['data_type']} rack=rack#{rack_num} host=#{node['hostname']}
         EOH
+        user node['ceph']['owner']
         action :run
         notifies :create, "ruby_block[save-status-#{index}]", :immediately
       end
@@ -55,6 +56,7 @@ if node['ceph']['osd']['devices'] && node['ceph']['osd']['crush']['update']
           WEIGHT=`echo "scale=4; ${INFO% *}/1000000000.0" | bc -q`
           ceph osd crush create-or-move $OSD $WEIGHT root=#{osd_device['data_type']} rack=rack#{rack_num} host=#{node['hostname']}
         EOH
+        user node['ceph']['owner']
         action :run
         notifies :create, "ruby_block[save-status-#{index}]", :immediately
       end

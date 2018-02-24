@@ -89,7 +89,7 @@ remote_directory '/opt/cepheus/scripts' do
 end
 
 execute 'set-scripts-perm' do
-  command "sudo chmod +x /opt/cepheus/scripts/*.sh"
+  command "chmod +x /opt/cepheus/scripts/*.sh"
 end
 
 # Default to bootstrap role

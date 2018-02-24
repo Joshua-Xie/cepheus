@@ -5,9 +5,8 @@
   "run_list": [
     "role[common]",
     "recipe[ceph-chef]",
-    "recipe[ceph-chef::repo]",
     "recipe[cepheus::ceph-osd]",
-    "recipe[ceph-chef::osd]",
+    "recipe[ceph-chef::osd_v2]",
     "recipe[cepheus::user-groups]",
     "recipe[cepheus::ceph-scripts]",
     "role[monitoring]"

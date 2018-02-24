@@ -104,22 +104,19 @@ template '/usr/local/lib/rgw_webservice/templates/rgw_webservice_help.html' do
     group 'radosgw'
 end
 
-# NB: So rgw_webservice process can read ceph.conf
-if node['cepheus']['ceph']['repo']['version']['name'] != 'hammer'
-    execute "add_user_to_ceph" do
-        command "usermod -a -G ceph nginx"
-        ignore_failure true
-    end
-    # Add this so that the rgw_webservice (running as radosgw) called processes (radosgw-admin) can access ceph.conf
-    execute "add_radosgw_to_ceph" do
-        command "usermod -a -G ceph radosgw"
-        ignore_failure true
-    end
-    # Add this so that the rgw_webservice (running as radosgw) called processes (radosgw-admin) can access ceph.conf
-    execute "add_ceph_to_radosgw" do
-        command "usermod -a -G radosgw ceph"
-        ignore_failure true
-    end
+execute "add_user_to_ceph" do
+    command "usermod -a -G ceph nginx"
+    ignore_failure true
+end
+# Add this so that the rgw_webservice (running as radosgw) called processes (radosgw-admin) can access ceph.conf
+execute "add_radosgw_to_ceph" do
+    command "usermod -a -G ceph radosgw"
+    ignore_failure true
+end
+# Add this so that the rgw_webservice (running as radosgw) called processes (radosgw-admin) can access ceph.conf
+execute "add_ceph_to_radosgw" do
+    command "usermod -a -G radosgw ceph"
+    ignore_failure true
 end
 
 # NB: This will change owner and group of radosgw-admin2 and rgw_s3_api.py that ceph-chef installed.
