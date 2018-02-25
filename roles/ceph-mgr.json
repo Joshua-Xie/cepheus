@@ -3,8 +3,6 @@
   "json_class": "Chef::Role",
   "description": "Ceph Manager",
   "run_list": [
-      "role[common]",
-      "recipe[ceph-chef]",
       "recipe[ceph-chef::mgr]",
       "recipe[cepheus::user-groups]"
   ]
