@@ -38,9 +38,9 @@ for i in ${CEPH_MON_HOSTS[@]}; do
 done
 
 # Step 3
-echo_yellow "====> Ceph MON Step 3 - key-gen..."
-for i in ${CEPH_MON_HOSTS[@]}; do
-  sleep 3 # Let things settle down from the mon-start
-  $KNIFE node run_list add $i 'role[ceph-mon-keys]'
-  do_on_node $i "sudo chef-client -o 'role[ceph-mon-keys]'"
-done
+# echo_yellow "====> Ceph MON Step 3 - key-gen..."
+# for i in ${CEPH_MON_HOSTS[@]}; do
+#   sleep 3 # Let things settle down from the mon-start
+#   $KNIFE node run_list add $i 'role[ceph-mon-keys]'
+#   do_on_node $i "sudo chef-client -o 'role[ceph-mon-keys]'"
+# done
