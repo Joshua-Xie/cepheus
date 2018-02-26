@@ -23,4 +23,9 @@ source {{ cache.repo }}/bootstrap/common/base_colors.sh
 # and quorum checks!
 
 echo_yellow "====> Ceph MGR..."
-ansible mgr -m shell -b -a "chef-client -o 'role[ceph-mgr]'"
+for i in ${CEPH_MON_HOSTS[@]}; do
+  $KNIFE node run_list add $i 'role[ceph-mgr]'
+  do_on_node $i "sudo chef-client -o 'role[ceph-mgr]'"
+done
+
+# ansible mgr -m shell -b -a "chef-client -o 'role[ceph-mgr]'"
