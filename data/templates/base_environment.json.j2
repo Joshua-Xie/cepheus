@@ -13,6 +13,9 @@
         "group": "{{ ceph.group }}",
         "mode": {{ ceph.mode }},
         "librados_version": "{{ ceph.librados_version }}",
+        "tcmalloc": {
+            "enable": {%- if ceph.tcmalloc.enable == True %} true, {% else %} false, {%- endif %}
+        },
         "repo": {
           "create": {%- if ceph_repo_create == True %} true, {% else %} false, {%- endif %}
           "version": {

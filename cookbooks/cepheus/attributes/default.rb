@@ -15,13 +15,10 @@
 #
 
 # Change these to fit your organization
-default['cepheus']['country'] = "US"
-default['cepheus']['state'] = "NY"
-default['cepheus']['location'] = "New York"
-default['cepheus']['organization'] = "LambdaStack"
-
-# Monitoring is somewhat unique in each organization
-default['cepheus']['monitoring']['enable'] = false
+# default['cepheus']['country'] = "US"
+# default['cepheus']['state'] = "NY"
+# default['cepheus']['location'] = "New York"
+# default['cepheus']['organization'] = "LambdaStack"
 
 case node['platform']
 when 'ubuntu'
@@ -32,22 +29,8 @@ end
 
 default['cepheus']['enabled']['encrypt_data_bag'] = false
 
-# NB: Set this to true if you would like to build-in a development environment (use for dev/test)
-default['cepheus']['development']['enabled'] = false
-# Just to have somewhere to put things. Only applies if the enabled is set to true
-default['cepheus']['development']['user'] = 'operations'
-
 # Don't remove unless you set it somewhere else since this controls the firewalld cookbook
 default['firewall']['allow_ssh'] = true
 
-default['cepheus']['ceph']['tcmalloc']['enable'] = true
-
-default['cepheus']['ceph']['radosgw']['debug']['logs']['enable'] = false
-default['cepheus']['ceph']['radosgw']['debug']['logs']['level'] = 20
-
-default['cepheus']['system']['scheduler']['device']['enable'] = false
-default['cepheus']['system']['sysctl']['enable'] = true
-
-# Only valide CFQ Scheduler
-default['cepheus']['ceph']['system']['scheduler']['device']['ceph']['class'] = 'idle'
-default['cepheus']['ceph']['system']['scheduler']['device']['ceph']['priority'] = 7
+# default['cepheus']['system']['scheduler']['device']['enable'] = false
+# default['cepheus']['system']['sysctl']['enable'] = true
