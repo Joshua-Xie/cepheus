@@ -35,6 +35,9 @@
             {%- endfor %}
             ]
         },
+        "mgr": {
+          "enable": {%- if ceph.mgr.enable == True %} true {% else %} false {%- endif %}
+        },
         "config": {
           {#- "NOTE": "This section is pure key/value. Meaning, the key and value are added to the given location in ceph.conf.", #}
           "global": {
@@ -625,6 +628,200 @@
             "key": "{{ subscription.key }}"
           },
         {%- endif %}
+      },
+
+        {#- NOTE: WIP - TODO: Remove CEPH section HERE and move all non ceph-chef attributes to 'cepheus' section only! #}
+
+      "ceph": {
+        "cluster": "{{ ceph.cluster }}",
+        "repo": {
+          "create": {%- if ceph_repo_create == True %} true, {% else %} false, {%- endif %}
+          "version": {
+            "name": "{{ ceph.name }}",
+            "number": "{{ ceph.version }}",
+            "branch": "{{ ceph_repo.branch }}",
+            "revision": "{{ ceph_repo.revision }}",
+            "arch": "{{ ceph_repo.arch }}"
+          }
+        },
+        "mgr": {
+          "enable": {%- if ceph.mgr.enable == True %} true {% else %} false {%- endif %}
+        },
+        "config": {
+          {#- "NOTE": "This section is pure key/value. Meaning, the key and value are added to the given location in ceph.conf.", #}
+          "global": {
+            "rgw override bucket index max shards": {{ ceph.radosgw.bucket_shards }}
+          },
+          "mon": {
+            {#- 'mon allow pool delete' = false *AFTER* the cluster is stable. Keeps someone from deleting pools :) #}
+            "mon osd full ratio": 0.95,
+            "mon osd nearfull ratio": 0.85,
+            "mon pg warn max per osd": 0,
+            "mon pg warn max object skew": 10,
+            "mon osd min down reporters": 3,
+            "mon osd down out interval": 600,
+            "clock drift allowed": 0.15
+          },
+          "radosgw": {
+            "cache max file size": 20000000
+          }
+        },
+        "mon": {
+          "port": {{ ceph.mon.port }},
+          "niceness": {{ ceph.mon.niceness }},
+
+          {#- NB: Need to remove the bond portion of here and the recipe #}
+          "bond": {
+            "enable": {%- if bond.enable == True %} true, {% else %} false, {%- endif %}
+            "name": "{{ bond.name }}",
+            "type": "Bond",
+            "mtu": {{ bond.mtu }},
+            "interfaces": ["{{ bond.interfaces|join('","') }}"],
+            "options": "{{ bond.options }}",
+            "nm_controlled": "no"
+          }
+
+        },
+        "radosgw": {
+          "port": {{ ceph.radosgw.default_port }},
+          "default_url": "{{ ceph.radosgw.default_url }}",
+          "debug": {
+            "logs": {
+              "level": {{ ceph.radosgw.debug.logs.level }},
+              "enable": {%- if ceph.radosgw.debug.logs.enable == True %} true {% else %} false {%- endif %}
+            }
+          },
+          "logs": {
+            "ops": {%- if ceph.radosgw.logs.ops.enable == True %} true, {% else %} false, {%- endif %}
+            "usage": {%- if ceph.radosgw.logs.usage.enable == True %} true {% else %} false {%- endif %}
+          },
+          "rgw_webservice": {
+            "enable": {%- if ceph.radosgw.rgw_webservice.enable == True %} true, {% else %} false, {%- endif %}
+            "port": {{ ceph.radosgw.rgw_webservice.port }},
+            "user": "{{ ceph.radosgw.rgw_webservice.user }}"
+          },
+          "gc": {
+            "max_objects": {{ ceph.radosgw.gc.max_objects }},
+            "obj_min_wait": {{ ceph.radosgw.gc.obj_min_wait }},
+            "processor_max_time": {{ ceph.radosgw.gc.processor_max_time }},
+            "processor_period": {{ ceph.radosgw.gc.processor_period }}
+          },
+          "users": [
+            {%- for user in ceph.radosgw.users %}
+              {"uid": "{{ user.uid }}", "name": "{{ user.name }}", "email": "{{ user.email }}", "admin_caps": "{{ user.admin_caps }}", "access_key": "{{ user.access_key }}", "secret_key": "{{ user.secret_key }}", "max_buckets": {{ user.max_buckets }}, "status": "{{ user.status }}", "key_type": "{{ user.key_type }}", "quota": {"user": { "status": "{{ user.quota.user.status }}", "size": {{ user.quota.user.size }}, "objects": {{ user.quota.user.objects }} }, "buckets": [{%- for bucket in user.quota.buckets %}{"name": "{{ bucket.name }}", "status": "{{ bucket.status }}", "size": {{ bucket.size }}, "objects": {{ bucket.objects }}}{%- if not loop.last %},{% endif %}{%- endfor %}]}, "zones": [{%- for zone in user.zone %}"{{ zone }}"{%- if not loop.last %},{% endif %}{% endfor %}], "buckets": [{%- for bucket in user.buckets %}{"name": "{{ bucket.name }}", "acl": "{{ bucket.acl }}"}{%- if not loop.last %},{% endif %}{% endfor %}]}{%- if not loop.last %},{% endif %}
+            {%- endfor %}
+          ],
+          "rgw_num_rados_handles": {{ ceph.radosgw.rados_handles }},
+          "civetweb_num_threads": {{ ceph.radosgw.civetweb_threads }},
+          "bond": {
+            "enable": {%- if bond.enable == True %} true, {% else %} false, {%- endif %}
+            "name": "{{ bond.name }}",
+            "type": "Bond",
+            "mtu": {{ bond.mtu }},
+            "interfaces": ["{{ bond.interfaces|join('","') }}"],
+            "options": "{{ bond.options }}",
+            "nm_controlled": "no"
+          }
+        },
+        "osd": {
+          {#- Move this data to the seed yamls if we need to make them more dynamic for different clusters. #}
+          "devices": [
+              {%- for item in ceph.osd.devices %}
+                {"data": "{{ ceph.osd.device }}{{ item.device }}", "data_type": "{{ item.data_type }}", "journal": "{{ ceph.osd.device }}{{ item.journal }}", "journal_type": "{{ item.journal_type }}", "encrypted": {% if item.encrypted == True %}true{% else %}false{%- endif %}}{%- if not loop.last %},{% endif %}
+              {%- endfor %}
+          ],
+          "crush": {
+            "update": {%- if ceph.osd.crush.update_crush == True %} true, {% else %} false, {%- endif %}
+            "update_on_start": {%- if ceph.osd.crush.update_on_start == True %} true, {% else %} false, {%- endif %}
+            "chooseleaf_type": {{ ceph.osd.crush.chooseleaf_type }}
+          },
+          {#- The add and remove should reflect the same structure as devices above and should be used for maintenance only! #}
+          "add": [],
+          "remove": [],
+          "niceness": {{ ceph.osd.niceness }},
+          {#- "encrypted": false, #}
+          "rebalance": {%- if ceph.osd.rebalance == True %} true, {% else %} false, {%- endif %}
+          "size": {
+            "max": 3,
+            "min": 2
+          },
+          "journal": {
+            {#- Change the journal size for the prod SSD #}
+            {#- Calculate min size (if you have space then use it): 2 * (#OSDs in node * 100MB/s) * 5 (default sync interval) = 2 * (12 * 100) * 5 = 12GB #}
+            "size": {{ ceph.osd.journal.size }}
+          }
+        },
+        "pools": {
+          "active": [
+            "{{ ceph.pools.active|join('", "') }}"
+          ],
+          "version": {{ ceph.pools.version }},
+          "crush": {
+            "rule": {{ ceph.pools.crush_rule }}
+          },
+          "erasure_coding": {
+            "profiles": [
+              {"profile": "{{ ceph.ec.profile }}", "directory": "{{ ceph.ec.directory }}", "plugin": "{{ ceph.ec.plugin }}", "force": true, "technique": "{{ ceph.ec.technique }}", "ruleset_root": "{{ ceph.ec.ruleset_root }}", "ruleset_failure_domain": "{{ ceph.ec.ruleset_failure_domain }}", "key_value": {"k": {{ ceph.ec.k }}, "m": {{ ceph.ec.m }}}}
+            ]
+          },
+          "radosgw": {
+            "federated": {
+              "enable": {%- if ceph.radosgw.federated.enable == True %} true, {% else %} false, {%- endif %}
+              "multisite_replication": false,
+              {#- Instance name MUST match VIPs name and Backend/Server instance variables. IF Federation is not used then Backend/Server instance variable should be empty. #}
+              "zone_instances": [
+                {%- for item in adc.vip.vips %}
+                  {%- if item.type == "rgw" %}
+                  {"name": "{{ item.name }}", "port": {{ item.backend_port }}, "region": "{{ item.region }}", "url": "{{ item.url }}", "rgw_thread_pool": {{ item.rgw_thread_pool }}, "handles": {{ item.handles }}, "threads": {{ item.threads }}}{%- if not loop.last %},{% endif %}
+                  {%- endif %}
+                {%- endfor %}
+              ],
+              "regions": ["{{ ceph.radosgw.federated.regions|join('", "') }}"],
+              "enable_regions_zones": {%- if ceph.radosgw.federated.enable_regions_zones == True %} true, {% else %} false, {%- endif %}
+              "master_zone": "{{ ceph.radosgw.federated.master_zone }}",
+              "master_zone_port": {{ ceph.radosgw.federated.master_zone_port }}
+            },
+            {#- The data_percent below should equal 100%. If Federated then the calculation will take those pools into account. #}
+            {#- NOTE: IMPORTANT - ONLY 'buckets' (data) can be erasure coded. Others need to be replicated. #}
+            "pools": [
+                {%- for item in ceph.pools.radosgw %}
+                  {"name": "{{ item.name }}", "data_percent": {{ "{:,.2f}".format(item.data_percent) }}, "type": "{{ item.type }}", "profile": "{{ item.profile }}", "crush_ruleset": {{ item.crush_ruleset }}, "crush_ruleset_name": "{{ item.crush_ruleset_name }}"}{%- if not loop.last %},{% endif %}
+                {%- endfor %}
+            ],
+            {#- If federated then the settings below apply to the federated pools else the non-federated pools. #}
+            "settings": {
+              "pg_num": {{ ceph.radosgw.settings.pg_num }},
+              "pgp_num": {{ ceph.radosgw.settings.pgp_num }},
+              "options": "{{ ceph.radosgw.settings.options }}",
+              "force": {%- if ceph.radosgw.settings.force == True %} true, {% else %} false, {%- endif %}
+              "calc": {%- if ceph.radosgw.settings.calc == True %} true, {% else %} false, {%- endif %}
+              "size": {{ ceph.radosgw.settings.size }},
+              "crush_ruleset": {{ ceph.radosgw.settings.crush_ruleset }},
+              "chooseleaf": "{{ ceph.radosgw.settings.chooseleaf }}",
+              "chooseleaf_type": {{ ceph.radosgw.settings.chooseleaf_type }},
+              "type": "{{ ceph.radosgw.settings.type }}",
+              "nodes_per_rack": {{ ceph.radosgw.settings.nodes_per_rack }}
+            },
+            "remove": {
+              "names": []
+            }
+          },
+          "pgs": {
+            "calc": {
+              "total_osds": {{ ceph.pgs.calc.total_osds }},
+              "target_pgs_per_osd": {{ ceph.pgs.calc.target_pgs_per_osd }},
+              "min_pgs_per_pool": {{ ceph.pgs.calc.min_pgs_per_pool }},
+              "replicated_size": {{ ceph.pgs.calc.replicated_size }},
+              "erasure_size": {{ ceph.pgs.calc.erasure_size }}
+            },
+            "num": {{ ceph.pgs.num }}
+          }
+        },
+        "restapi": {
+          "url": "{{ ceph.restapi.url }}",
+          "ip": "{{ ceph.restapi.ip }}",
+          "port": {{ ceph.restapi.port }}
+        }
       },
       "domain_name" : "{{ domain }}",
       "network": {

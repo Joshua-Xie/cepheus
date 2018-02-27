@@ -47,11 +47,6 @@ ceph: # Packages will come from enterprise repo manager OR ceph.com if access to
         ip: 10.121.1.21
         port: 5080
 
-    mgr:
-        # Must be set to true for luminous and later...
-        # If using luminous or later and this is set to false then the role of 'ceph-mgr' will not run and Ceph Healther will be ERR
-        enable: true
-
     # This goes along with System Scheduler for CFQ
     system:
         class: idle
