@@ -74,16 +74,16 @@ if is_adc_node && node['cepheus']['adc']['bond']['enable']
   bond_mtu = node['cepheus']['adc']['bond']['mtu']
 end
 
-if is_radosgw_node && node['cepheus']['ceph']['radosgw']['bond']['enable']
+if is_radosgw_node && node['ceph']['radosgw']['bond']['enable']
   bond = true
-  bond_interfaces = node['cepheus']['ceph']['radosgw']['bond']['interfaces']
+  bond_interfaces = node['ceph']['radosgw']['bond']['interfaces']
   bond_name = node['cepheus']['radosgw']['bond']['name']
   bond_mtu = node['cepheus']['radosgw']['bond']['mtu']
 end
 
-if is_mon_node && node['cepheus']['ceph']['mon']['bond']['enable']
+if is_mon_node && node['ceph']['mon']['bond']['enable']
   bond = true
-  bond_interfaces = node['cepheus']['ceph']['mon']['bond']['interfaces']
+  bond_interfaces = node['ceph']['mon']['bond']['interfaces']
   bond_name = node['cepheus']['mon']['bond']['name']
   bond_mtu = node['cepheus']['mon']['bond']['mtu']
 end

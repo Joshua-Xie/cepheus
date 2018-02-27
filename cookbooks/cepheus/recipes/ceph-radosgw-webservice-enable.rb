@@ -17,7 +17,6 @@
 # limitations under the License.
 #
 
-#if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
 if node['ceph']['radosgw']['rgw_webservice']['enable']
   include_recipe 'ceph-chef::ceph-radosgw-webservice-enable'
 

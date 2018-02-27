@@ -31,7 +31,7 @@
 #   ]
 # }
 
-if node['cepheus']['ceph']['tcmalloc']['enable']
+if node['ceph']['tcmalloc']['enable']
   cookbook_file "/etc/sysconfig/ceph" do
     source "ceph"
     owner 'root'

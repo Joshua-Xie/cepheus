@@ -39,7 +39,7 @@ rule hdd_replicated {
     step emit
 }
 
-<% if node['cepheus']['ceph']['pools']['radosgw']['settings']['type'] == 'erasure' %>
+<% if node['ceph']['pools']['radosgw']['settings']['type'] == 'erasure' %>
 # hdd is by default erasure coded
 rule hdd {
     ruleset 1
@@ -49,7 +49,7 @@ rule hdd {
     step set_chooseleaf_tries 20
     step set_choose_tries 120
     step take hdd
-    <% if node['cepheus']['ceph']['pools']['radosgw']['settings']['nodes_per_rack'] > 6 %>
+    <% if node['ceph']['pools']['radosgw']['settings']['nodes_per_rack'] > 6 %>
     step choose firstn 3 type rack
     step chooseleaf indep -3 type host
     <% else %>

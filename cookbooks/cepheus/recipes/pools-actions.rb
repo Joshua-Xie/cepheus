@@ -23,7 +23,7 @@
 
 # NOTE: DO NOT USE - EXPERIMENTAL ONLY!!!!
 
-node['cepheus']['ceph']['pools']['radosgw']['pools'].each do |pool|
+node['ceph']['pools']['radosgw']['pools'].each do |pool|
   pool['actions'].each do |action|
     if action['action'] == 'create' && action['type'] == 'erasure'
       execute "pool-actions-#{pool['name']}-#{action['action']}" do

@@ -103,7 +103,7 @@ if node['cepheus']['adc']['enable']
       source 'haproxy.cfg.erb'
       variables lazy {
         {
-          :backend_nodes => node['cepheus']['ceph']['pools']['radosgw']['federated']['enable'] ? get_adc_backend_federated_nodes : get_adc_backend_nodes,
+          :backend_nodes => node['ceph']['pools']['radosgw']['federated']['enable'] ? get_adc_backend_federated_nodes : get_adc_backend_nodes,
           :server => get_server,
           :public_ip => get_server_profile_ip(get_server, 'public')
         }

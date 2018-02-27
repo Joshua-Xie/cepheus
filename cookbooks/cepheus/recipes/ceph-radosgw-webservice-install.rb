@@ -17,7 +17,6 @@
 # limitations under the License.
 #
 
-#if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable']
 if node['ceph']['radosgw']['rgw_webservice']['enable']
     # This recipe installs everything needed for the RGW Admin Web Service...
 

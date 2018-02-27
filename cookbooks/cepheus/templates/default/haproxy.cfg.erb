@@ -42,7 +42,7 @@ listen stats <%= @public_ip %>:<%= node['cepheus']['adc']['stats']['port'] %>
 frontend radosgw-http-<%="#{vip['name']}"%>
   bind <%="#{vip['ip']}:#{node['cepheus']['adc']['vip']['port']['non_ssl']}"%>
   option httplog
-  <% if node['cepheus']['ceph']['pools']['radosgw']['federated']['enable'] %>
+  <% if node['ceph']['pools']['radosgw']['federated']['enable'] %>
   default_backend <%="#{vip['backend_label']}"%>-<%="#{vip['name']}"%>
   <% else %>
   default_backend <%="#{vip['backend_label']}"%>
@@ -52,7 +52,7 @@ frontend radosgw-http-<%="#{vip['name']}"%>
 frontend radosgw-https-<%="#{vip['name']}"%>
   bind <%="#{vip['ip']}:#{node['cepheus']['adc']['vip']['port']['ssl']}"%> ssl crt <%="#{node['cepheus']['adc']['ssl']['path']}/#{vip['cert']}" %>
   option httplog
-  <% if node['cepheus']['ceph']['pools']['radosgw']['federated']['enable'] %>
+  <% if node['ceph']['pools']['radosgw']['federated']['enable'] %>
   default_backend <%="#{vip['backend_label']}"%>-<%="#{vip['name']}"%>
   <% else %>
   default_backend <%="#{vip['backend_label']}"%>
@@ -64,7 +64,7 @@ frontend radosgw-https-<%="#{vip['name']}"%>
 # NOTE: For Federated RGW, each vip name represents an instance for RGW running on the node. For example, if there are
 # 3 VIPs and Federated is enabled then there will be 3 instances of RGW running.
 
-<% if node['cepheus']['ceph']['pools']['radosgw']['federated']['enable'] %>
+<% if node['ceph']['pools']['radosgw']['federated']['enable'] %>
 <% node['cepheus']['adc']['vips'].each do | vip | %>
 <% if vip['haproxy'] %>
 backend <%="#{vip['backend_label']}"%>-<%="#{vip['name']}"%>
@@ -97,7 +97,7 @@ backend <%="#{vip['backend_label']}"%>
 <% end -%>
 <% end -%>
 
-<% if node['cepheus']['ceph']['radosgw']['rgw_webservice']['enable'] %>
+<% if node['ceph']['radosgw']['rgw_webservice']['enable'] %>
 frontend rgw-webservice
     bind <%= node['cepheus']['adc']['vip']['rgw_webservice']['ip'] %>:<%= node['cepheus']['adc']['vip']['rgw_webservice']['port'] %> # ssl crt /etc/ssl/private/whatever.pem
     balance roundrobin
@@ -120,6 +120,6 @@ backend rgw-webservice-region-zone
     # Enable the next line if you want to inject additional url query params...
     # http-request set-query region=abc&zone=def&%[query]
     <% @backend_nodes.each do | backend_node | -%>
-    <%= "server #{backend_node['name']} #{backend_node['ip']}:#{node['cepheus']['ceph']['radosgw']['rgw_webservice']['port']} check fall 3 rise 2" %>
+    <%= "server #{backend_node['name']} #{backend_node['ip']}:#{node['ceph']['radosgw']['rgw_webservice']['port']} check fall 3 rise 2" %>
     <% end %>
 <% end %>
